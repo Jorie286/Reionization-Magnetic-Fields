@@ -23,6 +23,8 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
 
+get_sigmas(20, 1j)
+
 # Graph the values of sigma_{1,1} and sigma{2,1} in terms of various possible values for i D_theta / k v.
 # We only want to look at these two sigmas because these are the only two that affect G_iso and G_ani.
 
