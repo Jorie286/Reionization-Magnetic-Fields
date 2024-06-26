@@ -9,7 +9,7 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
     for l in range (1, n+1):
-        ab[1,l-1] = l*(l+1)*c # sigma_{l,m} coefficient
+        ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
         
     for l in range (1, n):
         ab[0,l] = math.sqrt(((l+2)*(l))/(((2*l)+3)*((2*l)+1))) # sigma_{l+1,m} coefficient
