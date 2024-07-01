@@ -53,7 +53,7 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
 
-# Compute Giso/u (the coefficient of proportionality) for a specific values of v using get_sigmas and get_D_theta.
+# Compute Giso/u (the coefficient of proportionality) for a specific values of velocity using get_sigmas and get_D_theta.
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     k_B = const.k # Boltzman constant
     m_e = const.m_e # mass electron???
