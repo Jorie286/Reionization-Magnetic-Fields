@@ -33,3 +33,11 @@ def get_D_theta(b, T):
         +(math.sqrt(2/math.pi)*(sigma_b/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b**2))))
         D_final = D_final + (D_one*D_two)
     return D_final
+
+# Compute Giso/u for a specific value of D_theta
+def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
+    return 0
+
+# Print the results of get_Giso_u
+for i in range(np.shape(data)[0]):
+    print(get_Giso_u(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], 200, 10**-12))
