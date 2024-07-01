@@ -27,6 +27,7 @@ def get_D_theta(b, T):
     # Calculate the columb logarithm.
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))                    
     n_b = 1 # What type of function should this have??
+    
     # Calculate the first portion of D_theta.
     D_one = ((q_a**2)*(q_b**2)*lamda_c)/(8*math.pi*(c_o**2)*(m_a**2)*(velocity[i]**3))
     # Calculate the second portion of D_theta
@@ -60,12 +61,15 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     m_e = const.m_e # mass electron???
     n_e = 1 #electron density or nHtot???
     sigma_e = math.sqrt((k_B*Te)/m_e)
+    
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso_sum = 0
     Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(1, 5*(10**4)))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*(sigma_e**2)))
     Giso_u = Giso_const*Giso
     return Giso_u
 
-# Print the results of get_Giso_u
-for i in range (0, 10):
-    print(get_Giso_u(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], 200, 10**-12))
+# Use a sum to find the value of Giso_u
+Giso_final = 0
+for i in range (0, 71):
+    Giso_compute = get_Giso_u(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], 200, 10**-12)
+    Giso_final = Giso_final + Giso_compute
+print(Giso_final)
