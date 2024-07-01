@@ -21,18 +21,16 @@ def get_D_theta(b, T):
     q_b = -const.eV # charge electron???
     c_o = 1 # what is this????
     n_e = 1 # electron density (what is the value???)
-    D_final = 0 # Start the value of D_theta at zero.
+    n_b = 1 # What type of function should this have (should this be nHtot)??
     # Calculate the velocity dispersion
-    sigma_b = math.sqrt((k_B*T)/m_b)
+    sigma_b = math.sqrt(((k_B**2)*T)/(m_b**2))
     # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))                    
-    n_b = 1 # What type of function should this have??
+    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))
     
     # Calculate the first portion of D_theta.
-    D_one = ((q_a**2)*(q_b**2)*lamda_c)/(8*math.pi*(c_o**2)*(m_a**2)*(velocity[i]**3))
+    D_one = ((q_a**2)*(q_b**2)*n_b*lamda_c)/(8*math.pi*(c_o**2)*(m_a**2)*(velocity[i]**3))
     # Calculate the second portion of D_theta
-    D_two = ((1-((sigma_b**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b)))
-    +(math.sqrt(2/math.pi)*(sigma_b/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b**2))))
+    D_two = ((1-((sigma_b**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b)))+(math.sqrt(2/math.pi)*(sigma_b/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b**2))))
     D_final = (D_one*D_two)
     return D_final
 
@@ -60,7 +58,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     k_B = const.k # Boltzman constant
     m_e = const.m_e # mass electron???
     n_e = 1 #electron density or nHtot???
-    sigma_e = math.sqrt((k_B*Te)/m_e)
+    sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
     
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
     Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(1, 5*(10**4)))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*(sigma_e**2)))
