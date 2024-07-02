@@ -65,11 +65,14 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     Giso_u = Giso_const*Giso
     return Giso_u
 
-# Use a sum to find the value of Giso_u
+# Should I compute Giso_u using data from every row of output.txt and sum over velocities for each row?
 Giso_final = 0
-for i in range (0, 71):
-    Giso_compute = get_Giso_u(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], 200, 10**-12)
-    Giso_final = Giso_final + Giso_compute
-    print(Giso_compute)
-    Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
-print(Giso_final)
+Giso_list = []
+for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
+    for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
+        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 10**-12)
+        Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
+        Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
+    Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
+    Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
+print(Giso_list)
