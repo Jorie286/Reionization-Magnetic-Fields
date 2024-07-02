@@ -23,7 +23,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     return Giso_u
 
 # Computing D_theta
-def get_D_theta(b, T):
+def get_D_theta(b, T, yH, yHe):
     k_B = const.k # Boltzman constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
     a_o = 5.29177210903*(10**-11) # Bohr radius
