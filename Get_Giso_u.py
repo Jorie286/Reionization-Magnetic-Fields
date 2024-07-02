@@ -70,4 +70,6 @@ Giso_final = 0
 for i in range (0, 71):
     Giso_compute = get_Giso_u(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], 200, 10**-12)
     Giso_final = Giso_final + Giso_compute
+    print(Giso_compute)
+    Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
 print(Giso_final)
