@@ -10,6 +10,18 @@ data = np.loadtxt(r'output.txt')
 # Create a distribution of velocities in log space.
 velocity = np.logspace(1,8,71)
 
+# Compute Giso/u (the coefficient of proportionality) for a specific values of velocity using get_sigmas and get_D_theta.
+def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
+    k_B = const.k # Boltzman constant
+    m_e = const.m_e # mass electron???
+    n_e = 1 #electron density or nHtot???
+    sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
+    
+    Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
+    Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(1, 5*(10**4)))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*(sigma_e**2)))
+    Giso_u = Giso_const*Giso
+    return Giso_u
+
 # Computing D_theta
 def get_D_theta(b, T):
     k_B = const.k # Boltzman constant
@@ -20,7 +32,11 @@ def get_D_theta(b, T):
     q_a = const.eV # charge proton???
     q_b = -const.eV # charge electron???
     epsilon_o = const.epsilon_0 # vacuum permiativity
-    n_e = 1 # electron density (what is the value???)
+    z = 7
+    omega_b = 0.046 # Fraction of the universe made of baryonic matter
+    H_o = 2.2618*(10**-18) # hubble constant
+    G = const.G # gravitational constant
+    n_e = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*(((4.5767*(10**20))*(1-yH))+((3.6132*(10**19))*(1-yHe))) # electron density funciton
     n_b = 1 # What type of function should this have (should this be nHtot)??
     # Calculate the velocity dispersion
     sigma_b = math.sqrt(((k_B**2)*T)/(m_b**2))
@@ -52,18 +68,6 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
     b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
-
-# Compute Giso/u (the coefficient of proportionality) for a specific values of velocity using get_sigmas and get_D_theta.
-def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
-    k_B = const.k # Boltzman constant
-    m_e = const.m_e # mass electron???
-    n_e = 1 #electron density or nHtot???
-    sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
-    
-    Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(1, 5*(10**4)))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*(sigma_e**2)))
-    Giso_u = Giso_const*Giso
-    return Giso_u
 
 # Should I compute Giso_u using data from every row of output.txt and sum over velocities for each row?
 Giso_final = 0
