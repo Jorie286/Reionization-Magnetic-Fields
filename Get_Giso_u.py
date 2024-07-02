@@ -19,7 +19,7 @@ def get_D_theta(b, T):
     m_b = const.m_e # mass electron???
     q_a = const.eV # charge proton???
     q_b = -const.eV # charge electron???
-    c_o = 1 # what is this????
+    epsilon_o = const.epsilon_0 # vacuum permiativity
     n_e = 1 # electron density (what is the value???)
     n_b = 1 # What type of function should this have (should this be nHtot)??
     # Calculate the velocity dispersion
