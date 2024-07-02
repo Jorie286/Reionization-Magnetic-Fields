@@ -14,7 +14,11 @@ velocity = np.logspace(1,8,71)
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     k_B = const.k # Boltzman constant
     m_e = const.m_e # mass electron???
-    n_e = 1 #electron density or nHtot???
+    z = 7
+    omega_b = 0.046 # Fraction of the universe made of baryonic matter
+    H_o = 2.2618*(10**-18) # hubble constant
+    G = const.G # gravitational constant
+    n_e = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*(((4.5767*(10**20))*(1-yH))+((3.6132*(10**19))*(1-yHe))) # electron density function
     sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
     
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
