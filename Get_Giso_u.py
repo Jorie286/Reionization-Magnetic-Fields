@@ -16,7 +16,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     m_e = const.m_e # mass electron???
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618*(10**-18) # hubble constant
+    H_o = 2.2682*(10**-18) # hubble constant
     G = const.G # gravitational constant
     n_e = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*(((4.5767*(10**20))*(1-yH))+((3.6132*(10**19))*(1-yHe))) # electron density function
     sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
