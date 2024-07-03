@@ -58,6 +58,7 @@ def get_D_theta(T, THII, THeII, yH, yHe, i):
     D_one_2 = (q_a**2*q_b**2*n_b2*lamda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity[i]**3)
     # Calculate the second portion of D_theta for HeII.
     D_two_2 = (1-(sigma_b2**2/velocity[i]**2))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b2))+math.sqrt(2/math.pi)*(sigma_b2/velocity[i])*math.exp(-velocity[i]**2/(2*sigma_b2**2))
+    
     D_final = D_one_1*D_two_1+D_one_2*D_two_2
     return D_final
 
