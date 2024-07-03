@@ -11,18 +11,18 @@ data = np.loadtxt(r'output.txt')
 velocity = np.logspace(1,8,71)
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
-def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
+def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     k_B = const.k # Boltzman constant
     m_e = const.m_e # mass electron???
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2682*(10**-18) # hubble constant
     G = const.G # gravitational constant
-    n_e = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*(((4.5767*(10**20))*(1-yH))+((3.6132*(10**19))*(1-yHe))) # electron density function
+    n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density function
     sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
     
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(5*(10**4), THII, THeII, yH, yHe))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*(sigma_e**2)))
+    Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(5e4, THII, THeII, yH, yHe))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return Giso_u
 
@@ -86,7 +86,7 @@ Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 10**-12)
+        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 10**-12, i)
         Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
         Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
     Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
