@@ -19,15 +19,15 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     H_o = 2.2682*(10**-18) # hubble constant
     G = const.G # gravitational constant
     n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density function
-    sigma_e = math.sqrt(((k_B**2)*Te)/(m_e**2))
+    sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
     
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (velocity[i]**2)*(get_sigmas(20, get_D_theta(5e4, THII, THeII, yH, yHe))[0])*((n_e*velocity[i])/(((2*math.pi)**(3/2))*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
+    Giso = velocity[i]**2*get_sigmas(20, get_D_theta(5e4, THII, THeII, yH, yHe, i))[0]*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return Giso_u
 
 # Computing D_theta
-def get_D_theta(T, THII, THeII, yH, yHe):
+def get_D_theta(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzman constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
     a_o = 5.29177210903*(10**-11) # Bohr radius
@@ -41,25 +41,25 @@ def get_D_theta(T, THII, THeII, yH, yHe):
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2618*(10**-18) # hubble constant
     G = const.G # gravitational constant
-    n_e = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*(((4.5767*(10**20))*(1-yH))+((3.6132*(10**19))*(1-yHe))) # electron density funciton
-    n_b1 = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*((4.5767*(10**20))*(1-yH)) # number density of ionized H
-    n_b2 = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*((3.6132*(10**19))*(1-yHe)) # number density of ionized He
+    n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density funciton
+    n_b1 = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*4.5767e20*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*3.6132e19*(1-yHe) # number density of ionized He
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt(((k_B**2)*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt(((k_B**2)*THeII)/(m_b2**2))
+    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
+    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
     # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))
+    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the first portion of D_theta for HII.
-    D_one_1 = ((q_a**2)*(q_b**2)*n_b1*lamda_c)/(8*math.pi*(epsilon_o**2)*(m_a**2)*(velocity[i]**3))
+    D_one_1 = (q_a**2*q_b**2*n_b1*lamda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity[i]**3)
     # Calculate the second portion of D_theta for HII.
-    D_two_1 = ((1-((sigma_b1**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b1)))+(math.sqrt(2/math.pi)*(sigma_b1/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b1**2))))
+    D_two_1 = (1-(sigma_b1**2/velocity[i]**2))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b1))+math.sqrt(2/math.pi)*(sigma_b1/velocity[i])*math.exp(-velocity[i]**2/(2*sigma_b1**2))
     
     # Calculate the first portion of D_theta for HeII.
-    D_one_2 = ((q_a**2)*(q_b**2)*n_b2*lamda_c)/(8*math.pi*(epsilon_o**2)*(m_a**2)*(velocity[i]**3))
+    D_one_2 = (q_a**2*q_b**2*n_b2*lamda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity[i]**3)
     # Calculate the second portion of D_theta for HeII.
-    D_two_2 = ((1-((sigma_b2**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b2)))+(math.sqrt(2/math.pi)*(sigma_b2/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b2**2))))
-    D_final = (D_one_1*D_two_1)+(D_one_2*D_two_2)
+    D_two_2 = (1-(sigma_b2**2/velocity[i]**2))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b2))+math.sqrt(2/math.pi)*(sigma_b2/velocity[i])*math.exp(-velocity[i]**2/(2*sigma_b2**2))
+    D_final = D_one_1*D_two_1+D_one_2*D_two_2
     return D_final
 
 def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
@@ -70,10 +70,10 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
         ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
         
     for l in range (1, n):
-        ab[0,l] = math.sqrt(((l+2)*(l))/(((2*l)+3)*((2*l)+1))) # sigma_{l+1,m} coefficient
+        ab[0,l] = math.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
         
     for l in range (2, n+1):
-        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/(((2*l)-1)*((2*l)+1))) # sigma_{l-1,m} coefficient
+        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
     
     # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
     b = np.zeros((n,), dtype=np.complex128)
