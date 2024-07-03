@@ -31,10 +31,11 @@ def get_D_theta(T, THII, THeII, yH, yHe):
     k_B = const.k # Boltzman constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
     a_o = 5.29177210903*(10**-11) # Bohr radius
-    m_a = const.m_p # mass proton???
-    m_b = const.m_e # mass electron???
-    q_a = const.eV # charge proton???
-    q_b = -const.eV # charge electron???
+    m_a = const.m_e # mass of an electron (is this what we want here?)
+    m_b1 = const.m_p # mass of HII
+    m_b2 = (2*const.m_p)+(2*const.m_n)+const.m_e # mass of HeII (ionized once so it still has one electron)
+    q_a = -const.eV # charge of an electron (is this what we want here?)
+    q_b = const.eV # charge of HII and HeII
     epsilon_o = const.epsilon_0 # vacuum permiativity
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
@@ -44,8 +45,8 @@ def get_D_theta(T, THII, THeII, yH, yHe):
     n_b1 = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*((4.5767*(10**20))*(1-yH)) # number density of ionized H
     n_b2 = ((3*((1+z)**4)*omega_b*H_o)/(8*math.pi*G))*((3.6132*(10**19))*(1-yHe)) # number density of ionized He
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt(((k_B**2)*THII)/(m_b**2))
-    sigma_b2 = math.sqrt(((k_B**2)*THeII)/(m_b**2))
+    sigma_b1 = math.sqrt(((k_B**2)*THII)/(m_b1**2))
+    sigma_b2 = math.sqrt(((k_B**2)*THeII)/(m_b2**2))
     # Calculate the columb logarithm.
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))
     
