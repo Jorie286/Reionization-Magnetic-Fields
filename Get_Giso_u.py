@@ -11,11 +11,11 @@ velocity = np.logspace(1,8,71)
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
-    k_B = const.k # Boltzman constant
+    k_B = const.k # Boltzmann constant
     m_e = const.m_e # mass electron (is this what we want here?)
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2682e-18 # hubble constant
+    H_o = 2.2682e-18 # Hubble constant
     G = const.G # gravitational constant
     n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density function
     sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
@@ -27,7 +27,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 
 # Computing D_theta
 def get_D_theta(T, THII, THeII, yH, yHe, i):
-    k_B = const.k # Boltzman constant
+    k_B = const.k # Boltzmann constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
     a_o = 5.29177210903e-11 # Bohr radius
     m_a = const.m_e # mass of an electron (is this what we want here?)
@@ -35,12 +35,12 @@ def get_D_theta(T, THII, THeII, yH, yHe, i):
     m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
     q_a = -const.eV # charge of an electron (is this what we want here?)
     q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permiativity
+    epsilon_o = const.epsilon_0 # vacuum permittivity
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618e-18 # hubble constant
+    H_o = 2.2618e-18 # Hubble constant
     G = const.G # gravitational constant
-    n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density funciton
+    n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density function
     n_b1 = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*4.5767e20*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*3.6132e19*(1-yHe) # number density of ionized He
     # Calculate the velocity dispersion (one for each of the species)
