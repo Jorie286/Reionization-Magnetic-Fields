@@ -10,7 +10,7 @@ data = np.loadtxt(r'output.txt')
 # Create a distribution of velocities in log space.
 velocity = np.logspace(1,8,71)
 
-# Compute Giso/u (the coefficient of proportionality) for a specific values of velocity using get_sigmas and get_D_theta.
+# Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k):
     k_B = const.k # Boltzman constant
     m_e = const.m_e # mass electron???
