@@ -2,7 +2,6 @@ import math
 import numpy as np
 import scipy.constants as const
 from scipy.linalg import solve_banded
-import scipy.integrate as inte
 
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
@@ -13,7 +12,7 @@ velocity = np.logspace(1,8,71)
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     k_B = const.k # Boltzman constant
-    m_e = const.m_e # mass electron???
+    m_e = const.m_e # mass electron (is this what we want here?)
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2682*(10**-18) # hubble constant
@@ -30,16 +29,16 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 def get_D_theta(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzman constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
-    a_o = 5.29177210903*(10**-11) # Bohr radius
+    a_o = 5.29177210903e-11) # Bohr radius
     m_a = const.m_e # mass of an electron (is this what we want here?)
     m_b1 = const.m_p # mass of HII
-    m_b2 = (2*const.m_p)+(2*const.m_n)+const.m_e # mass of HeII (ionized once so it still has one electron)
+    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
     q_a = -const.eV # charge of an electron (is this what we want here?)
     q_b = const.eV # charge of HII and HeII
     epsilon_o = const.epsilon_0 # vacuum permiativity
     z = 7
     omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618*(10**-18) # hubble constant
+    H_o = 2.2618e-18 # hubble constant
     G = const.G # gravitational constant
     n_e = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*(4.5767e20*(1-yH)+3.6132e19*(1-yHe)) # electron density funciton
     n_b1 = ((3*(1+z)**4*omega_b*H_o)/(8*math.pi*G))*4.5767e20*(1-yH) # number density of ionized H
@@ -81,12 +80,12 @@ def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_the
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
 
-# Should I compute Giso_u using data from every row of output.txt and sum over velocities for each row?
+# Computes Giso_u as a sum over the velocities for a row in output.txt
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 10**-12, i)
+        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
         Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
         Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
     Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
