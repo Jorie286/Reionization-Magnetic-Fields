@@ -29,7 +29,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 def get_D_theta(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzman constant
     R_y = const.Rydberg # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11) # Bohr radius
+    a_o = 5.29177210903e-11 # Bohr radius
     m_a = const.m_e # mass of an electron (is this what we want here?)
     m_b1 = const.m_p # mass of HII
     m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
