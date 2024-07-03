@@ -50,14 +50,14 @@ def get_D_theta(T, THII, THeII, yH, yHe):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*(a_o**3)*n_e))
     
     # Calculate the first portion of D_theta for HII.
-    D_one_1 = ((q_a**2)*(q_b**2)*n_b1*lamda_c)/(8*math.pi*(c_o**2)*(m_a**2)*(velocity[i]**3))
+    D_one_1 = ((q_a**2)*(q_b**2)*n_b1*lamda_c)/(8*math.pi*(epsilon_o**2)*(m_a**2)*(velocity[i]**3))
     # Calculate the second portion of D_theta for HII.
-    D_two_1 = ((1-((sigma_b1**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b)))+(math.sqrt(2/math.pi)*(sigma_b/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b**2))))
+    D_two_1 = ((1-((sigma_b1**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b1)))+(math.sqrt(2/math.pi)*(sigma_b1/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b1**2))))
     
     # Calculate the first portion of D_theta for HeII.
-    D_one_2 = ((q_a**2)*(q_b**2)*n_b2*lamda_c)/(8*math.pi*(c_o**2)*(m_a**2)*(velocity[i]**3))
+    D_one_2 = ((q_a**2)*(q_b**2)*n_b2*lamda_c)/(8*math.pi*(epsilon_o**2)*(m_a**2)*(velocity[i]**3))
     # Calculate the second portion of D_theta for HeII.
-    D_two_2 = ((1-((sigma_b2**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b)))+(math.sqrt(2/math.pi)*(sigma_b/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b**2))))
+    D_two_2 = ((1-((sigma_b2**2)/(velocity[i]**2)))*math.erf(velocity[i]/(math.sqrt(2)*sigma_b2)))+(math.sqrt(2/math.pi)*(sigma_b2/velocity[i])*math.exp(-(velocity[i]**2)/(2*(sigma_b2**2))))
     D_final = (D_one_1*D_two_1)+(D_one_2*D_two_2)
     return D_final
 
