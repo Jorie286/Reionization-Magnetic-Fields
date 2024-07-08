@@ -7,3 +7,5 @@ It then graphs the sigmas in terms various potential values of i D_theta / k v t
 The output.txt file contains the output from the reionization code by frankelzeng.
 
 The Get_Giso_u Python code uses the output.txt file to solve for Giso/u after finding the value of D_theta for a specific number of species. This is done by using a Reimann sum over values of velocity in place of using an integral.
+
+The Graphing_Giso_u Python code uses the data from Get_Giso_u to graph the Giso_u data in terms of variables in the output.txt file. These variables include time, H neutral fraction, He neutral fraction, electron temperature, ionized H temperature, and ionized He temperature.
