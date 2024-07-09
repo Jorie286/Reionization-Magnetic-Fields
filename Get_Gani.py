@@ -79,7 +79,7 @@ def get_alm(l, m):
 # Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
     n_e = get_n_e(yH, yHe) # electron density function
-    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
+    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
     return Gani
   
 # Computes Gani as a sum over the velocities for a row in output.txt
