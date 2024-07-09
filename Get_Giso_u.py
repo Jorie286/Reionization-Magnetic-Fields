@@ -25,7 +25,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
     
     Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = velocity[i]**2*get_sigmas(20, get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))[0]*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
+    Giso = velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[0]*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return Giso_u
 
@@ -94,4 +94,11 @@ for j in range(0, len(data[:,0])): #Iterate through all the rows of data and com
         Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
     Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
     Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
+real = [None]*len(Giso_list)
+imaginary = [None]*len(Giso_list)
+for m in range(0, len(Giso_list)):
+    real[m] = Giso_list[m].real
+    imaginary[m] = Giso_list[m].imag
 print(Giso_list)
+print(imaginary)
+print(real)
