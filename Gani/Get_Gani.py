@@ -9,7 +9,7 @@ from scipy.linalg import solve_banded
 from Get_Giso_u.py import data
 from Get_Giso_u.py import velocity
 
-# Compute the electron number density.
+# Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
     z = 7
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
@@ -112,11 +112,13 @@ def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
             alm_compute_im = 0 
         return alm_compute
 
+# Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
     n_e = get_n_e(yH, yHe) # electron density function
     Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
     return Gani
 
+# Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
