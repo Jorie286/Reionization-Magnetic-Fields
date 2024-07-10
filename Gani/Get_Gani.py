@@ -9,7 +9,7 @@ from scipy.linalg import solve_banded
 from Get_Giso_u.py import data
 from Get_Giso_u.py import velocity
 
-# Compute the electron number density during reionization.
+# Compute the electron number density.
 def get_n_e(yH, yHe):
     z = 7
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
@@ -73,23 +73,57 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
-def get_alm(l, m):
-    return 0
+def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
+    # Generate a list of values over which to calculate alm for both theta and phi.
+    theta = np.arange(0, 2*math.pi, 0.001)
+    phi = np.arange(0,math.pi/2, 0.001)
+    alm = 0
+    alm_r = 0
+    alm_im = 0
+    alm_compute=0
+    
+    # Use an if loop to check for which value of m to use and calculate alm.
+    # Use a Reimann sum over theta and phi for all m to calulate alm.
+    if m == 0:
+        for p in range(0,50):
+            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
+            alm_compute = a*(math.sqrt(5)/math.sqrt(16*math.pi))*(3*math.cos(theta[p])**2-1)
+            alm = alm_compute + alm
+            alm_compute = 0 # Reset alm_compute so it does not interfere with the next iteration.
+        return alm
+            
+    # For m = +/-2 we need to consider the both the imaginary and real portions for calculation. They can be added back together and returned as an imaginary number.
+    elif m == 2:
+        for p in range(0,50):
+            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
+            alm_compute_r = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((-2*1j*phi[p]).real)
+            alm_compute_im = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((-2*1j*phi[p]).imag)
+            alm_compute = alm_compute + (alm_compute_r + 1j*alm_compute_im)
+            alm_compute_r = 0 # Reset alm_compute_r and alm_compute_im so it does not interfere with the next iteration.
+            alm_compute_im = 0 
+        return alm_compute
+    else:
+        for p in range(0,50):
+            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
+            alm_compute_r = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((2*1j*phi[p]).real)
+            alm_compute_im = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((2*1j*phi[p]).imag)
+            alm_compute = alm_compute + (alm_compute_r + 1j*alm_compute_im)
+            alm_compute_r = 0 # Reset alm_compute_r and alm_compute_im so it does not interfere with the next iteration.
+            alm_compute_im = 0 
+        return alm_compute
 
-# Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
     n_e = get_n_e(yH, yHe) # electron density function
     Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
     return Gani
-  
-# Computes Gani as a sum over the velocities for a row in output.txt
+
 Gani_final = 0
-Gani_list = []
-for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
+Gani_data = []
+for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
-        Gani_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
-        Gani_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
-    Gani_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
-    Gani_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
-print(Gani_list)
+        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
+        Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
+        Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
+    Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+    Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
+print(Gani_data)
