@@ -1,4 +1,4 @@
-# A draft of what Get_Gani might look like (I am not sure how the get_alm function will look and what variables it will have in it).
+# A draft of what Get_Gani might look like.
 
 import math
 import numpy as np
