@@ -73,6 +73,75 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
+def get_A_a(T, THII, THeII, yH, yHe, i):
+    k_B = const.k # Boltzmann constant
+    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
+    a_o = 5.29177210903e-11 # Bohr radius
+    m_a = const.m_e # mass of an electron
+    m_b1 = const.m_p # mass of HII
+    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
+    m_b3 = const.m_e # mass of an electron
+    q_a = -const.eV # charge of an electron (also the charge of m_b3)
+    q_b = const.eV # charge of HII and HeII
+    epsilon_o = const.epsilon_0 # vacuum permittivity
+    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
+    H_o = 2.2618e-18 # Hubble constant
+    G = const.G # gravitational constant
+    z = 7
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
+    n_b3 = n_e
+    # Calculate the columb logarithm.
+    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    
+    # Calculate the velocity dispersion (one for each of the species)
+    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
+    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
+    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
+    A_final = 0
+    for a in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
+        A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity[i]**2)
+        A_two = math.erf(velocity[i]/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity[i]/A_numbers[3+a])*math.exp(-velocity[i]**2/(2*A_numbers[3+a]**2))
+        A_final = A_final + A_one*A_two
+    return -A_final # The result for A_a(v) is addative inverse of its sum over species.
+
+def get_D_a(T, THII, THeII, yH, yHe, i):
+    k_B = const.k # Boltzmann constant
+    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
+    a_o = 5.29177210903e-11 # Bohr radius
+    m_a = const.m_e # mass of an electron
+    m_b1 = const.m_p # mass of HII
+    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
+    m_b3 = const.m_e # mass of an electron
+    q_a = -const.eV # charge of an electron (also the charge of m_b3)
+    q_b = const.eV # charge of HII and HeII
+    epsilon_o = const.epsilon_0 # vacuum permittivity
+    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
+    H_o = 2.2618e-18 # Hubble constant
+    G = const.G # gravitational constant
+    z = 7
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
+    n_b3 = n_e
+    # Calculate the columb logarithm.
+    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    
+    # Calculate the velocity dispersion (one for each of the species)
+    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
+    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
+    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    
+    Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
+    Da_final = 0
+    for d in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
+        Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*(m_a/(Da_numbers[6+d]+1))*Da_numbers[3+d]*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity[i]**3)
+        Da_two = math.erf(velocity[i]/(math.sqrt(2)*Da_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity[i]/Da_numbers[3+a])*math.exp(-velocity[i]**2/(2*Da_numbers[3+a]**2))
+        Da_final = Da_final + Da_one*Da_two
+    return -Da_final # The result for D_a(v) is the addative inverse of its sum over species.
+
 def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
     # Generate a list of values over which to calculate alm for both theta and phi.
     theta = np.arange(0, 2*math.pi, 0.001)
