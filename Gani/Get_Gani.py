@@ -73,6 +73,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
+# Compute the Chandrasekhar dynamical friction formula.
 def get_A_a(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -107,6 +108,7 @@ def get_A_a(T, THII, THeII, yH, yHe, i):
         A_final = A_final + A_one*A_two
     return -A_final # The result for A_a(v) is addative inverse of its sum over species.
 
+# Compute the diffusion coefficient for a.
 def get_D_a(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
