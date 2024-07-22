@@ -263,7 +263,10 @@ int main(int argc, char **argv) {
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
-    
+    double tauH[NGRID], tauHe[NGRID]
+    for(i=0;i<N_NU;i++)
+      tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
+      tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10)
     for(j=0;j<NGRID;j++)
       dEH[j] -= get_cooling_rate(Te[j], y1H[j], y1He[j])/(1.+ABUND_HE)/Ub;
     for(j=0;j<NGRID;j++) {
