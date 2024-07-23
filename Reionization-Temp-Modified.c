@@ -263,10 +263,13 @@ int main(int argc, char **argv) {
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
-    double tauH[NGRID], tauHe[NGRID]
-    for(i=0;i<N_NU;i++)
+    double tauH[NGRID], tauHe[NGRID], tottauH[j], tottauHe[j]
+    for(i=0;i<N_NU;i++){
       tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10)
+      tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+      tottauH[j] = tottauH[j] + tauH[j]
+      tottauHe[j] = tottauHe[j] + tauHe[j]
+    }
     for(j=0;j<NGRID;j++)
       dEH[j] -= get_cooling_rate(Te[j], y1H[j], y1He[j])/(1.+ABUND_HE)/Ub;
     for(j=0;j<NGRID;j++) {
@@ -385,7 +388,7 @@ int main(int argc, char **argv) {
   printf("j, (j+.5)*DNHI,     y1H[j],     y1He[j],     EH[j],     Te[j],     EHII[j],     THII[j],     EHI[j],     THI[j],     EHeI[j],     THeI[j],     EHeII[j],     THeII[j],     dEH[j],     tauH[j],     tauHe[j]\n");
   for(j=0; j<NGRID; j++) {
     printf("%4ld %11.5lE %8.15lf %8.6lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.10lf %8.6lf %8.6lf\n",
-      j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j], tauH[j], tauHe[j]);
+      j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j], tottauH[j], tottauHe[j]);
   }
 
   return(0);
