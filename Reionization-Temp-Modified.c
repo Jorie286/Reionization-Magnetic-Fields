@@ -267,8 +267,8 @@ int main(int argc, char **argv) {
     for(i=0;i<N_NU;i++){
       tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-      tottauH[j] = tottauH[j] + tauH[j]
-      tottauHe[j] = tottauHe[j] + tauHe[j]
+      tottauH[j] = tottauH[j] + tauH[j];
+      tottauHe[j] = tottauHe[j] + tauHe[j];
     }
     for(j=0;j<NGRID;j++)
       dEH[j] -= get_cooling_rate(Te[j], y1H[j], y1He[j])/(1.+ABUND_HE)/Ub;
