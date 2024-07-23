@@ -263,13 +263,6 @@ int main(int argc, char **argv) {
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
-    double tauH[NGRID], tauHe[NGRID], tautotH[j], tautotHe[j];
-    for(i=0;i<N_NU;i++){
-      tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-      tautotH[j] = tautotH[j] + tauH[j];
-      tautotHe[j] = tautotHe[j] + tauHe[j];
-    }
     for(j=0;j<NGRID;j++)
       dEH[j] -= get_cooling_rate(Te[j], y1H[j], y1He[j])/(1.+ABUND_HE)/Ub;
     for(j=0;j<NGRID;j++) {
@@ -381,6 +374,13 @@ int main(int argc, char **argv) {
 
   /*Print out the overall one-dimentional model values for each cell*/
   //n: run the code on cluster, plot dEH[3] and dEH[1245]
+  double tauH[NGRID], tauHe[NGRID], tautotH[j], tautotHe[j];
+  for(i=0;i<N_NU;i++){
+    tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
+    tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+    tautotH[j] = tautotH[j] + tauH[j];
+    tautotHe[j] = tautotHe[j] + tauHe[j];
+  }
   for(i=0; i<5; i++)
     printf("\n");
   printf("One-dimensional model\n");
