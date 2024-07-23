@@ -378,9 +378,7 @@ int main(int argc, char **argv) {
   for(i=0;i<N_NU;i++){
     tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
     tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-    tautotH[j] = tautotH[j] + tauH[j];
-    tautotHe[j] = tautotHe[j] + tauHe[j];
-  }
+    }
   for(i=0; i<5; i++)
     printf("\n");
   printf("One-dimensional model\n");
