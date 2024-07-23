@@ -263,7 +263,7 @@ int main(int argc, char **argv) {
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
-    double tauH[NGRID], tauHe[NGRID], tottauH[j], tottauHe[j]
+    double tauH[NGRID], tauHe[NGRID], tottauH[j], tottauHe[j];
     for(i=0;i<N_NU;i++){
       tauH[j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
