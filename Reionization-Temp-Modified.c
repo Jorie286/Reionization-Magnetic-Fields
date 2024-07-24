@@ -379,7 +379,7 @@ int main(int argc, char **argv) {
     }
   }
   FILE *my_file;
-  my_file = fopen("tauH.txt", "w"); /*tauH*/
+  my_file = fopen(tauH.txt, w); /*tauH*/
   fprintf(my_file, "# hydorgen optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
@@ -390,7 +390,7 @@ int main(int argc, char **argv) {
   fclose(my_file); /*close file*/
   printf("Sucess");
 
-  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
+  my_file = fopen(tauHe.txt, w); /*tauHe*/
   fprintf(my_file, "# helium optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
