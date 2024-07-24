@@ -236,6 +236,7 @@ int main(int argc, char **argv) {
   set_sigma(nu,sigH,sigHe); 
   
 #if 0
+  printf("Sucess");
   for(i=0;i<N_NU;i++)
     printf("%2d %8.6lf %8.6lf %11.5lE %11.5lE\n", i, nu[i], fracflux[i], sigH[i], sigHe[i]);
 #endif
