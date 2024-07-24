@@ -225,25 +225,13 @@ int main(int argc, char **argv) {
   double I[N][N];
   //Define blackbody incident temperature and ionization front velocity
   double T, U;
-  printf("Sucess");
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
 
   /*The function sscanf returns an integer which is equal to the number of parameters that were successfully converted*/
   sscanf(argv[1], "%lf", &T);
   set_bb(fracflux,T);
-  set_sigma(nu,sigH,sigHe);
-  
-  printf("Sucess");
-  
-  for(i=0;i<N_NU;i++){
-    for(j=0;j<NGRID;j++){
-      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-    }
-  }
-
-  printf("Sucess");
+  set_sigma(nu,sigH,sigHe); 
   
 #if 0
   for(i=0;i<N_NU;i++)
@@ -258,8 +246,14 @@ int main(int argc, char **argv) {
     EHII[j] = 1.e-30;
     EHeII[j] = 1.e-30;
   }
-
-
+  printf("Sucess");
+  for(i=0;i<N_NU;i++){
+    for(j=0;j<NGRID;j++){
+      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
+      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+    }
+  } 
+  printf("Sucess");
   /*U is the ionization front speed???*/
   sscanf(argv[2], "%lf", &U);
   printf("InverseMatrix00,   InverseMatrix01,   InverseMatrix02,   InverseMatrix03,   InverseMatrix04\n");
