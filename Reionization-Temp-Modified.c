@@ -203,10 +203,22 @@ void display(double mat[N][N], int row, int col)
     }
 }
 
+void get_tau(sigH[i], y1H[j], U, i, j){
+  //Define matricies for optical depth values 
+  double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
+  int i;
+  int j;
+  for(i=0;i<N_NU;i++){
+    for(j=0;j<NGRID;j++){
+      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
+      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   //Iteration index
   int i;
-  int k;
   long j, istep;
   //Define flux in each bin and cross section
   double fracflux[N_NU], nu[N_NU], sigH[N_NU], sigHe[N_NU];
@@ -226,9 +238,6 @@ int main(int argc, char **argv) {
   double I[N][N];
   //Define blackbody incident temperature and ionization front velocity
   double T, U;
-  //Define matricies for optical depth values 
-  double tauH[N_NU][NGRID];
-  double tauHe[N_NU][NGRID];
 
   /*The function sscanf returns an integer which is equal to the number of parameters that were successfully converted*/
   sscanf(argv[1], "%lf", &T);
@@ -236,7 +245,6 @@ int main(int argc, char **argv) {
   set_sigma(nu,sigH,sigHe); 
   
 #if 0
-  printf("Sucess");
   for(i=0;i<N_NU;i++)
     printf("%2d %8.6lf %8.6lf %11.5lE %11.5lE\n", i, nu[i], fracflux[i], sigH[i], sigHe[i]);
 #endif
@@ -249,14 +257,6 @@ int main(int argc, char **argv) {
     EHII[j] = 1.e-30;
     EHeII[j] = 1.e-30;
   }
-  printf("Sucess");
-  for(k=0;k<N_NU;k++){
-    for(j=0;j<NGRID;j++){
-      tauH[k][j] = DNHI * sigH[k] * y1H[j] / (1 - U/3.e10);
-      tauHe[k][j] = ABUND_HE * DNHI * sigHe[k] * y1He[j]/ (1 - U/3.e10);
-    }
-  } 
-  printf("Sucess");
   /*U is the ionization front speed???*/
   sscanf(argv[2], "%lf", &U);
   printf("InverseMatrix00,   InverseMatrix01,   InverseMatrix02,   InverseMatrix03,   InverseMatrix04\n");
