@@ -382,14 +382,6 @@ int main(int argc, char **argv) {
   for(j=0; j<NGRID; j++) {
     printf("%4ld %11.5lE %8.15lf %8.6lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.10lf %8.6lf %8.6lf\n",
       j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j]);
-  }
-    double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
-  for(i=0;i<N_NU;i++){
-    for(j=0; j<NGRID; j++) {
-      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-    }
-  }
-  
+  }  
   return(0);
 }
