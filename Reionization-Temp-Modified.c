@@ -208,9 +208,10 @@ void get_tau(double *y1H, double *y1He, double *sigH, double *sigHe, double U){
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
   double taulH, taulHe;
-  sigH[i] = (double*)malloc((size_t)(3*N_NU*sizeof(double)));
-  sigHe[i] = sigH[i] + N_NU;
-  nu = sigHe[i] + N_NU;
+  double nu;
+  sigH = (double*)malloc((size_t)(3*N_NU*sizeof(double)));
+  sigHe = sigH[i] + N_NU;
+  nu = sigHe + N_NU;
   set_sigma(nu,sigH[i],sigHe[i]);
   for(i=0;i<N_NU;i++){
     for(j=0;j<NGRID;j++){
