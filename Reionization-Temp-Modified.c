@@ -391,27 +391,5 @@ int main(int argc, char **argv) {
     }
   }
   
-  FILE *my_file;
-  my_file = fopen("tauH.txt", "w"); /*tauH*/
-  fprintf(my_file, "# hydorgen optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauH[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
-
-  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
-  fprintf(my_file, "# helium optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
   return(0);
 }
