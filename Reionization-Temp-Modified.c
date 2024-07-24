@@ -225,11 +225,43 @@ int main(int argc, char **argv) {
   double I[N][N];
   //Define blackbody incident temperature and ionization front velocity
   double T, U;
+  //Define matricies for optical depth values 
+  double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
 
   /*The function sscanf returns an integer which is equal to the number of parameters that were successfully converted*/
   sscanf(argv[1], "%lf", &T);
   set_bb(fracflux,T);
   set_sigma(nu,sigH,sigHe);
+  
+  for(i=0;i<N_NU;i++){
+    for(j=0; j<NGRID; j++) {
+      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
+      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+    }
+  }
+  FILE *my_file;
+  my_file = fopen("tauH.txt", "w"); /*tauH*/
+  fprintf(my_file, "# hydorgen optical depths\n");
+  for(i=0; i<N_NU; i++){
+    for(j=0; j<NGRID; j++){
+      fprintf(my_file, "%21.14IE ", tauH[i][j]);
+    }
+    fprintf(my_file, "\n");
+  }
+  fclose(my_file); /*close file*/
+  printf("Sucess");
+
+  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
+  fprintf(my_file, "# helium optical depths\n");
+  for(i=0; i<N_NU; i++){
+    for(j=0; j<NGRID; j++){
+      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
+    }
+    fprintf(my_file, "\n");
+  }
+  fclose(my_file); /*close file*/
+  printf("Sucess");
+  
 #if 0
   for(i=0;i<N_NU;i++)
     printf("%2d %8.6lf %8.6lf %11.5lE %11.5lE\n", i, nu[i], fracflux[i], sigH[i], sigHe[i]);
@@ -371,35 +403,6 @@ int main(int argc, char **argv) {
     }
     }
   }
-  double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
-  for(i=0;i<N_NU;i++){
-    for(j=0; j<NGRID; j++) {
-      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
-    }
-  }
-  FILE *my_file;
-  my_file = fopen(tauH.txt, w); /*tauH*/
-  fprintf(my_file, "# hydorgen optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauH[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
-
-  my_file = fopen(tauHe.txt, w); /*tauHe*/
-  fprintf(my_file, "# helium optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
   
   /*Print out the overall one-dimentional model values for each cell*/
   //n: run the code on cluster, plot dEH[3] and dEH[1245]  
