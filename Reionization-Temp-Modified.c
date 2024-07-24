@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
     EHeII[j] = 1.e-30;
   }
   printf("Sucess");
-  for(k=0;i<N_NU;i++){
+  for(k=0;k<N_NU;k++){
     for(j=0;j<NGRID;j++){
       tauH[k][j] = DNHI * sigH[k] * y1H[j] / (1 - U/3.e10);
       tauHe[k][j] = ABUND_HE * DNHI * sigHe[k] * y1He[j]/ (1 - U/3.e10);
