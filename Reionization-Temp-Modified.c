@@ -206,6 +206,7 @@ void display(double mat[N][N], int row, int col)
 int main(int argc, char **argv) {
   //Iteration index
   int i;
+  int k;
   long j, istep;
   //Define flux in each bin and cross section
   double fracflux[N_NU], nu[N_NU], sigH[N_NU], sigHe[N_NU];
