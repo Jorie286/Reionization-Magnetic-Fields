@@ -203,10 +203,15 @@ void display(double mat[N][N], int row, int col)
     }
 }
 
-void get_tau(double *sigH[i], double *sigHe[i], double *y1H[j], double *y1He[j], double U){
+void get_tau(double *y1H, double *y1He, double *sigH, double *sigHe, double U){
   long i,j;
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
+  double taulH, taulHe;
+  sigH = (double*)malloc((size_t)(3*N_NU*sizeof(double)));
+  sigHe = sigH + N_NU;
+  nu = sigHe + N_NU;
+  set_sigma(nu,sigH,sigHe);
   for(i=0;i<N_NU;i++){
     for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
