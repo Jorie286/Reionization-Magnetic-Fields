@@ -213,6 +213,26 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
     }
   }
+  FILE *my_file;
+  my_file = fopen("tauH.txt", "w"); /*tauH*/
+  fprintf(my_file, "# hydorgen optical depths\n");
+  for(i=0; i<N_NU; i++){
+    for(j=0; j<NGRID; j++){
+      fprintf(my_file, "%21.14IE ", tauH[i][j]);
+    }
+    fprintf(my_file, "\n");
+  }
+  fclose(my_file); /*close file*/
+
+  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
+  fprintf(my_file, "# helium optical depths\n");
+  for(i=0; i<N_NU; i++){
+    for(j=0; j<NGRID; j++){
+      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
+    }
+    fprintf(my_file, "\n");
+  }
+  fclose(my_file); /*close file*/
 }
 
 int main(int argc, char **argv) {
@@ -271,6 +291,7 @@ int main(int argc, char **argv) {
       }
      }
     get_ion_rate(y1H,y1He,fracflux,dy1H,dy1He,dEH,Te,istep,U);
+    get_tau(sigH[i], sigHe[i], y1H[j], y1He[j], U);
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
