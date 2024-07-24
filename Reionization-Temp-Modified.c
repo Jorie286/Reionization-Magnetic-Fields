@@ -239,28 +239,6 @@ int main(int argc, char **argv) {
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
     }
   }
-  FILE *my_file;
-  my_file = fopen("tauH.txt", "w"); /*tauH*/
-  fprintf(my_file, "# hydorgen optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauH[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
-
-  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
-  fprintf(my_file, "# helium optical depths\n");
-  for(i=0; i<N_NU; i++){
-    for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
-    }
-    fprintf(my_file, "\n");
-  }
-  fclose(my_file); /*close file*/
-  printf("Sucess");
   
 #if 0
   for(i=0;i<N_NU;i++)
@@ -410,7 +388,7 @@ int main(int argc, char **argv) {
     printf("\n");
   printf("One-dimensional model\n");
   printf("Timestep=%7d\n", NTIMESTEP);
-  printf("j, (j+.5)*DNHI,     y1H[j],     y1He[j],     EH[j],     Te[j],     EHII[j],     THII[j],     EHI[j],     THI[j],     EHeI[j],     THeI[j],     EHeII[j],     THeII[j],     dEH[j],     tauH[j],     tauHe[j]\n");
+  printf("j, (j+.5)*DNHI,     y1H[j],     y1He[j],     EH[j],     Te[j],     EHII[j],     THII[j],     EHI[j],     THI[j],     EHeI[j],     THeI[j],     EHeII[j],     THeII[j],     dEH[j]\n");
   for(j=0; j<NGRID; j++) {
     printf("%4ld %11.5lE %8.15lf %8.6lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.10lf %8.6lf %8.6lf\n",
       j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j]);
