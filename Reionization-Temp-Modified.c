@@ -391,7 +391,7 @@ int main(int argc, char **argv) {
       j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j]);
   }
   FILE *my_file;
-  my_file = fopen("tauH.dat", "w"); /*tauH*/
+  my_file = fopen("tauH.txt", "w"); /*tauH*/
   fprintf(my_file, "# hydorgen optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
@@ -401,7 +401,7 @@ int main(int argc, char **argv) {
   }
   fclose(my_file); /*close file*/
 
-  my_file = fopen("tauHe.dat", "w"); /*tauHe*/
+  my_file = fopen("tauHe.txt", "w"); /*tauHe*/
   fprintf(my_file, "# helium optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
