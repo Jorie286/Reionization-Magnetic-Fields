@@ -401,7 +401,7 @@ int main(int argc, char **argv) {
     fprintf(my_file, "\n");
   }
   fclose(my_file); /*close file*/
-  print("Sucess")
+  print("Sucess");
 
   my_file = fopen("tauHe.txt", "w"); /*tauHe*/
   fprintf(my_file, "# helium optical depths\n");
@@ -412,6 +412,6 @@ int main(int argc, char **argv) {
     fprintf(my_file, "\n");
   }
   fclose(my_file); /*close file*/
-  print("Sucess")
+  print("Sucess");
   return(0);
 }
