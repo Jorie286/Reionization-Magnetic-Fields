@@ -203,7 +203,7 @@ void display(double mat[N][N], int row, int col)
     }
 }
 
-void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
+void get_tau(double *sigH[i], double *sigHe[i], double *y1H[j], double *y1He[j], double U){
   long i,j;
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
