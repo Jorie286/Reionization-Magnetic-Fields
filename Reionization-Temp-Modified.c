@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
   set_sigma(nu,sigH,sigHe);
   
   for(i=0;i<N_NU;i++){
-    for(j=0; j<NGRID; j++) {
+    for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
     }
