@@ -226,7 +226,8 @@ int main(int argc, char **argv) {
   //Define blackbody incident temperature and ionization front velocity
   double T, U;
   //Define matricies for optical depth values 
-  double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
+  double tauH[N_NU][NGRID];
+  double tauHe[N_NU][NGRID];
 
   /*The function sscanf returns an integer which is equal to the number of parameters that were successfully converted*/
   sscanf(argv[1], "%lf", &T);
@@ -247,10 +248,10 @@ int main(int argc, char **argv) {
     EHeII[j] = 1.e-30;
   }
   printf("Sucess");
-  for(i=0;i<N_NU;i++){
+  for(k=0;i<N_NU;i++){
     for(j=0;j<NGRID;j++){
-      tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
-      tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
+      tauH[k][j] = DNHI * sigH[k] * y1H[j] / (1 - U/3.e10);
+      tauHe[k][j] = ABUND_HE * DNHI * sigHe[k] * y1He[j]/ (1 - U/3.e10);
     }
   } 
   printf("Sucess");
