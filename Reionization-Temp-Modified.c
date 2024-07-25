@@ -206,8 +206,12 @@ void display(double mat[N][N], int row, int col)
 void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   long i,j;
   //Define matricies for optical depth values 
-  double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
+  double **tauH, **tauHe;
+  tauH = (double**)malloc((size_t)(N_NU*sizeof(double*)));
+  tauHe = (double**)malloc((size_t)(N_NU*sizeof(double*)));
   for(i=0;i<N_NU;i++){
+    tauH[i] = (double*)malloc((size_t)(NGRID*sizeof(double)));
+    tauHe[i] = (double*)malloc((size_t)(NGRID*sizeof(double)));
     for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
@@ -233,6 +237,13 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
     fprintf(my_file, "\n");
   }
   fclose(my_file); /*close file*/
+  
+  for(i=0;i<N_NU;i++){
+    free((char*)tauH[i]);
+    free((char*)tauHe[i]);
+  }
+  free((char*)tauH);
+  free((char*)tauHe);
 }
 
 int main(int argc, char **argv) {
