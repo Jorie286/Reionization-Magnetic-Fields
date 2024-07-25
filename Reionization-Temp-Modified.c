@@ -412,7 +412,7 @@ int main(int argc, char **argv) {
   printf("Timestep=%7d\n", NTIMESTEP);
   printf("j, (j+.5)*DNHI,     y1H[j],     y1He[j],     EH[j],     Te[j],     EHII[j],     THII[j],     EHI[j],     THI[j],     EHeI[j],     THeI[j],     EHeII[j],     THeII[j],     dEH[j]\n");
   for(j=0; j<NGRID; j++) {
-    printf("%4ld %11.5lE %8.15lf %8.6lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.10lf %8.6lf %8.6lf\n",
+    printf("%4ld %11.5lE %8.15lf %8.6lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.6lf %7.15lf %8.10lf\n",
       j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j]);
   }  
   return(0);
