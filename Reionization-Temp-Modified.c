@@ -13,7 +13,7 @@
 /*Delta t^prime == 2.5e15 cm^-2*/
 #define DTIMESTEP 2.5e15
 /*N t^prime evolve until t'=3*10^19 cm^-2*/
-#define NTIMESTEP 12000
+#define NTIMESTEP 500
 
 /*Number of Frequency bins*/
 #define N_NU 128
