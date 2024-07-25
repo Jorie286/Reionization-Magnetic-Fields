@@ -208,7 +208,6 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
   for(i=0;i<N_NU;i++){
-    printf("Running");
     for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
@@ -282,6 +281,7 @@ int main(int argc, char **argv) {
   printf("InverseMatrix00,   InverseMatrix01,   InverseMatrix02,   InverseMatrix03,   InverseMatrix04\n");
   for(istep=0;istep<NTIMESTEP;istep++) {
     if (istep==0) {
+      printf("Running");
       for(j=0;j<NGRID;j++) {
          /*New temperatures here*/
         Te[j] = EH[j]/1.5/(1.-y1H[j]+ABUND_HE*(1.- 1*y1He[j]))*RYD_K;
