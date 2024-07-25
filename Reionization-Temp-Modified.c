@@ -218,7 +218,7 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   fprintf(my_file, "# hydorgen optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauH[i][j]);
+      fprintf(my_file, "%21.14lE ", tauH[i][j]);
     }
     fprintf(my_file, "\n");
   }
@@ -228,7 +228,7 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   fprintf(my_file, "# helium optical depths\n");
   for(i=0; i<N_NU; i++){
     for(j=0; j<NGRID; j++){
-      fprintf(my_file, "%21.14IE ", tauHe[i][j]);
+      fprintf(my_file, "%21.14lE ", tauHe[i][j]);
     }
     fprintf(my_file, "\n");
   }
