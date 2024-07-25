@@ -203,13 +203,10 @@ void display(double mat[N][N], int row, int col)
     }
 }
 
-void get_tau(double *y1H, double *y1He, double *sigH, double *sigHe, double U){
+void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   long i,j;
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
-  double taulH, taulHe;
-  sigH = (double*)malloc((size_t)(3*N_NU*sizeof(double)));
-  sigHe = sigH + N_NU;
   for(i=0;i<N_NU;i++){
     for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
@@ -294,7 +291,7 @@ int main(int argc, char **argv) {
       }
      }
     get_ion_rate(y1H,y1He,fracflux,dy1H,dy1He,dEH,Te,istep,U);
-    get_tau(sigH[i], sigHe[i], y1H[j], y1He[j], U);
+    get_tau(sigH, sigHe, y1H, y1He, U);
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
