@@ -281,7 +281,6 @@ int main(int argc, char **argv) {
   printf("InverseMatrix00,   InverseMatrix01,   InverseMatrix02,   InverseMatrix03,   InverseMatrix04\n");
   for(istep=0;istep<NTIMESTEP;istep++) {
     if (istep==0) {
-      printf("Running");
       for(j=0;j<NGRID;j++) {
          /*New temperatures here*/
         Te[j] = EH[j]/1.5/(1.-y1H[j]+ABUND_HE*(1.- 1*y1He[j]))*RYD_K;
@@ -291,7 +290,6 @@ int main(int argc, char **argv) {
         THeII[j] = EHeII[j]/1.5/(ABUND_HE*(1.-y1He[j]))*RYD_K;
       }
      }
-    printf("Running");
     get_ion_rate(y1H,y1He,fracflux,dy1H,dy1He,dEH,Te,istep,U);
    
    //Ub stands for relativistic correction
