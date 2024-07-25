@@ -208,6 +208,7 @@ void get_tau(double *sigH, double *sigHe, double *y1H, double *y1He, double U){
   //Define matricies for optical depth values 
   double tauH[N_NU][NGRID], tauHe[N_NU][NGRID];
   for(i=0;i<N_NU;i++){
+    printf("Running")
     for(j=0;j<NGRID;j++){
       tauH[i][j] = DNHI * sigH[i] * y1H[j] / (1 - U/3.e10);
       tauHe[i][j] = ABUND_HE * DNHI * sigHe[i] * y1He[j]/ (1 - U/3.e10);
