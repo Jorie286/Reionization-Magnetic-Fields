@@ -291,10 +291,9 @@ int main(int argc, char **argv) {
         THeII[j] = EHeII[j]/1.5/(ABUND_HE*(1.-y1He[j]))*RYD_K;
       }
      }
+    printf("Running");
     get_ion_rate(y1H,y1He,fracflux,dy1H,dy1He,dEH,Te,istep,U);
     get_tau(sigH, sigHe, y1H, y1He, U);
-    
-    printf("Running");
    
    //Ub stands for relativistic correction
     double Ub = U / (1 - U/3.e10);
