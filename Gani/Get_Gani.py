@@ -1,13 +1,19 @@
-# A draft of what Get_Gani might look like.
-
 import math
 import numpy as np
 import scipy.constants as const
 from scipy.linalg import solve_banded
+from scipy.misc import derivative
 
-# Import the data from the Get_Giso_u file to be used again here.
-from Get_Giso_u.py import data
-from Get_Giso_u.py import velocity
+# A draft of what Get_Gani might look like (I am not sure how the get_alm function will look and what variables it will have in it).
+
+# Open and load the reionization temperatures output into Python
+data = np.loadtxt(r'output.txt')
+tauHdat = np.loadtxt(r'tauH.txt')
+tauHedat = np.loadtxt(r'tauHe.txt')
+fracflux = np.loadtxt(r'fracflux.txt')
+
+# Create a distribution of velocities in log space.
+velocity = np.logspace(1,8,71)
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
@@ -73,7 +79,6 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
-# Compute the Chandrasekhar dynamical friction formula.
 def get_A_a(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -108,7 +113,6 @@ def get_A_a(T, THII, THeII, yH, yHe, i):
         A_final = A_final + A_one*A_two
     return -A_final # The result for A_a(v) is addative inverse of its sum over species.
 
-# Compute the diffusion coefficient for a.
 def get_D_a(T, THII, THeII, yH, yHe, i):
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -144,44 +148,39 @@ def get_D_a(T, THII, THeII, yH, yHe, i):
         Da_final = Da_final + Da_one*Da_two
     return -Da_final # The result for D_a(v) is the addative inverse of its sum over species.
 
+# Source term
+def get_Slm(yH, tauH, tauHe, fracflux, i, k):
+    N_NU = 128 # number of frequency bins
+    DNHI = 2.5e16
+    f_He = 0.079 # He abundance
+    # Ionization energy of hydrogen and helium (in Joules)
+    I_H = 2.18e-18
+    I_He = 3.4e-19
+    m_e = const.m_e # mass of an electron
+    H_o = 2.2618e-18 # Hubble constant
+    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
+    G = const.G # gravitational constant
+    E_lamda_H = I_H + (1/2)*m_a*velocity[i]**2 # Energy of H for a photon energy bin, lambda
+    E_lamda_He = I_He + (1/2)*m_a*velocity[i]**2 # Energy of He for a photon energy bin, lambda
+    delta_E_H = E_lamda_H*math.log(4)/N_NU # Energy bin width for H
+    delta_E_He = E_lamda_He*math.log(4)/N_NU # Energy bin width for He
+    n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
+    F = (velocity[i]*n_H*(1+f_He))/(1-velocity[i]/const.c) # incident flux
+    tautot = tauHdat + tauHedat
+    
+    A_j = fracflux[:, None]*math.exp(-np.cumsum(tautot, axis=1))*((1-math.exp(-tautot))/DNHI)
+        
+    Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauH[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_H))*math.sqrt((1/3)*((16*math.pi)/5)) 
+    Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHe[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_He))*math.sqrt((1/3)*((16*math.pi)/5))
+    Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
+    return Slm_tot
+
 def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
-    # Generate a list of values over which to calculate alm for both theta and phi.
-    theta = np.arange(0, 2*math.pi, 0.001)
-    phi = np.arange(0,math.pi/2, 0.001)
     alm = 0
     alm_r = 0
     alm_im = 0
     alm_compute=0
     
-    # Use an if loop to check for which value of m to use and calculate alm.
-    # Use a Reimann sum over theta and phi for all m to calulate alm.
-    if m == 0:
-        for p in range(0,50):
-            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
-            alm_compute = a*(math.sqrt(5)/math.sqrt(16*math.pi))*(3*math.cos(theta[p])**2-1)
-            alm = alm_compute + alm
-            alm_compute = 0 # Reset alm_compute so it does not interfere with the next iteration.
-        return alm
-            
-    # For m = +/-2 we need to consider the both the imaginary and real portions for calculation. They can be added back together and returned as an imaginary number.
-    elif m == 2:
-        for p in range(0,50):
-            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
-            alm_compute_r = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((-2*1j*phi[p]).real)
-            alm_compute_im = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((-2*1j*phi[p]).imag)
-            alm_compute = alm_compute + (alm_compute_r + 1j*alm_compute_im)
-            alm_compute_r = 0 # Reset alm_compute_r and alm_compute_im so it does not interfere with the next iteration.
-            alm_compute_im = 0 
-        return alm_compute
-    else:
-        for p in range(0,50):
-            a = theta[p]*phi[p] # Need to determine the function for a(theta, phi) to solve for alm!!!
-            alm_compute_r = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((2*1j*phi[p]).real)
-            alm_compute_im = a*(math.sqrt(15)/math.sqrt(32*math.pi))*math.sin(theta[p])**2*math.exp((2*1j*phi[p]).imag)
-            alm_compute = alm_compute + (alm_compute_r + 1j*alm_compute_im)
-            alm_compute_r = 0 # Reset alm_compute_r and alm_compute_im so it does not interfere with the next iteration.
-            alm_compute_im = 0 
-        return alm_compute
 
 # Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
