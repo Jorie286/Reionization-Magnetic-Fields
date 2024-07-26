@@ -426,5 +426,13 @@ int main(int argc, char **argv) {
       j, (j+.5)*DNHI, y1H[j], y1He[j], EH[j], Te[j], EHII[j], THII[j], EHI[j], THI[j], EHeI[j], THeI[j], EHeII[j], THeII[j], dEH[j]);
   }  
   get_tau(sigH, sigHe, y1H, y1He, U);
+  
+  my_file = fopen("fracflux.txt", "w"); /*fracflux*/
+  fprintf(my_file, "# flux fraction in a photon bin\n");
+  for(i=0; i<N_NU; i++){
+    fprintf(my_file, "%8.6lf ", fracflux[i]);
+  }
+  fclose(my_file); /*close file*/
+  
   return(0);
 }
