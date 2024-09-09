@@ -160,8 +160,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     H_o = 2.2618e-18 # Hubble constant
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
     G = const.G # gravitational constant
-    E_lamda_H = I_H + (1/2)*m_a*velocity[i]**2 # Energy of H for a photon energy bin, lambda
-    E_lamda_He = I_He + (1/2)*m_a*velocity[i]**2 # Energy of He for a photon energy bin, lambda
+    E_lamda_H = I_H + (1/2)*m_e*velocity[i]**2 # Energy of H for a photon energy bin, lambda
+    E_lamda_He = I_He + (1/2)*m_e*velocity[i]**2 # Energy of He for a photon energy bin, lambda
     delta_E_H = E_lamda_H*math.log(4)/N_NU # Energy bin width for H
     delta_E_He = E_lamda_He*math.log(4)/N_NU # Energy bin width for He
     n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
