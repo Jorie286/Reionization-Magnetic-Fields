@@ -6,8 +6,8 @@ from scipy.linalg import solve_banded
 # Calculate the value of sigma.
 def get_sigmas(n,c):
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function,
-    it is assumed that m=1 for all sigmas, only the value of l changes.
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
+    The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input.
     
     Input arguments (2)
         required    integer values
