@@ -11,6 +11,18 @@ velocity = np.logspace(1,8,71)
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
+    """
+    Funtion to find the value of the number density of electrons for .
+    
+    Input arguments (2)
+        required    integer values
+                        yH,
+                        yHe,
+    Returns
+        the number density of electrons for 
+        
+    Date of last revision: July 12, 2024
+    """
     z = 7
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2618e-18 # Hubble constant
@@ -31,6 +43,19 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 
 # Computing D_theta
 def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
+    """
+    Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions.
+
+    Input arguments (7)
+        required    float or integer-like values
+                        T, the temperature
+                        Te, 
+                        THII,
+                        THEII,
+                        yH,
+                        yHe,
+                        i,
+    """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
     a_o = 5.29177210903e-11 # Bohr radius
@@ -65,8 +90,20 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
-def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
+def get_sigmas(n, c):
+    """
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function,
+    it is assumed that m=1 for all sigmas, only the value of l changes.
     
+    Input arguments (2)
+        required    integer values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which the value can be defined
+    Returns
+        the values of the first n sigma_{n,1} using a matrix to solve.
+        
+    Date of last revision: July 9, 2024
+    """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
     for l in range (1, n+1):
