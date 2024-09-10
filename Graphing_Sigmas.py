@@ -4,8 +4,20 @@ import matplotlib.pyplot as plt
 from scipy.linalg import solve_banded
 
 # Calculate the value of sigma.
-def get_sigmas(n,c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
+def get_sigmas(n,c):
+    """
+    Funtion to find the value of a specific sigma_{l,m} for a certian number of sigmas. For this function,
+    it is assumed that m=1 for all sigmas, only the value of l changes.
     
+    Input arguments (2)
+        required    integer values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which the value can be defined
+    Returns
+        the values of the first n sigma_{n,1} using a matrix to solve.
+
+    Date of last revision: July 9, 2024
+    """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
     for l in range (1, n+1):
