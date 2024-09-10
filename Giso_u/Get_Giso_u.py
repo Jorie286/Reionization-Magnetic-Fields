@@ -12,25 +12,46 @@ velocity = np.logspace(1,8,71)
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
     """
-    Funtion to find the value of the number density of electrons for .
+    Funtion to find the electron number density (units of electrons m^-3). This function is used as a part of get_Giso_u. The inputs should be postive otherwise
+    the ouptut will not make sense, please note that he function does not check for good inputs.
     
     Input arguments (2)
-        required    integer values
-                        yH,
-                        yHe,
+        required    float or integer-like values
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
     Returns
-        the number density of electrons for 
+        the number density of electrons under the given conditions
         
     Date of last revision: July 12, 2024
     """
     z = 7
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618e-18 # Hubble constant
+    H_o = 2.2618e-18 # Hubble constant (units of s^-1)
     G = const.G # gravitational constant
     n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
     return n_e
 
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
+    """
+    Function to get the value of Giso_u for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
+    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    sense, please note that the function does not check for good inputs.
+
+    Input arguments (7)
+        required    float or integer-like values 
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        nHtot, total number of hydrogen atoms in the distribution???
+                        k, ???????????????????????????
+                        i, the slab number of the iteration
+    Returns
+        the value of Giso_u for the specific conditions entered into the function
+        
+    Date of last revision: July 12, 2024
+    """
     k_B = const.k # Boltzmann constant
     m_e = const.m_e # mass electron
     n_e = get_n_e(yH, yHe) # electron density function
@@ -44,17 +65,23 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 # Computing D_theta
 def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     """
-    Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions.
+    Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
+    distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
+    postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
     Input arguments (7)
         required    float or integer-like values
-                        T, the temperature
-                        Te, 
-                        THII,
-                        THEII,
-                        yH,
-                        yHe,
-                        i,
+                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        i, the slab number of the iteration
+    Returns
+        the value of D_theta for the specific conditions entered into the function
+        
+    Date of last revision: July 12, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -92,15 +119,16 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
 
 def get_sigmas(n, c):
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function,
-    it is assumed that m=1 for all sigmas, only the value of l changes.
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
+    This funciton is used as part of the function get_Giso_u. The input for n must be a positive whole number for the function to work correctly, please note that
+    it does not check for good input.
     
     Input arguments (2)
-        required    integer values
+        required    float or integer-like values
                         n, the number of sigma_{l,m} parameters we want values for
-                        c = (i*D_theta)/(k*v), a constant for which the value can be defined
+                        c = (i*D_theta)/(k*v), a constant for which a value can be defined
     Returns
-        the values of the first n sigma_{n,1} using a matrix to solve.
+        the values of the first n sigma_{n,1}
         
     Date of last revision: July 9, 2024
     """
