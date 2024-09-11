@@ -45,7 +45,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
                         nHtot, total number of hydrogen atoms in the distribution???
-                        k, ???????????????????????????
+                        k = 1e-12, ???????
                         i, the slab number of the iteration
     Returns
         the value of Giso_u for the specific conditions entered into the function
@@ -77,7 +77,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
                         THEII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        i, the slab number of the iteration
+                        i, the slab number of the iteration over velocities
     Returns
         the value of D_theta for the specific conditions entered into the function
         
