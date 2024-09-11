@@ -17,6 +17,19 @@ velocity = np.logspace(1,8,71)
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
+    """
+    Funtion to find the electron number density (units of electrons m^-3). This function is used as a part of get_Giso_u. The inputs should be postive otherwise
+    the ouptut will not make sense, please note that he function does not check for good inputs.
+    
+    Input arguments (2)
+        required    float or integer-like values
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+    Returns
+        the number density of electrons under the given conditions
+        
+    Date of last revision: July 12, 2024
+    """
     z = 7
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2618e-18 # Hubble constant
@@ -25,7 +38,20 @@ def get_n_e(yH, yHe):
     return n_e
 
 def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
+    """
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
+    This funciton is used as part of the function get_Giso_u. The input for n must be a positive whole number for the function to work correctly, please note that
+    it does not check for good input.
     
+    Input arguments (2)
+        required    float or integer-like values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which a value can be defined
+    Returns
+        the values of the first n sigma_{n,1}
+        
+    Date of last revision: July 9, 2024
+    """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
     for l in range (1, n+1):
@@ -45,6 +71,25 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 
 # Computing D_theta
 def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
+    """
+    Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
+    distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
+    postive otherwise the ouptut will not make sense, the function does not check for good inputs.
+
+    Input arguments (7)
+        required    float or integer-like values
+                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        i, the slab number of the iteration over velocities
+    Returns
+        the value of D_theta for the specific conditions entered into the function
+        
+    Date of last revision: July 12, 2024
+    """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
     a_o = 5.29177210903e-11 # Bohr radius
@@ -80,6 +125,24 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     return D_final
 
 def get_A_a(T, THII, THeII, yH, yHe, i):
+    """
+    Function to get the fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can be used to 
+    iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
+    Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
+
+    Input arguments (6)
+        required    float or integer-like values
+                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        i, the slab number of the iteration over velocities
+    Returns
+        the value of A_a for the specific conditions entered into the function
+        
+    Date of last revision: July 11, 2024
+    """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
     a_o = 5.29177210903e-11 # Bohr radius
@@ -114,6 +177,24 @@ def get_A_a(T, THII, THeII, yH, yHe, i):
     return -A_final # The result for A_a(v) is addative inverse of its sum over species.
 
 def get_D_a(T, THII, THeII, yH, yHe, i):
+    """
+    Function to get the value for the source term. This function can be used to iterate over a series of slabs in a distribution for which we know
+    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    sense, please note that the function does not check for good inputs.
+
+    Input argument (6)
+        required    float or integer-like values
+                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
+                        yH, the neutral fraction of hydrogen
+                        yHe, the neutral fraction of helium
+                        i, the slab number of the iteration over velocities
+    Returns
+        the value of the source term for the specific conditions entered into the function
+
+    Date of last revision: July 11, 2024
+    """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
     a_o = 5.29177210903e-11 # Bohr radius
@@ -150,6 +231,24 @@ def get_D_a(T, THII, THeII, yH, yHe, i):
 
 # Source term
 def get_Slm(yH, tauH, tauHe, fracflux, i, k):
+    """
+    Function to get the value for the source term. This function can be used to iterate over a series of slabs in a distribution for which we know
+    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    sense, please note that the function does not check for good inputs.
+
+    Input argument (6)
+        required    float or integer-like values
+                        yH, neutral fraction of hydrogen
+                        tauH, hydrogen optical depth
+                        tauHe, helium optical depth
+                        fracflux, flux fraction in a photon bin
+                        i, the slab number of the iteration over velocities
+                        k = 1e-12, ???????
+    Returns
+        the value of the source term for the specific conditions entered into the function
+
+    Date of last revision: July 11, 2024
+    """
     N_NU = 128 # number of frequency bins
     DNHI = 2.5e16
     f_He = 0.079 # He abundance
@@ -175,7 +274,20 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     return Slm_tot
 
-def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
+def get_alm(l, m):
+    """
+    Function to get the value of a_{l,m} for values of (l, m). For our anisotropic solution, we use l=2 and m=0,2,-2. The inputs should be positive whole numbers 
+    otherwise the output will not make sense, note that the function does not check for good inputs.
+
+    Input argument (2)
+        required    integer values
+                        l = 2, the value of l for which Gani is non-zero (for the purposes of our original Gani solution)
+                        m = 0, 2, -2, the values of m that determine how Gani behaves (for the purposes of our original Gani solution)
+    Returns
+        the value of a_{l,m} (the multipole moment) for the given l and m
+
+    Date of last revision: September 10, 2024
+    """
     alm = 0
     alm_r = 0
     alm_im = 0
@@ -184,6 +296,26 @@ def get_alm(l, m): # In the equation for Gani l=2, m=0,2,-2.
 
 # Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
+    """
+    Function to get the value of Gani for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
+    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    sense, please note that the function does not check for good inputs.
+
+    Input arguments (7)
+        required    float or integer-like values 
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        nHtot = 200, total number of hydrogen atoms in the distribution???
+                        k = 1e-12, ???????
+                        i, the slab number of the iteration over velocities
+    Returns
+        the value of Gani for the specific conditions entered into the function
+        
+    Date of last revision: July 12, 2024
+    """
     n_e = get_n_e(yH, yHe) # electron density function
     Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
     return Gani
