@@ -178,9 +178,9 @@ def get_A_a(T, THII, THeII, yH, yHe, i):
 
 def get_DA_a(T, THII, THeII, yH, yHe, i):
     """
-    Function to get the derivative fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can be used to 
-    iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
-    Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
+    Function to get the derivative fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can
+    be used to iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being 
+    considered. Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
     Input arguments (6)
         required    float or integer-like values
@@ -193,7 +193,7 @@ def get_DA_a(T, THII, THeII, yH, yHe, i):
     Returns
         the value of the derivative of A_a for the specific conditions entered into the function
         
-    Date of last revision: July 11, 2024
+    Date of last revision: September 23, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -225,13 +225,14 @@ def get_DA_a(T, THII, THeII, yH, yHe, i):
     for a in range(0,3): # Iterate through numbers and calculate DA_a for each of the species. Returns the sum over all species.
         A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity[i]**2)
         A_two = math.exp(-velocity[i]**2/(2*A_numbers[3+a]**2)*((2/(math.sqrt(2*math.pi)*A_numbers[3+a]))-(math.sqrt(2/math.pi)*(1/A_numbers[3+a]))+(math.sqrt(2/math.pi)*((velocity[i]**2)/(A_numbers[3+a]**3))))
-        DA_final = A_final + A_one*A_two
-    return -DA_final # The result for A_a(v) is addative inverse of its sum over species.
+        DA_final = DA_final + A_one*A_two
+    # The result for A_a(v) is addative inverse of its sum over species.
+    return -DA_final
                
 def get_D_a(T, THII, THeII, yH, yHe, i):
     """
-    Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we know
-    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we 
+    know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
     Input argument (6)
@@ -279,14 +280,15 @@ def get_D_a(T, THII, THeII, yH, yHe, i):
         Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*(m_a/(Da_numbers[6+d]+1))*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity[i]**3)
         Da_two = math.erf(velocity[i]/(math.sqrt(2)*Da_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity[i]/Da_numbers[3+a])*math.exp(-velocity[i]**2/(2*Da_numbers[3+a]**2))
         Da_final = Da_final + Da_one*Da_two
-    return -Da_final # The result for D_a(v) is the addative inverse of its sum over species.
+    # The result for DA_a(v) is the addative inverse of its sum over species.
+    return -Da_final
 
 # Source term
 def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     """
-    Function to get the value for the source term, S_{2,0}. This is the only nonzero term in the source equation. (????) This function can be used to iterate over a series of slabs in a distribution for which we know
-    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
-    sense, please note that the function does not check for good inputs.
+    Function to get the value for the source term, S_{2,0}. This is the only nonzero term in the source equation. (????) This function can be used to iterate over a
+    series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
+    be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
     Input argument (6)
         required    float or integer-like values
@@ -328,8 +330,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
 
 def get_alm(yH, tauH, tauHe, fracflux, i, k):
     """
-    Function to get the value of a_{l,m} for values of (l, m). For our anisotropic solution, we use l=2 and m=0,2,-2. The inputs should be positive whole numbers 
-    otherwise the output will not make sense, note that the function does not check for good inputs.
+    Function to get the value of a_{l,m} for values of (l, m). However, since the only nonzero value of a_{l,m} is for l=2, m=0, this is the only one that
+    is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
     Input argument (2)
         required    integer values
@@ -338,13 +340,16 @@ def get_alm(yH, tauH, tauHe, fracflux, i, k):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: September 10, 2024
+    Date of last revision: September 23, 2024
     """
-    alm = 0
-    alm_r = 0
-    alm_im = 0
-    alm_compute=0
-    
+    b = 1 # what is b that makes a_{2,0}(0)=0 ????????????
+    # define the placeholders used in overleaf to make final equation more neat
+    D_v = (get_D_a(T, THII, THeII, yH, yHe, i)/velocity[i]**2)*((-4*velocity[i]*(velocity[i]+b))+(4*velocity[i]**2(velocity[i]+b)**2)-(2*velocity[i]**2))
+    B_v = 2*get_A_a(T, THII, THeII, yH, yHe, i)*(velocity[i]+b)
+    C_v = -get_DA_a(T, THII, THeII, yH, yHe, i) - (2*get_A_a(T, THII, THeII, yH, yHe, i)/ velocity[i]) - (6*get_D_theta(T, Te, THII, THeII, yH, yHe, i))
+    # put everyting together to compute the value of a_{2,0}
+    a_20 = get_Slm(yH, tauH, tauHe, fracflux, i, k)/(-D_v - B_v + C_v)
+    return a_20
 
 # Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
