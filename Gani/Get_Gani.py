@@ -328,10 +328,10 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     return Slm_tot
 
-def get_alm(yH, tauH, tauHe, fracflux, i, k):
+def get_alm(yH, tauH, tauHe, fracflux, T, THII, THeII, yHe, i, k):
     """
     Function to get the value of a_{l,m} for values of (l, m). However, since the only nonzero value of a_{l,m} is for l=2, m=0, this is the only one that
-    is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
+    is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
     Input argument (2)
         required    integer values
@@ -374,6 +374,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
     Date of last revision: July 12, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
+    # this needs to updated to reflect the solution for a_{l,m}
     Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
     return Gani
 
