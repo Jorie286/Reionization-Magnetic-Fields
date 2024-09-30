@@ -318,7 +318,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     delta_E_H = E_lamda_H*math.log(4)/N_NU # Energy bin width for H
     delta_E_He = E_lamda_He*math.log(4)/N_NU # Energy bin width for He
     n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    F = (velocity[i]*n_H*(1+f_He))/(1-velocity[i]/const.c) # incident flux
+    F = (500000000*n_H*(1+f_He))/(1-500000000/const.c) # incident flux
     tautot = tauHdat + tauHedat
     
     A_j = fracflux[:, None]*math.exp(-np.cumsum(tautot, axis=1))*((1-math.exp(-tautot))/DNHI)
