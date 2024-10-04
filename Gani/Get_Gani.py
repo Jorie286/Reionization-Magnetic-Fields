@@ -124,15 +124,16 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
-def get_A_a(T, THII, THeII, yH, yHe, i):
+def get_A_a(T, Te, THII, THeII, yH, yHe, i):
     """
     Function to get the fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can be used to 
     iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
     Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
-    Input arguments (6)
+    Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
@@ -176,15 +177,16 @@ def get_A_a(T, THII, THeII, yH, yHe, i):
         A_final = A_final + A_one*A_two
     return -A_final # The result for A_a(v) is addative inverse of its sum over species.
 
-def get_DA_a(T, THII, THeII, yH, yHe, i):
+def get_DA_a(T, Te, THII, THeII, yH, yHe, i):
     """
     Function to get the derivative fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can
     be used to iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being 
     considered. Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
-    Input arguments (6)
+    Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
@@ -221,23 +223,24 @@ def get_DA_a(T, THII, THeII, yH, yHe, i):
     sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
     sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
     A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
-    DA_final = 0
+    Da_final = 0
     for a in range(0,3): # Iterate through numbers and calculate DA_a for each of the species. Returns the sum over all species.
         A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity[i]**2)
-        A_two = math.exp(-velocity[i]**2/(2*A_numbers[3+a]**2)*((2/(math.sqrt(2*math.pi)*A_numbers[3+a]))-(math.sqrt(2/math.pi)*(1/A_numbers[3+a]))+(math.sqrt(2/math.pi)*((velocity[i]**2)/(A_numbers[3+a]**3))))
-        DA_final = DA_final + A_one*A_two
+        A_two = math.exp(-velocity[i]**2/(2*A_numbers[3+a]**2)*((2/(math.sqrt(2*math.pi)*A_numbers[3+a]))-(math.sqrt(2/math.pi)*(1/A_numbers[3+a]))+(math.sqrt(2/math.pi)*((velocity[i]**2)/(A_numbers[3+a]**3)))))
+        Da_final = Da_final + A_one*A_two
     # The result for A_a(v) is addative inverse of its sum over species.
-    return -DA_final
+    return -Da_final
                
-def get_D_a(T, THII, THeII, yH, yHe, i):
+def get_D_a(T, Te, THII, THeII, yH, yHe, i):
     """
     Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we 
     know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
-    Input argument (6)
+    Input argument (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THEII, temperature of ionized helium in the reionization front
                         yH, the neutral fraction of hydrogen
@@ -278,13 +281,13 @@ def get_D_a(T, THII, THeII, yH, yHe, i):
     Da_final = 0
     for d in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
         Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*(m_a/(Da_numbers[6+d]+1))*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity[i]**3)
-        Da_two = math.erf(velocity[i]/(math.sqrt(2)*Da_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity[i]/Da_numbers[3+a])*math.exp(-velocity[i]**2/(2*Da_numbers[3+a]**2))
+        Da_two = math.erf(velocity[i]/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity[i]/Da_numbers[3+d])*math.exp(-velocity[i]**2/(2*Da_numbers[3+d]**2))
         Da_final = Da_final + Da_one*Da_two
     # The result for DA_a(v) is the addative inverse of its sum over species.
     return -Da_final
 
 # Source term
-def get_Slm(yH, tauH, tauHe, fracflux, i, k):
+def get_Slm(yH, tauH, tauHe, fracflux, i, k, j):
     """
     Function to get the value for the source term, S_{2,0}. This is the only nonzero term in the source equation. (????) This function can be used to iterate over a
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
@@ -298,6 +301,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
                         fracflux, flux fraction in a photon bin
                         i, the slab number of the iteration over velocities
                         k = 1e-12, ???????
+                        j, the bin number ?????
     Returns
         the value of the source term for the specific conditions entered into the function
 
@@ -313,6 +317,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     H_o = 2.2618e-18 # Hubble constant
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
     G = const.G # gravitational constant
+    z = 7
     E_lamda_H = I_H + (1/2)*m_e*velocity[i]**2 # Energy of H for a photon energy bin, lambda
     E_lamda_He = I_He + (1/2)*m_e*velocity[i]**2 # Energy of He for a photon energy bin, lambda
     delta_E_H = E_lamda_H*math.log(4)/N_NU # Energy bin width for H
@@ -321,38 +326,105 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k):
     F = (500000000*n_H*(1+f_He))/(1-500000000/const.c) # incident flux
     tautot = tauHdat + tauHedat
     
-    A_j = fracflux[:, None]*math.exp(-np.cumsum(tautot, axis=1))*((1-math.exp(-tautot))/DNHI)
+    A_j = fracflux[j]*math.exp(-np.cumsum(tautot, axis=1))*((1-math.exp(-tautot))/DNHI)
         
     Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauH[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
     Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHe[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     return Slm_tot
 
-def get_alm(yH, tauH, tauHe, fracflux, T, THII, THeII, yHe, i, k):
+def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     """
-    Function to get the value of a_{l,m} for values of (l, m). However, since the only nonzero value of a_{l,m} is for l=2, m=0, this is the only one that
-    is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
+    Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
+    this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
+    does not check for good inputs.
 
-    Input argument (2)
+    Input argument (12)
         required    integer values
-                        l = 2, the value of l for which Gani is non-zero (for the purposes of our original Gani solution)
-                        m = 0, 2, -2, the values of m that determine how Gani behaves (for the purposes of our original Gani solution)
+                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        tauH, hydrogen optical depth
+                        tauHe, helium optical depth
+                        fracflux, flux fraction in a photon bin
+                        k = 1e-12, ???????
+                        i, the slab number of the iteration over velocities
+                        j, the bin number ?????
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: September 23, 2024
+    Date of last revision: October 4, 2024
     """
-    b = 1 # what is b that makes a_{2,0}(0)=0 ????????????
-    # define the placeholders used in overleaf to make final equation more neat
-    D_v = (get_D_a(T, THII, THeII, yH, yHe, i)/velocity[i]**2)*((-4*velocity[i]*(velocity[i]+b))+(4*velocity[i]**2(velocity[i]+b)**2)-(2*velocity[i]**2))
-    B_v = 2*get_A_a(T, THII, THeII, yH, yHe, i)*(velocity[i]+b)
-    C_v = -get_DA_a(T, THII, THeII, yH, yHe, i) - (2*get_A_a(T, THII, THeII, yH, yHe, i)/ velocity[i]) - (6*get_D_theta(T, Te, THII, THeII, yH, yHe, i))
-    # put everyting together to compute the value of a_{2,0}
-    a_20 = get_Slm(yH, tauH, tauHe, fracflux, i, k)/(-D_v - B_v + C_v)
-    return a_20
+    # define all the variables for calculating the matricies
+    D_theta_vals=np.array([])
+    A_v_vals_plus=np.array([])
+    A_v_vals=np.array([])
+    D_para_vals_plus=np.array([])
+    D_para_vals_1=np.array([])
+    D_para_vals_2=np.array([])
+    D_para_vals_minus=np.array([])
+    plus_1 = 0
+    minus_1 = 0
+    velocity = np.linspace(1,10**8,71)
+
+    # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
+    for i in range(len(velocity)):
+        D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i))
+        # create indeicies to check if i+/-1 will be out of range for v
+        plus_1 = i+1
+        minus_1 = i-1
+    
+        # ensure that the i+/-1 indicies will not be out of range by checking their values
+        if plus_1>70:
+            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
+        else:
+            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+        
+        if minus_1<0:
+            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
+        else:
+            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+        plus_1 = 0
+        minus_1 = 0
+    # remove the first or last values for off diagonal matricies so they don't interfere with the construction
+    D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
+    A_v_vals_plus = np.delete(A_v_vals_plus,[0])
+    D_para_vals_plus = np.delete(D_para_vals_plus,[0])
+
+    # diagonalize the matricies to make a tri-diagonal matrix
+    D_theta_matrix = np.diag(D_theta_vals)
+    A_v_matrix = np.diag(A_v_vals)
+    D_para_matrix_1 = np.diag(D_para_vals_1)
+    D_para_matrix_2 = np.diag(D_para_vals_2)
+    D_para_matrix_minus = np.diag(D_para_vals_minus, k=-1)
+    A_v_matrix_plus = np.diag(A_v_vals_plus, k=1)
+    D_para_matrix_plus = np.diag(D_para_vals_plus, k=1)
+
+    # create a matrix full of zeros to add the computed values to
+    matrix=np.zeros((71,71), dtype=float)
+
+    # add the matricies together to get the complete matrix
+    for m in range(0,71):
+        for n in range(0,71):
+            matrix[m][n]=D_theta_matrix[m][n]-A_v_matrix[m][n]+D_para_matrix_1[m][n]+D_para_matrix_2[m][n]-D_para_matrix_minus[m][n]+A_v_matrix_plus[m][n]-D_para_matrix_plus[m][n]
+    
+    
+    # still need to add S_{2,0} and a_{2,0} vectors and solve the matrix equation
+    return a
 
 # Compute Gani for a specific value of sigma and D_theta.
-def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
+def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j):
     """
     Function to get the value of Gani for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
@@ -360,14 +432,19 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
 
     Input arguments (7)
         required    float or integer-like values 
+                        T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THEII, temperature of ionized helium in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        nHtot = 200, total number of hydrogen atoms in the distribution???
+                        nHtot = 200, total number of hydrogen atoms in the distribution??
+                        tauH, hydrogen optical depth
+                        tauHe, helium optical depth
+                        fracflux, flux fraction in a photon bin
                         k = 1e-12, ???????
                         i, the slab number of the iteration over velocities
+                        j, the bin number ?????
     Returns
         the value of Gani for the specific conditions entered into the function
         
@@ -375,7 +452,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, k, i):
     """
     n_e = get_n_e(yH, yHe) # electron density function
     # this needs to updated to reflect the solution for a_{l,m}
-    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(2,0) - get_alm(2,2) - get_alm(2,-2))
+    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[1]*(math.sqrt(6)*get_alm(yH, tauH, tauHe, fracflux, T, Te, THII, THeII, yHe, i, k, j))
     return Gani
 
 # Computes Gani as a sum over the velocities for a row in output.txt
@@ -383,7 +460,7 @@ Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
+        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], 5e4, i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
         Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
     Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
