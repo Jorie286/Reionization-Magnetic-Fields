@@ -372,8 +372,10 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))
+        
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*veloctiy[i]**2))
+        
         # create indeicies to check if i+/-1 will be out of range for v
         plus_1 = i+1
         minus_1 = i-1
@@ -421,8 +423,10 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
             matrix[m][n]=D_theta_matrix[m][n]-A_v_matrix[m][n]+D_para_matrix_1[m][n]+D_para_matrix_2[m][n]-D_para_matrix_minus[m][n]+A_v_matrix_plus[m][n]-D_para_matrix_plus[m][n]
     
     
-    # still need to add S_{2,0} and a_{2,0} vectors and solve the matrix equation
-    return a
+    # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix a20
+    a20 = np.linalg.solve(matrix, Slm_vals)
+
+    return a20
 
 # Compute Gani for a specific value of sigma and D_theta.
 def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j):
