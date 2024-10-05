@@ -4,8 +4,6 @@ import scipy.constants as const
 from scipy.linalg import solve_banded
 from scipy.misc import derivative
 
-# A draft of what Get_Gani might look like (I am not sure how the get_alm function will look and what variables it will have in it).
-
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
 tauHdat = np.loadtxt(r'tauH.txt')
@@ -366,35 +364,38 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     D_para_vals_1=np.array([])
     D_para_vals_2=np.array([])
     D_para_vals_minus=np.array([])
+    Slm_vals=np.array([])
     plus_1 = 0
     minus_1 = 0
     velocity = np.linspace(1,10**8,71)
 
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
-        D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i))
+        D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))
+        # make the vector for the source terms
+        Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*veloctiy[i]**2))
         # create indeicies to check if i+/-1 will be out of range for v
         plus_1 = i+1
         minus_1 = i-1
     
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         if plus_1>70:
-            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(-velocity[i]))
+            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(-velocity[i]))
         else:
-            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
         
         if minus_1<0:
-            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]))
+            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]))
         else:
-            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[0,5], data[0,7], data[0,13], data[0,2], data[0,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            A_v_vals_plus = np.append(A_v_vals_plus, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
         plus_1 = 0
         minus_1 = 0
     # remove the first or last values for off diagonal matricies so they don't interfere with the construction
