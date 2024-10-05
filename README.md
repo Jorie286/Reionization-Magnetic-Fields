@@ -6,8 +6,8 @@ It then graphs the sigmas in terms various potential values of $\frac{i\ D_{\the
 
 The output.txt file contains the output from the reionization code by frankelzeng.
 
-The Get_Giso_u Python code uses the output.txt file to solve for $\frac{Giso}{u}$ after finding the value of $D_{\theta}$ for a specific number of species. This is done by using a Reimann sum over values of velocity in place of using an integral.
+The Get_Giso_u Python code uses the output.txt file to solve for $\frac{G^{iso}}{u}$ after finding the value of $D_{\theta}$ for a specific number of species. This is done by using a Reimann sum over values of velocity in place of using an integral.
 
-The Graphing_Giso_u Python code uses the data from Get_Giso_u to graph the $Giso_u$ data in terms of variables in the output.txt file. These variables include time, H neutral fraction, He neutral fraction, electron temperature, ionized H temperature, and ionized He temperature.
+The Graphing_Giso_u Python code uses the data from Get_Giso_u to graph the $G^{iso}_u$ data in terms of variables in the output.txt file. These variables include time, H neutral fraction, He neutral fraction, electron temperature, ionized H temperature, and ionized He temperature.
 
-The Get_Gani Python code uses the data from the output.txt file to solve for Gani. This uses a very similar method to Get_Giso_u in order to compute the values of Gani. Again, a Reimann sum was used to substitute for the integral over v. The funtion for get_alm has been added but there are still some bugs in the code that need to be worked out.
+The Get_Gani Python code uses the data from the output.txt file to solve for $G^{ani}$. This uses a very similar method to Get_Giso_u in order to compute the values of $G^{ani}$. Again, a Reimann sum was used to substitute for the integral over v. The funtion for get_alm has been added but there are still some bugs in the code that need to be worked out.
