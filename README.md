@@ -10,4 +10,4 @@ The Get_Giso_u Python code uses the output.txt file to solve for Giso/u after fi
 
 The Graphing_Giso_u Python code uses the data from Get_Giso_u to graph the Giso_u data in terms of variables in the output.txt file. These variables include time, H neutral fraction, He neutral fraction, electron temperature, ionized H temperature, and ionized He temperature.
 
-The Get_Gani Python code uses the data from the output.txt file to solve for Gani. This uses a very similar method to Get_Giso_u in order to compute the values of Gani. Again, a Reimann sum was used to substitute for the integral over v. (This file is not yet complete, the function for alm has not been determined).
+The Get_Gani Python code uses the data from the output.txt file to solve for Gani. This uses a very similar method to Get_Giso_u in order to compute the values of Gani. Again, a Reimann sum was used to substitute for the integral over v. The funtion for get_alm has been added but there are still some bugs in the code that need to be worked out.
