@@ -10,8 +10,8 @@ tauHdat = np.loadtxt(r'tauH.txt')
 tauHedat = np.loadtxt(r'tauHe.txt')
 fracflux = np.loadtxt(r'fracflux.txt')
 
-# Create a distribution of velocities in log space.
-velocity = np.logspace(1,8,71)
+# Create a distribution of velocities in linear space.
+velocity = np.linspace(1,10**8,71)
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
@@ -322,13 +322,29 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k, j):
     delta_E_He = E_lamda_He*math.log(4)/N_NU # Energy bin width for He
     n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     F = (500000000*n_H*(1+f_He))/(1-500000000/const.c) # incident flux
-    tautot = tauHdat + tauHedat
     
-    A_j = fracflux[j]*math.exp(-np.cumsum(tautot, axis=1))*((1-math.exp(-tautot))/DNHI)
-        
-    Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauH[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
-    Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHe[k]/(tauH[k]+tauHe[k]))*(m_e/(velocity[i]*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
-    Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
+    # get the sum for each element in the tauHdat and tauHedat data
+    tautot=np.array([], dtype="float")
+    tautot_list=[]
+    for a in range(0, tauHdat.shape[0]):
+        for b in range(0, tauHdat.shape[1]):
+            tautot_list.append(tauHdat[a][b] + tauHedat[a][b])
+        # add the list of values for that row to the tautot array
+        tautot=np.append(tautot, tautot_list)
+        # clear the list after each row iteration
+        tautot_list=[]
+    tautot=np.reshape(tautot, (128,2000))
+    
+    Slm_tot = []
+    A_j = 0
+    Slm_H = 0
+    Slm_He = 0
+    for r in range(0, tautot.shape[0]):
+        # CHECK THIS, I am not sure if this is exactly what we want to do here.
+        A_j = fracflux*math.exp([sum(tautot[:,j]) for j in range(0, tautot.shape[1])][r])*((1-math.exp(-tautot[r,j]))/DNHI)
+        Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity[i]*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
+        Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity[i]*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
+        Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
     return Slm_tot
 
 def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
@@ -354,7 +370,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 4, 2024
+    Date of last revision: October 5, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -367,14 +383,13 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     Slm_vals=np.array([])
     plus_1 = 0
     minus_1 = 0
-    velocity = np.linspace(1,10**8,71)
 
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))
         
         # make the vector for the source terms
-        Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*veloctiy[i]**2))
+        Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*velocity[i].astype(int)**2))
         
         # create indeicies to check if i+/-1 will be out of range for v
         plus_1 = i+1
@@ -435,7 +450,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j)
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
-    Input arguments (7)
+    Input arguments (13)
         required    float or integer-like values 
                         T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
@@ -447,8 +462,8 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j)
                         tauH, hydrogen optical depth
                         tauHe, helium optical depth
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, ???????
                         i, the slab number of the iteration over velocities
+                        k = 1e-12, ???????
                         j, the bin number ?????
     Returns
         the value of Gani for the specific conditions entered into the function
@@ -465,7 +480,7 @@ Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], 5e4, i, 1e-12, j)
+        Gani_compute = get_Gani(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
         Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
     Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
