@@ -153,6 +153,7 @@ def get_sigmas(n, c):
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
+    print("Run", j)
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
         Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
         Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
