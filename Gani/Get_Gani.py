@@ -303,7 +303,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k, j):
     Returns
         the value of the source term for the specific conditions entered into the function
 
-    Date of last revision: September 23, 2024
+    Date of last revision: October 10, 2024
     """
     N_NU = 128 # number of frequency bins
     DNHI = 2.5e16
@@ -345,7 +345,10 @@ def get_Slm(yH, tauH, tauHe, fracflux, i, k, j):
         Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity[i]*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity[i]*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
-    return Slm_tot
+    
+    # average over wavelength bins to make Slm_tot into a single column??????
+    Slm_final=sum(Slm_tot)/len(Slm_tot)
+    return Slm_final
 
 def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     """
@@ -370,7 +373,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 5, 2024
+    Date of last revision: October 10, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -387,14 +390,13 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))
-        
         # make the vector for the source terms
-        Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*velocity[i].astype(int)**2))
-        
+        Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, i, 1e-12, j)*(velocity[i]**2)))
+
         # create indeicies to check if i+/-1 will be out of range for v
         plus_1 = i+1
         minus_1 = i-1
-    
+
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         if plus_1>70:
             A_v_vals = np.append(A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(-velocity[i]))
@@ -415,6 +417,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
             D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
         plus_1 = 0
         minus_1 = 0
+
     # remove the first or last values for off diagonal matricies so they don't interfere with the construction
     D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
     A_v_vals_plus = np.delete(A_v_vals_plus,[0])
@@ -437,8 +440,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
         for n in range(0,71):
             matrix[m][n]=D_theta_matrix[m][n]-A_v_matrix[m][n]+D_para_matrix_1[m][n]+D_para_matrix_2[m][n]-D_para_matrix_minus[m][n]+A_v_matrix_plus[m][n]-D_para_matrix_plus[m][n]
     
-    
-    # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix a20
+    # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix*a20
     a20 = np.linalg.solve(matrix, Slm_vals)
 
     return a20
@@ -479,6 +481,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j)
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
+    print("Run", j)
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
         Gani_compute = get_Gani(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
