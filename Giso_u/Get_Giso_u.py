@@ -6,8 +6,8 @@ from scipy.linalg import solve_banded
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
 
-# Create a distribution of velocities in log space.
-velocity = np.logspace(1,8,71)
+# Create a distribution of velocities
+velocity = np.linspace(1,10**8,71)
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
@@ -41,7 +41,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
         required    float or integer-like values 
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THEII, temperature of ionized helium in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
                         nHtot, total number of hydrogen atoms in the distribution???
@@ -74,7 +74,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
                         T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THEII, temperature of ionized helium in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
                         i, the slab number of the iteration over velocities
@@ -160,11 +160,14 @@ for j in range(0, len(data[:,0])): #Iterate through all the rows of data and com
         Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
     Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
     Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
+# Create lists of the correct length to fill with the computed values.
 real = [None]*len(Giso_list)
 imaginary = [None]*len(Giso_list)
+# Add the computed values to the lists.
 for m in range(0, len(Giso_list)):
     real[m] = Giso_list[m].real
     imaginary[m] = Giso_list[m].imag
+# Print out the results.
 print(Giso_list)
 print(imaginary)
 print(real)
