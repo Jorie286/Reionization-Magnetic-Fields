@@ -4,7 +4,7 @@ import scipy.constants as const
 from scipy.linalg import solve_banded
 from scipy.misc import derivative
 
-# Open and load the reionization temperatures output into Python
+# Open and load the modified reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
 tauHdat = np.loadtxt(r'tauH.txt')
 tauHedat = np.loadtxt(r'tauHe.txt')
@@ -79,7 +79,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
                         T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THEII, temperature of ionized helium in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
                         i, the slab number of the iteration over velocities
@@ -240,7 +240,7 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, i):
                         T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THEII, temperature of ionized helium in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
                         yH, the neutral fraction of hydrogen
                         yHe, the neutral fraction of helium
                         i, the slab number of the iteration over velocities
@@ -367,8 +367,8 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, i, k, j):
                         tauH, hydrogen optical depth
                         tauHe, helium optical depth
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, ???????
                         i, the slab number of the iteration over velocities
+                        k = 1e-12, ???????
                         j, the bin number ?????
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
@@ -481,11 +481,12 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, i, k, j)
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
-    print("Run", j)
+    print("Run", j) # Print a message duing each run so we can track the progress.
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
         Gani_compute = get_Gani(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
         Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
-    Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+    Gani_data.append(Gani_final) # Add the computed value of Gani to the list of all Gani computed for each row of data.
     Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
+# Return the results
 print(Gani_data)
