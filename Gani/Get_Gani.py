@@ -1,8 +1,11 @@
 import math
+import time
 import numpy as np
 import scipy.constants as const
 from scipy.linalg import solve_banded
 from scipy.misc import derivative
+
+computation_start_time=time.time() # get the time the code cell started computations
 
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
@@ -82,11 +85,11 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
                         THEII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        velocity, the value for the velocity 
+                        velocity, . . . 
     Returns
         the value of D_theta for the specific conditions entered into the function
         
-    Date of last revision: October 14, 2024
+    Date of last revision: July 12, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -136,11 +139,11 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        velocity, the value for the velocity
+                        velocity, . . . .
     Returns
         the value of A_a for the specific conditions entered into the function
         
-    Date of last revision: October 14, 2024
+    Date of last revision: July 11, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -189,11 +192,11 @@ def get_DA_a(T, Te, THII, THeII, yH, yHe, velocity):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        velocity, the value for the velocity
+                        velocity,  . . . . .
     Returns
         the value of the derivative of A_a for the specific conditions entered into the function
         
-    Date of last revision: October 14, 2024
+    Date of last revision: September 23, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -240,14 +243,14 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
                         T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
-                        THeII, temperature of ionized helium in the reionization front
+                        THEII, temperature of ionized helium in the reionization front
                         yH, the neutral fraction of hydrogen
                         yHe, the neutral fraction of helium
-                        velocity, the value for the velocity
+                        velocity, . . . .
     Returns
         the value of the along the path diffusion coefficient for the values entered into the function
 
-    Date of last revision: October 14, 2024
+    Date of last revision: September 23, 2024
     """
     k_B = const.k # Boltzmann constant
     R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
@@ -291,19 +294,19 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
     be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
-    Input argument (7)
+    Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauH, hydrogen optical depth
                         tauHe, helium optical depth
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, wave number
-                        j, the bin number (time step)
-                        velocity, the value for the velocity
+                        k = 1e-12, ???????
+                        j, the bin number ?????
+                        velocity, . . . . .
     Returns
         the value of the source term for the specific conditions entered into the function
 
-    Date of last revision: October 14, 2024
+    Date of last revision: October 10, 2024
     """
     N_NU = 128 # number of frequency bins
     DNHI = 2.5e16
@@ -352,8 +355,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
 
 def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     """
-    Function to get the values of a_{l,m} for each velocity bin. Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
-    this is the only one that is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function
+    Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
+    this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
     does not check for good inputs.
 
     Input argument (12)
@@ -385,10 +388,12 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Slm_vals=np.array([])
     plus_1 = 0
     minus_1 = 0
+    start_time=0
+    end_time=0
 
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
-        print("Running velocity", i)
+        start_time = time.time() # get the time this iteration started
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*velocity[i]**2)
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
@@ -417,6 +422,9 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
             D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
         plus_1 = 0
         minus_1 = 0
+        end_time = time.time() # get the time this iteration finished
+        # get the total time spent on this iteration
+        print("Time for velocity", i, "computation was", end_time-start_time, "seconds.")
 
     # remove the first or last values for off diagonal matricies so they don't interfere with the construction
     D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
@@ -447,8 +455,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
 
 def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     """
-    Calls the function to get the values of a_{l,m} for each velocity bin. This should be computed once for each bin number to avoid repetitivley computing the values.
-    The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
+    Calls function to get the values of a_{l,m} for each velocity bin.
 
     Input argument (11)
         required    integer values
@@ -464,11 +471,18 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
                         k = 1e-12, wave number
                         j, the bin number (time step)
     Returns
-        a list of a_{2,0} (the multipole moment) values for each velocity bin.
+        the value of a_{l,m} (the multipole moment) for the given l and m
 
     Date of last revision: October 14, 2024
     """
+    start_time=time.time() # get the time the function started computing
+    print("Starting slab", j, "computation.")
     alm = get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j)
+    
+    end_time=time.time() # get the time the funtion finished computing
+    
+    # print out the total time spent on this funciton
+    print("Time for slab", j, "alm computation was", end_time-start_time, "seconds.")
     
     return alm
 
@@ -491,7 +505,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
                         tauH, hydrogen optical depth
                         tauHe, helium optical depth
                         fracflux, flux fraction in a photon bin
-                        alm, list of solutions of a_{2,0} for all velocities for a slab number
+                        alm, solution of a_{2,0} for all velocities for a slab number
                         i, the slab number of the iteration over velocities
                         k = 1e-12, wave number
                         j, the bin number (time step)
@@ -502,14 +516,13 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     """
     n_e = get_n_e(yH, yHe) # electron density function
     # this needs to updated to reflect the solution for a_{l,m}
-    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm[i])
+    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
     return Gani
 
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
-    print("Run", j)
     alm = compute_for_slab_timestep(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat[j], tauHedat[j], fracflux[j], 1e-12, j)
     print(alm)
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
@@ -518,4 +531,8 @@ for j in range(0, len(data[:,0])): #Iterate through all the rows of data and com
         Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
     Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
     Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
+    
+computation_end_time=time.time() # get the time the code cell finished
+# return the total time it spent calculating the values
+print("Time for computation to complete:", computation_end_time-computation_start_time, "seconds")
 print(Gani_data)
