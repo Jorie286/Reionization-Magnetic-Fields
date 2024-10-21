@@ -394,12 +394,12 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
 
         # create indeicies to check if i+/-1 will be out of range for v
-        plus_1 = i+1
-        minus_1 = i-1
+        plus_1 = (i+1)/2
+        minus_1 = (i-1)/2
 
-        # ensure that the i+/-1 indicies will not be out of range by checking their values
+        # ensure that the i indicies will not be out of range by checking their values
         if plus_1>70:
-            A_v_vals = np.append(2*A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
+            A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i])))
             D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
             D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
         else:
@@ -408,7 +408,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
             D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
         
         if minus_1<0:
-            A_v_vals_plus = np.append(2*A_v_vals_plus, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
+            A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i])))
             D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
             D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
         else:
