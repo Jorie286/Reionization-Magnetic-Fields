@@ -4,6 +4,7 @@ import numpy as np
 import scipy.constants as const
 from scipy.linalg import solve_banded
 from scipy.misc import derivative
+import sys
 
 computation_start_time=time.time() # get the time the code cell started computations
 
@@ -377,7 +378,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 10, 2024
+    Date of last revision: October 21, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -407,16 +408,16 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
 
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
-        if plus_1>70:
+        if i>=len(velocity)-1:
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
             D_para_vals_1 = np.append(D_para_vals_1, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
         else:
-            A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
-            D_para_vals_plus = np.append(D_para_vals_plus, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
+            A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
+            D_para_vals_plus = np.append(D_para_vals_plus, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
             D_para_vals_1 = np.append(D_para_vals_1, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
         
-        if minus_1<0:
+        if i<=0:
             D_para_vals_2 = np.append(D_para_vals_2, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]))))
         else:
             D_para_vals_minus = np.append(D_para_vals_minus, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
@@ -425,12 +426,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         minus_1 = 0
         end_time = time.time() # get the time this iteration finished
         # get the total time spent on this iteration
-        print("Time for velocity", i, "computation was", end_time-start_time, "seconds.")
-
-    # remove the first or last values for off diagonal matricies so they don't interfere with the construction
-    # D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
-    # A_v_vals_plus = np.delete(A_v_vals_plus,[0])
-    # D_para_vals_plus = np.delete(D_para_vals_plus,[0])
+        print("Time for velocity", i, "computation was", end_time-start_time, "seconds.") 
 
     # diagonalize the matricies to make a tri-diagonal matrix    
     D_theta_matrix = np.diag(D_theta_vals)
@@ -525,7 +521,7 @@ Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     alm = compute_for_slab_timestep(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat[j], tauHedat[j], fracflux[j], 1e-12, j)
-    print(alm)
+    print("Values for a_{2,0}:\n", alm)
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
         Gani_compute = get_Gani(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], alm[i], i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
