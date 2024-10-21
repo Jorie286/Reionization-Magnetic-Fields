@@ -15,6 +15,8 @@ fracflux = np.loadtxt(r'fracflux.txt')
 
 # Create a distribution of velocities in linear space.
 velocity = np.linspace(1,10**8,71)
+# make a linear velocity distribution including "half-steps" for get_alm
+velocity_half = np.linspace(1,10**8,142)
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
@@ -398,28 +400,26 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
 
-        # create indeicies to check if i+/-1 will be out of range for v
-        plus_1 = i+1
-        minus_1 = i-1
+        # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
+        # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
+        plus_1 = (i*2)+1
+        minus_1 = (i*2)-1
 
         # ensure that the i+/-1 indicies will not be out of range by checking their values
+        # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if plus_1>70:
-            A_v_vals = np.append(2*A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
+            A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(-velocity_half[i]))))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(-velocity_half[i])))
         else:
-            A_v_vals = np.append(2*A_v_vals, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-        
+            A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity_half[i])))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity_half[i])))
+            A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity_half[i]))))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity_half[i])))
         if minus_1<0:
-            A_v_vals_plus = np.append(2*A_v_vals_plus, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(velocity_half[i])))
         else:
-            A_v_vals_plus = np.append(2*A_v_vals_plus, (get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity[minus_1]**2))/((velocity[i]**2)*(velocity_half[i]-velocity[minus_1])))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[i])*(velocity_half[i]**2))/((velocity[i]**2)*(velocity_half[i]-velocity_half[minus_1])))
         plus_1 = 0
         minus_1 = 0
         end_time = time.time() # get the time this iteration finished
@@ -427,9 +427,9 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         print("Time for velocity", i, "computation was", end_time-start_time, "seconds.")
 
     # remove the first or last values for off diagonal matricies so they don't interfere with the construction
-    D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
-    A_v_vals_plus = np.delete(A_v_vals_plus,[0])
-    D_para_vals_plus = np.delete(D_para_vals_plus,[0])
+    # D_para_vals_minus = np.delete(D_para_vals_minus,[-1])
+    # A_v_vals_plus = np.delete(A_v_vals_plus,[0])
+    # D_para_vals_plus = np.delete(D_para_vals_plus,[0])
 
     # diagonalize the matricies to make a tri-diagonal matrix
     D_theta_matrix = np.diag(D_theta_vals)
