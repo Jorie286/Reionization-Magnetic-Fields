@@ -180,62 +180,6 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
         A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-velocity**2/(2*A_numbers[3+a]**2))
         A_final = A_final + A_one*A_two
     return -A_final # The result for A_a(v) is addative inverse of its sum over species.
-
-def get_DA_a(T, Te, THII, THeII, yH, yHe, velocity):
-    """
-    Function to get the derivative fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can
-    be used to iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being 
-    considered. Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
-
-    Important note: all physical constants are in units ov MKS for easy conversions.
-    
-    Input arguments (7)
-        required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
-                        Te, temperature of electrons in the reionization front
-                        THII, temperature of ionized hydrogen in the reionization front
-                        THeII, temperature of ionized helium in the reionization front
-                        yH, neutral fraction of hydrogen
-                        yHe, neutral fraction of helium
-                        velocity, the value for the velocity
-    Returns
-        the value of the derivative of A_a for the specific conditions entered into the function
-        
-    Date of last revision: October 14, 2024
-    """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
-    n_b3 = n_e
-    # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
-    
-    # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
-    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
-    Da_final = 0
-    for a in range(0,3): # Iterate through numbers and calculate DA_a for each of the species. Returns the sum over all species.
-        A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
-        A_two = math.exp(-velocity**2/(2*A_numbers[3+a]**2)*((2/(math.sqrt(2*math.pi)*A_numbers[3+a]))-(math.sqrt(2/math.pi)*(1/A_numbers[3+a]))+(math.sqrt(2/math.pi)*((velocity**2)/(A_numbers[3+a]**3)))))
-        Da_final = Da_final + A_one*A_two
-    # The result for A_a(v) is addative inverse of its sum over species.
-    return -Da_final
                
 def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     """
@@ -386,7 +330,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 10, 2024
+    Date of last revision: October 23, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -414,21 +358,21 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         # ensure that the i indicies will not be out of range by checking their values
         if plus_1>70:
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i])))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i]))
         else:
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i])))
-            D_para_vals_1 = np.append(D_para_vals_1, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
-            D_para_vals_minus = np.append(D_para_vals_minus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_1 = np.append(D_para_vals_1, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
+            D_para_vals_minus = np.append(D_para_vals_minus, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[plus_1]-velocity[i]))
         
         if minus_1<0:
             A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i])))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]))
         else:
             A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1])))
-            D_para_vals_plus = np.append(D_para_vals_plus, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
-            D_para_vals_2 = np.append(D_para_vals_2, (get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_plus = np.append(D_para_vals_plus, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
+            D_para_vals_2 = np.append(D_para_vals_2, (get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i]-velocity[minus_1]))
         plus_1 = 0
         minus_1 = 0
 
