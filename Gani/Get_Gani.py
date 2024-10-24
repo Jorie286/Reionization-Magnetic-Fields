@@ -25,6 +25,8 @@ def get_n_e(yH, yHe):
     Funtion to find the electron number density (units of electrons m^-3). This function is used as a part of get_Giso_u. The inputs should be postive otherwise
     the ouptut will not make sense, please note that he function does not check for good inputs.
     
+    Important note: all physical constants are in units of MKS for easy conversions.
+    
     Input arguments (2)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
@@ -34,7 +36,7 @@ def get_n_e(yH, yHe):
         
     Date of last revision: July 12, 2024
     """
-    z = 7
+    z = 7 # redshift
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter
     H_o = 2.2618e-18 # Hubble constant
     G = const.G # gravitational constant
@@ -46,6 +48,8 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
     This funciton is used as part of the function get_Giso_u. The input for n must be a positive whole number for the function to work correctly, please note that
     it does not check for good input.
+    
+    Important note: all physical constants are in units of MKS for easy conversions.
     
     Input arguments (2)
         required    float or integer-like values
@@ -79,6 +83,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
     postive otherwise the ouptut will not make sense, the function does not check for good inputs.
+    
+    Important note: all physical constants are in units of MKS for easy conversions.
 
     Input arguments (7)
         required    float or integer-like values
@@ -88,7 +94,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
                         THEII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        velocity, . . . 
+                        velocity, given speed of electrons from linearly distributed list
     Returns
         the value of D_theta for the specific conditions entered into the function
         
@@ -107,7 +113,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
     H_o = 2.2618e-18 # Hubble constant
     G = const.G # gravitational constant
-    z = 7
+    z = 7 # redshift
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
@@ -124,7 +130,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     D_final = 0
     for n in range(0,3): # Iterate through numbers and calculate D_theta for each of the species. Returns the sum over all species.
         D_one = (q_a**2*q_b**2*numbers[0+n]*lamda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity**3)
-        D_two = (1-(numbers[3+n]**2/velocity**2))*math.erf(velocity/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/velocity)*math.exp(-velocity**2/(2*numbers[3+n]**2))
+        D_two = (1-(numbers[3+n]**2/velocity**2))*math.erf(velocity/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/velocity)*math.exp(-(velocity**2)/(2*numbers[3+n]**2))
         D_final = D_one*D_two+D_final
     return D_final
 
@@ -134,6 +140,8 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
     Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
+    Important note: all physical constants are in units of MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -142,7 +150,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        velocity, . . . .
+                        velocity, given speed of electrons from linearly distributed list
     Returns
         the value of A_a for the specific conditions entered into the function
         
@@ -161,7 +169,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
     H_o = 2.2618e-18 # Hubble constant
     G = const.G # gravitational constant
-    z = 7
+    z = 7 # redshift
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
@@ -177,70 +185,20 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     A_final = 0
     for a in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
         A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
-        A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-velocity**2/(2*A_numbers[3+a]**2))
+        A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-(velocity**2)/(2*A_numbers[3+a]**2))
         A_final = A_final + A_one*A_two
-    return -A_final # The result for A_a(v) is addative inverse of its sum over species.
-
-def get_DA_a(T, Te, THII, THeII, yH, yHe, velocity):
-    """
-    Function to get the derivative fraciton of the ionizing photons that are absorbed in slab j (a row of the data) and are in a photon energy bin. This function can
-    be used to iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being 
-    considered. Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
-
-    Input arguments (7)
-        required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
-                        Te, temperature of electrons in the reionization front
-                        THII, temperature of ionized hydrogen in the reionization front
-                        THeII, temperature of ionized helium in the reionization front
-                        yH, neutral fraction of hydrogen
-                        yHe, neutral fraction of helium
-                        velocity,  . . . . .
-    Returns
-        the value of the derivative of A_a for the specific conditions entered into the function
-        
-    Date of last revision: September 23, 2024
-    """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
-    n_b3 = n_e
-    # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
-    # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
-    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
-    Da_final = 0
-    for a in range(0,3): # Iterate through numbers and calculate DA_a for each of the species. Returns the sum over all species.
-        A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
-        A_two = math.exp(-velocity**2/(2*A_numbers[3+a]**2)*((2/(math.sqrt(2*math.pi)*A_numbers[3+a]))-(math.sqrt(2/math.pi)*(1/A_numbers[3+a]))+(math.sqrt(2/math.pi)*((velocity**2)/(A_numbers[3+a]**3)))))
-        Da_final = Da_final + A_one*A_two
-    # The result for A_a(v) is addative inverse of its sum over species.
-    return -Da_final
-               
+    A_final_neg = -A_final # The result for A_a(v) is addative inverse of its sum over species.
+    return A_final_neg
+
 def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     """
     Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we 
     know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units of MKS for easy conversions.
+    
     Input argument (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -249,7 +207,7 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
                         THEII, temperature of ionized helium in the reionization front
                         yH, the neutral fraction of hydrogen
                         yHe, the neutral fraction of helium
-                        velocity, . . . .
+                        velocity, given speed of electrons from linearly distributed list
     Returns
         the value of the along the path diffusion coefficient for the values entered into the function
 
@@ -285,10 +243,12 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     Da_final = 0
     for d in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
         Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*(m_a/(Da_numbers[6+d]+1))*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity**3)
-        Da_two = math.erf(velocity/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity/Da_numbers[3+d])*math.exp(-velocity**2/(2*Da_numbers[3+d]**2))
+        Da_two = math.erf(velocity/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity/Da_numbers[3+d])*math.exp(-(velocity**2)/(2*Da_numbers[3+d]**2))
         Da_final = Da_final + Da_one*Da_two
-    # The result for DA_a(v) is the addative inverse of its sum over species.
-    return -Da_final
+    
+    Da_final_neg = -Da_final
+    # The result for Da_a(v) is the addative inverse of its sum over species.
+    return Da_final_neg
 
 # Source term
 def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
@@ -297,15 +257,17 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
     be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units of MKS for easy conversions.
+
     Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauH, hydrogen optical depth
                         tauHe, helium optical depth
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, ???????
-                        j, the bin number ?????
-                        velocity, . . . . .
+                        k = 1e-12, wave number
+                        j, the bin number (time step)
+                        velocity, given speed of electrons from linearly distributed list
     Returns
         the value of the source term for the specific conditions entered into the function
 
@@ -346,7 +308,6 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     Slm_H = 0
     Slm_He = 0
     for r in range(0, tautot.shape[0]):
-        # CHECK THIS, I am not sure if this is exactly what we want to do here.
         A_j = fracflux*math.exp([sum(tautot[:,j]) for j in range(0, tautot.shape[1])][r])*((1-math.exp(-tautot[r,j]))/DNHI)
         Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
@@ -361,6 +322,8 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
     this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
     does not check for good inputs.
+
+    Important note: all physical constants are in units of MKS for easy conversions.
 
     Input argument (12)
         required    integer values
@@ -410,18 +373,18 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if i>=len(velocity)-1:
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
         else:
             A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
-            D_para_vals_plus = np.append(D_para_vals_plus, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
+            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
             A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
         
         if i<=0:
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]))))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]))))
         else:
-            D_para_vals_minus = np.append(D_para_vals_minus, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_DA_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
+            D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
         plus_1 = 0
         minus_1 = 0
         end_time = time.time() # get the time this iteration finished
@@ -454,6 +417,8 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
+    Important note: all physical constants are in units of MKS for easy conversions.
+    
     Input argument (11)
         required    integer values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -489,7 +454,9 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     Function to get the value of Gani for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
-
+    
+    Important note: all physical constants are in units of MKS for easy conversions.
+    
     Input arguments (13)
         required    float or integer-like values 
                         T = 5e4 Kelvin, the temperature of the reionization front???
