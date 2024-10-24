@@ -14,6 +14,8 @@ def get_n_e(yH, yHe):
     """
     Funtion to find the electron number density (units of electrons m^-3). This function is used as a part of get_Giso_u. The inputs should be postive otherwise
     the ouptut will not make sense, please note that he function does not check for good inputs.
+
+    Important note: all physical constants are in units ov MKS for easy conversions.
     
     Input arguments (2)
         required    float or integer-like values
@@ -37,6 +39,8 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values 
                         Te, temperature of electrons in the reionization front
@@ -69,6 +73,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
     postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -122,6 +128,8 @@ def get_sigmas(n, c):
     Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
     This funciton is used as part of the function get_Giso_u. The input for n must be a positive whole number for the function to work correctly, please note that
     it does not check for good input.
+    
+    Important note: all physical constants are in units ov MKS for easy conversions.
     
     Input arguments (2)
         required    float or integer-like values

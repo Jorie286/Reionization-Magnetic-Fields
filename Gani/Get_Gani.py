@@ -86,6 +86,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     
     Important note: all physical constants are in units of MKS for easy conversions.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -140,7 +142,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
     Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
-    Important note: all physical constants are in units of MKS for easy conversions.
+    Important note: all physical constants are in units ov MKS for easy conversions.
     
     Input arguments (7)
         required    float or integer-like values
@@ -196,9 +198,9 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we 
     know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
-
-    Important note: all physical constants are in units of MKS for easy conversions.
     
+    Important note: all physical constants are in units ov MKS for easy conversions.
+      
     Input argument (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -257,9 +259,10 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
     be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
-    Important note: all physical constants are in units of MKS for easy conversions.
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
+    Input argument (7)
 
-    Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauH, hydrogen optical depth
@@ -322,8 +325,8 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
     this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
     does not check for good inputs.
-
-    Important note: all physical constants are in units of MKS for easy conversions.
+    
+    Important note: all physical constants are in units ov MKS for easy conversions.
 
     Input argument (12)
         required    integer values
@@ -341,7 +344,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 21, 2024
+    Date of last revision: October 23, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -363,12 +366,12 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*velocity[i]**2)
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
-
+        
         # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
         plus_1 = (i*2)+1
         minus_1 = (i*2)-1
-
+        
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if i>=len(velocity)-1:
@@ -385,6 +388,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         else:
             D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
             D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
+
         plus_1 = 0
         minus_1 = 0
         end_time = time.time() # get the time this iteration finished
@@ -417,7 +421,7 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
-    Important note: all physical constants are in units of MKS for easy conversions.
+    Important note: all physical constants are in units ov MKS for easy conversions.
     
     Input argument (11)
         required    integer values
@@ -455,7 +459,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
     
-    Important note: all physical constants are in units of MKS for easy conversions.
+    Important note: all physical constants are in units ov MKS for easy conversions.
     
     Input arguments (13)
         required    float or integer-like values 
