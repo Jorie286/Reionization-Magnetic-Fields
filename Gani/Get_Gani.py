@@ -19,6 +19,8 @@ def get_n_e(yH, yHe):
     Funtion to find the electron number density (units of electrons m^-3). This function is used as a part of get_Giso_u. The inputs should be postive otherwise
     the ouptut will not make sense, please note that he function does not check for good inputs.
     
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (2)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
@@ -74,6 +76,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
     postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -128,6 +132,8 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
     Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -181,6 +187,8 @@ def get_DA_a(T, Te, THII, THeII, yH, yHe, velocity):
     be used to iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being 
     considered. Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -235,6 +243,8 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input argument (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -291,6 +301,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
     be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input argument (7)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
@@ -356,6 +368,8 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     this is the only one that is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function
     does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input argument (12)
         required    integer values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -450,6 +464,8 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     Calls the function to get the values of a_{l,m} for each velocity bin. This should be computed once for each bin number to avoid repetitivley computing the values.
     The inputs should be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input argument (11)
         required    integer values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -479,6 +495,8 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
 
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
     Input arguments (13)
         required    float or integer-like values 
                         T = 5e4 Kelvin, the temperature of the reionization front???
