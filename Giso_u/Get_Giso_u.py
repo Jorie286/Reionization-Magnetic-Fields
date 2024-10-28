@@ -30,6 +30,8 @@ G = const.G # gravitational constant
 z = 7 # redshift
 m_e = const.m_e # mass of an electron
 
+T = 5e4 # the temperature of the reionization front (Kelvin)
+
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
     """
@@ -82,7 +84,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     return Giso_u
 
 # Computing D_theta
-def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
+def get_D_theta(Te, THII, THeII, yH, yHe, i):
     """
     Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
@@ -90,9 +92,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
 
     Important note: all physical constants are in units ov MKS for easy conversions.
     
-    Input arguments (7)
+    Input arguments (6)
         required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
