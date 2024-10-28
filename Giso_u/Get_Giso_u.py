@@ -111,9 +111,9 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
+    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
+    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
