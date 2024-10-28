@@ -62,7 +62,7 @@ def get_n_e(yH, yHe):
     Returns
         the number density of electrons under the given conditions
         
-    Date of last revision: July 12, 2024
+    Date of last revision: October 28, 2024
     """
     n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
     return n_e
@@ -82,7 +82,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     Returns
         the values of the first n sigma_{n,1}
         
-    Date of last revision: July 9, 2024
+    Date of last revision: October 28, 2024
     """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
@@ -121,7 +121,7 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of D_theta for the specific conditions entered into the function
         
-    Date of last revision: July 12, 2024
+    Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
@@ -163,7 +163,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of A_a for the specific conditions entered into the function
         
-    Date of last revision: July 11, 2024
+    Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
@@ -182,7 +182,6 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
         A_one = (q_a**2*q_b**2*A_numbers[0+a]*((m_a/A_numbers[6+a])+1)*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
         A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-(velocity**2)/(2*A_numbers[3+a]**2))
         A_final = A_final + A_one*A_two
-    
     A_final_neg = -A_final # The result for A_a(v) is addative inverse of its sum over species.
     return A_final_neg
 
@@ -206,7 +205,7 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of the along the path diffusion coefficient for the values entered into the function
 
-    Date of last revision: September 23, 2024
+    Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
@@ -226,7 +225,6 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
         Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*((m_a/Da_numbers[6+d])+1)*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity**3)
         Da_two = math.erf(velocity/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity/Da_numbers[3+d])*math.exp(-(velocity**2)/(2*Da_numbers[3+d]**2))
         Da_final = Da_final + Da_one*Da_two
-    
     return Da_final
 
 # Source term
@@ -250,7 +248,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     Returns
         the value of the source term for the specific conditions entered into the function
 
-    Date of last revision: October 10, 2024
+    Date of last revision: October 28, 2024
     """
     E_lamda_H = I_H + (1/2)*m_e*velocity**2 # Energy of H for a photon energy bin, lambda
     E_lamda_He = I_He + (1/2)*m_e*velocity**2 # Energy of He for a photon energy bin, lambda
@@ -260,16 +258,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     F = (500000000*n_H*(1+f_He))/(1-500000000/const.c) # incident flux
     
     # get the sum for each element in the tauHdat and tauHedat data
-    tautot=np.array([], dtype="float")
-    tautot_list=[]
-    for a in range(0, tauHdat.shape[0]):
-        for b in range(0, tauHdat.shape[1]):
-            tautot_list.append(tauHdat[a][b] + tauHedat[a][b])
-        # add the list of values for that row to the tautot array
-        tautot=np.append(tautot, tautot_list)
-        # clear the list after each row iteration
-        tautot_list=[]
-    tautot=np.reshape(tautot, (128,2000))
+    tautot = tauHdat + tauHedat
+    tautot=np.reshape(tautot, (128,2000)) # make sure that the array is the correct shape
     
     Slm_tot = []
     A_j = 0
@@ -280,7 +270,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
         Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
-    
+          
     # average over wavelength bins to make Slm_tot into a single column??????
     Slm_final=sum(Slm_tot)/len(Slm_tot)
     return Slm_final
@@ -295,7 +285,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
 
     Input argument (12)
         required    integer values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -309,7 +299,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 21, 2024
+    Date of last revision: October 28, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -328,7 +318,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
         start_time = time.time() # get the time this iteration started
-        D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*velocity[i]**2)
+        D_theta_vals = np.append(D_theta_vals, (6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*velocity[i]**2))
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
 
@@ -366,17 +356,11 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     A_v_matrix_plus = np.diag(A_v_vals_plus, k=1)
     D_para_matrix_plus = np.diag(D_para_vals_plus, k=1)
 
-    # create a matrix full of zeros to add the computed values to
-    matrix=np.zeros((71,71), dtype=float)
-
     # add the matricies together to get the complete matrix
-    for m in range(0,71):
-        for n in range(0,71):
-            matrix[m][n]=D_theta_matrix[m][n]-A_v_matrix[m][n]+D_para_matrix_1[m][n]+D_para_matrix_2[m][n]-D_para_matrix_minus[m][n]+A_v_matrix_plus[m][n]-D_para_matrix_plus[m][n]
+    matrix = D_theta_matrix - A_v_matrix + D_para_matrix_1 + D_para_matrix_2 - D_para_matrix_minus + A_v_matrix_plus - D_para_matrix_plus
     
     # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix*a20
     a20 = np.linalg.solve(matrix, Slm_vals)
-
     return a20
 
 def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
@@ -387,7 +371,7 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     
     Input argument (11)
         required    integer values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -401,7 +385,7 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 14, 2024
+    Date of last revision: October 28, 2024
     """
     start_time=time.time() # get the time the function started computing
     print("Starting slab", j, "computation.")
@@ -411,7 +395,6 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     
     # print out the total time spent on this funciton
     print("Time for slab", j, "alm computation was", end_time-start_time, "seconds.")
-    
     return alm
 
 # Compute Gani for a specific value of sigma and D_theta.
@@ -425,7 +408,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     
     Input arguments (13)
         required    float or integer-like values 
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -442,7 +425,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     Returns
         the value of Gani for the specific conditions entered into the function
         
-    Date of last revision: October 14, 2024
+    Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
     # this needs to updated to reflect the solution for a_{l,m}
