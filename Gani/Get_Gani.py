@@ -14,10 +14,38 @@ tauHdat = np.loadtxt(r'tauH.txt')
 tauHedat = np.loadtxt(r'tauHe.txt')
 fracflux = np.loadtxt(r'fracflux.txt')
 
+# define the maximum velocity and number of velocities that we want to use for the compuation
+vmax = 1.0e8
+Nv = 71
+
 # Create a distribution of velocities in linear space.
-velocity = np.linspace(1,10**8,71)
+velocity = np.linspace(vmax/Nv, vmax, Nv)
 # make a linear velocity distribution including "half-steps" for get_alm
-velocity_half = np.linspace(1,10**8,142)
+velocity_half = np.linspace(vmax/Nv, vmax, Nv*2)
+
+# Define necessary constants for all computations
+k_B = const.k # Boltzmann constant
+R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
+a_o = 5.29177210903e-11 # Bohr radius
+m_a = const.m_e # mass of an electron
+m_b1 = const.m_p # mass of HII
+m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
+m_b3 = const.m_e # mass of an electron
+q_a = -const.eV # charge of an electron (also the charge of m_b3)
+q_b = const.eV # charge of HII and HeII
+epsilon_o = const.epsilon_0 # vacuum permittivity
+Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
+H_o = 2.2618e-18 # Hubble constant
+G = const.G # gravitational constant
+z = 7 # redshift
+N_NU = 128 # number of frequency bins
+DNHI = 2.5e16
+f_He = 0.079 # He abundance
+
+# Ionization energy of hydrogen and helium (in Joules)
+I_H = 2.18e-18
+I_He = 3.4e-19
+m_e = const.m_e # mass of an electron
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
@@ -36,10 +64,6 @@ def get_n_e(yH, yHe):
         
     Date of last revision: July 12, 2024
     """
-    z = 7 # redshift
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
     n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
     return n_e
 
@@ -78,7 +102,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     return x
 
 # Computing D_theta
-def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
+def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     """
     Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
@@ -86,9 +110,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Input arguments (7)
+    Input arguments (6)
         required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THEII, temperature of ionized helium in the reionization front
@@ -100,20 +123,6 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
         
     Date of last revision: July 12, 2024
     """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7 # redshift
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
@@ -144,7 +153,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     
     Input arguments (7)
         required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -156,20 +165,6 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
         
     Date of last revision: July 11, 2024
     """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7 # redshift
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
@@ -201,7 +196,7 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     
     Input argument (7)
         required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THEII, temperature of ionized helium in the reionization front
@@ -213,20 +208,6 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
 
     Date of last revision: September 23, 2024
     """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
@@ -271,17 +252,6 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
 
     Date of last revision: October 10, 2024
     """
-    N_NU = 128 # number of frequency bins
-    DNHI = 2.5e16
-    f_He = 0.079 # He abundance
-    # Ionization energy of hydrogen and helium (in Joules)
-    I_H = 2.18e-18
-    I_He = 3.4e-19
-    m_e = const.m_e # mass of an electron
-    H_o = 2.2618e-18 # Hubble constant
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    G = const.G # gravitational constant
-    z = 7
     E_lamda_H = I_H + (1/2)*m_e*velocity**2 # Energy of H for a photon energy bin, lambda
     E_lamda_He = I_He + (1/2)*m_e*velocity**2 # Energy of He for a photon energy bin, lambda
     delta_E_H = E_lamda_H*math.log(4)/N_NU # Energy bin width for H
@@ -306,7 +276,7 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     Slm_H = 0
     Slm_He = 0
     for r in range(0, tautot.shape[0]):
-        A_j = fracflux*math.exp([sum(tautot[:,j]) for j in range(0, tautot.shape[1])][r])*((1-math.exp(-tautot[r,j]))/DNHI)
+        A_j = fracflux*math.exp(-np.sum(tautot[r,:j])*((-np.expm1(-tautot[r,j]))/DNHI)
         Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
         Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
