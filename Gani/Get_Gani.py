@@ -86,8 +86,6 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Important note: all physical constants are in units ov MKS for easy conversions.
-    
     Input arguments (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -124,9 +122,9 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, velocity):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
+    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
+    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
@@ -142,7 +140,7 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     iterate over a series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. 
     Please note that the inputs should be postive otherwise the ouptut will not make sense, the function does not check for good inputs.
 
-    Important note: all physical constants are in units ov MKS for easy conversions.
+    Important note: all physical constants are in units of MKS for easy conversions.
     
     Input arguments (7)
         required    float or integer-like values
@@ -180,13 +178,13 @@ def get_A_a(T, Te, THII, THeII, yH, yHe, velocity):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
+    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
+    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
     A_final = 0
     for a in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
-        A_one = (q_a**2*q_b**2*A_numbers[0+a]*(m_a/(A_numbers[6+a]+1))*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
+        A_one = (q_a**2*q_b**2*A_numbers[0+a]*((m_a/A_numbers[6+a])+1)*lamda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
         A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-(velocity**2)/(2*A_numbers[3+a]**2))
         A_final = A_final + A_one*A_two
     
@@ -198,9 +196,9 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     Function to get the value for the along the path diffusion coefficient. This function can be used to iterate over a series of slabs in a distribution for which we 
     know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
+
+    Important note: all physical constants are in units of MKS for easy conversions.
     
-    Important note: all physical constants are in units ov MKS for easy conversions.
-      
     Input argument (7)
         required    float or integer-like values
                         T = 5e4 Kelvin, the temperature of the reionization front???
@@ -237,20 +235,18 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B**2*THII)/(m_b1**2))
-    sigma_b2 = math.sqrt((k_B**2*THeII)/(m_b2**2))
-    sigma_b3 = math.sqrt((k_B**2*Te)/(m_b3**2))
+    sigma_b1 = math.sqrt((k_B*THII)/(m_b1)
+    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
+    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     
     Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
     Da_final = 0
     for d in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
-        Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*(m_a/(Da_numbers[6+d]+1))*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity**3)
+        Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*((m_a/Da_numbers[6+d])+1)*Da_numbers[3+d]**2*lamda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity**3)
         Da_two = math.erf(velocity/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity/Da_numbers[3+d])*math.exp(-(velocity**2)/(2*Da_numbers[3+d]**2))
         Da_final = Da_final + Da_one*Da_two
     
-    Da_final_neg = -Da_final
-    # The result for Da_a(v) is the addative inverse of its sum over species.
-    return Da_final_neg
+    return Da_final
 
 # Source term
 def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
@@ -259,10 +255,9 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
     be postive otherwise the ouptut will not make sense, please note that the function does not check for good inputs.
 
-    Important note: all physical constants are in units ov MKS for easy conversions.
-    
-    Input argument (7)
+    Important note: all physical constants are in units of MKS for easy conversions.
 
+    Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauH, hydrogen optical depth
@@ -325,8 +320,8 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
     this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
     does not check for good inputs.
-    
-    Important note: all physical constants are in units ov MKS for easy conversions.
+
+    Important note: all physical constants are in units of MKS for easy conversions.
 
     Input argument (12)
         required    integer values
@@ -344,7 +339,7 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: October 23, 2024
+    Date of last revision: October 21, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -366,35 +361,32 @@ def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
         D_theta_vals = np.append(D_theta_vals, 6*get_D_theta(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*velocity[i]**2)
         # make the vector for the source terms
         Slm_vals = np.append(Slm_vals, (get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])*(velocity[i]**2)))
-        
+
         # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
         plus_1 = (i*2)+1
         minus_1 = (i*2)-1
-        
+
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if i>=len(velocity)-1:
-            A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(-velocity[i]))))
+            A_v_vals = np.append(A_v_vals, ((get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(-velocity[i])))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((-velocity[i])*(-velocity[i]))))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((-velocity[i])*(-velocity[i]))))
         else:
-            A_v_vals_plus = np.append(A_v_vals_plus, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
-            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]**2)*(velocity_half[plus_1+1]-velocity[i+1]))))
-            A_v_vals = np.append(A_v_vals, (2*(get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity_half[plus_1]-velocity[i]))))
+            A_v_vals_plus = np.append(A_v_vals_plus, ((get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i+1])*(velocity[i+1]**2))/(velocity[i+1]-velocity[i])))
+            A_v_vals = np.append(A_v_vals, ((get_A_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i+1]-velocity[i])))
+            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]-velocity[i])*(velocity[i+1]-velocity[i]))))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i+1]-velocity[i])*(velocity[i+1]-velocity[i]))))
         
-        if i<=0:
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]))))
-        else:
-            D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/((velocity[i]**2)*(velocity[i]-velocity_half[minus_1]))))
-
+            D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])*(velocity[i+1]-velocity[i]))))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(5e4, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])*(velocity[i+1]-velocity[i]))))
         plus_1 = 0
         minus_1 = 0
         end_time = time.time() # get the time this iteration finished
         # get the total time spent on this iteration
         print("Time for velocity", i, "computation was", end_time-start_time, "seconds.") 
-
+        
     # diagonalize the matricies to make a tri-diagonal matrix    
     D_theta_matrix = np.diag(D_theta_vals)
     A_v_matrix = np.diag(A_v_vals)
@@ -421,7 +413,7 @@ def compute_for_slab_timestep(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
-    Important note: all physical constants are in units ov MKS for easy conversions.
+    Important note: all physical constants are in units of MKS for easy conversions.
     
     Input argument (11)
         required    integer values
@@ -459,7 +451,7 @@ def get_Gani(T, Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, 
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
     sense, please note that the function does not check for good inputs.
     
-    Important note: all physical constants are in units ov MKS for easy conversions.
+    Important note: all physical constants are in units of MKS for easy conversions.
     
     Input arguments (13)
         required    float or integer-like values 
