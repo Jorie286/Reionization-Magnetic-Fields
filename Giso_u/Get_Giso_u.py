@@ -6,8 +6,29 @@ from scipy.linalg import solve_banded
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
 
-# Create a distribution of velocities
-velocity = np.linspace(1,10**8,71)
+# define the maximum velocity and number of velocities that we want to use for the compuation
+vmax = 1.0e8
+Nv = 71
+
+# Create a distribution of velocities in linear space.
+velocity = np.linspace(vmax/Nv, vmax, Nv)
+
+# Define necessary constants for all computations
+k_B = const.k # Boltzmann constant
+R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
+a_o = 5.29177210903e-11 # Bohr radius
+m_a = const.m_e # mass of an electron
+m_b1 = const.m_p # mass of HII
+m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
+m_b3 = const.m_e # mass of an electron
+q_a = -const.eV # charge of an electron (also the charge of m_b3)
+q_b = const.eV # charge of HII and HeII
+epsilon_o = const.epsilon_0 # vacuum permittivity
+Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
+H_o = 2.2618e-18 # Hubble constant
+G = const.G # gravitational constant
+z = 7 # redshift
+m_e = const.m_e # mass of an electron
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
@@ -24,12 +45,8 @@ def get_n_e(yH, yHe):
     Returns
         the number density of electrons under the given conditions
         
-    Date of last revision: July 12, 2024
+    Date of last revision: October 28, 2024
     """
-    z = 7
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter
-    H_o = 2.2618e-18 # Hubble constant (units of s^-1)
-    G = const.G # gravitational constant
     n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
     return n_e
 
@@ -54,10 +71,8 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     Returns
         the value of Giso_u for the specific conditions entered into the function
         
-    Date of last revision: July 12, 2024
+    Date of last revision: October 28, 2024
     """
-    k_B = const.k # Boltzmann constant
-    m_e = const.m_e # mass electron
     n_e = get_n_e(yH, yHe) # electron density function
     sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
     
@@ -87,22 +102,8 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     Returns
         the value of D_theta for the specific conditions entered into the function
         
-    Date of last revision: July 12, 2024
+    Date of last revision: October 28, 2024
     """
-    k_B = const.k # Boltzmann constant
-    R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-    a_o = 5.29177210903e-11 # Bohr radius
-    m_a = const.m_e # mass of an electron
-    m_b1 = const.m_p # mass of HII
-    m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-    m_b3 = const.m_e # mass of an electron
-    q_a = -const.eV # charge of an electron (also the charge of m_b3)
-    q_b = const.eV # charge of HII and HeII
-    epsilon_o = const.epsilon_0 # vacuum permittivity
-    Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-    H_o = 2.2618e-18 # Hubble constant
-    G = const.G # gravitational constant
-    z = 7
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
