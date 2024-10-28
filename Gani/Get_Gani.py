@@ -47,6 +47,20 @@ I_H = 2.18e-18
 I_He = 3.4e-19
 m_e = const.m_e # mass of an electron
 
+# PLEASE CHECK THIS:
+#
+# Compute the range of energies for H and He across all frequency bins
+# choose the highest and lowest frequencies we want to consider
+freq_max = 1e3 # hertz (radio waves)
+freq_min = 1e19 # hertz (gamma rays)
+
+# compute the energies that correspond to these frequencies
+E_max = const.h*freq_max
+E_min = const.h*freq_min
+
+# make a list of energies that we are considering with the same length as the number of frequency bins
+E_list = np.linspace(E_min, E_max, N_NU)
+
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
     """
@@ -215,7 +229,7 @@ def get_D_a(T, Te, THII, THeII, yH, yHe, velocity):
     lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B*THII)/(m_b1)
+    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
     sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
     sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     
@@ -260,20 +274,28 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     # get the sum for each element in the tauHdat and tauHedat data
     tautot = tauHdat + tauHedat
     tautot=np.reshape(tautot, (128,2000)) # make sure that the array is the correct shape
-    
+
+    # Determine which energy bin the energy of H or He is in for the given velocity (where the E_list value becomes larger than the E_lambda value).
+    for r in range(len(E_list)):
+        if E_lamda_H <= E_list[r]:
+            r_H = r
+            break
+            
+    for r in range(len(E_list)):
+        if E_lamda <= E_list[r]:
+            r_He = r
+            break
+
     Slm_tot = []
-    A_j = 0
-    Slm_H = 0
-    Slm_He = 0
-    for r in range(0, tautot.shape[0]):
-        A_j = fracflux*math.exp(-np.sum(tautot[r,:j])*((-np.expm1(-tautot[r,j]))/DNHI)
-        Slm_H = -((8*math.pi)/3)*n_H*F*A_j*(tauHdat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_H))*(1/3)*math.sqrt((16*math.pi)/5)
-        Slm_He = -((8*math.pi)/3)*n_H*F*A_j*(tauHedat[r,j]/(tauHdat[r,j]+tauHedat[r,j]))*(m_e/(velocity*delta_E_He))*(1/3)*math.sqrt((16*math.pi)/5)
-        Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
-          
-    # average over wavelength bins to make Slm_tot into a single column??????
-    Slm_final=sum(Slm_tot)/len(Slm_tot)
-    return Slm_final
+    # Get S_{2,0} for H and He
+    A_j_H = fracflux*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/DNHI)
+    Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,j]/(tauHdat[r_H,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
+        
+    A_j_He = fracflux*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/DNHI)
+    Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_He,j]/(tauHdat[r_H,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
+    
+    Slm_tot.append(Slm_H + Slm_He) # Sum over the species in the source term (H and He)
+    return Slm_tot
 
 def get_alm(T, Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     """
