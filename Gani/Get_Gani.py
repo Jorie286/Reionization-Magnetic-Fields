@@ -243,7 +243,7 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     return Da_final
 
 # Source term
-def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
+def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
     """
     Function to get the value for the source term, S_{2,0}. This is the only nonzero term in the source equation. (????) This function can be used to iterate over a
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should 
@@ -254,8 +254,8 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
     Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
-                        tauH, hydrogen optical depth
-                        tauHe, helium optical depth
+                        tauHdat, hydrogen optical depths
+                        tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
                         k = 1e-12, wave number
                         j, the bin number (time step)
@@ -288,16 +288,16 @@ def get_Slm(yH, tauH, tauHe, fracflux, k, j, velocity):
             break
     
     # Get S_{2,0} for H and He
-    A_j_H = fracflux*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/DNHI)
+    A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/DNHI)
     Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,j]/(tauHdat[r_H,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
         
-    A_j_He = fracflux*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/DNHI)
+    A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/DNHI)
     Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_H,j]/(tauHdat[r_He,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
     
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     return Slm_tot
 
-def get_alm(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
+def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
     """
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0, 
     this is the only one that is computed. (?????????) The inputs should be postive otherwise the ouptut will not make sense, please note that the function
@@ -312,8 +312,8 @@ def get_alm(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        tauH, hydrogen optical depth
-                        tauHe, helium optical depth
+                        tauHdat, hydrogen optical depths
+                        tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
                         k = 1e-12, wave number
                         j, the bin number (time step)
@@ -380,7 +380,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
     a20 = np.linalg.solve(matrix, Slm_vals)
     return a20
 
-def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j):
+def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
@@ -393,8 +393,8 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        tauH, hydrogen optical depth
-                        tauHe, helium optical depth
+                        tauHdat, hydrogen optical depths
+                        tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
                         k = 1e-12, wave number
                         j, the bin number (time step)
@@ -405,7 +405,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k
     """
     start_time=time.time() # get the time the function started computing
     print("Starting slab", j, "computation.")
-    alm = get_alm(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k, j)
+    alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
 
     end_time=time.time() # get the time the funtion finished computing
     
@@ -414,7 +414,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauH, tauHe, fracflux, k
     return alm
 
 # Compute Gani for a specific value of sigma and D_theta.
-def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, k, j):
+def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, i, k, j):
     """
     Function to get the value of Gani for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
@@ -430,8 +430,8 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, k, 
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
                         nHtot = 200, total number of hydrogen atoms in the distribution??
-                        tauH, hydrogen optical depth
-                        tauHe, helium optical depth
+                        tauHdat, hydrogen optical depths
+                        tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
                         alm, solution of a_{2,0} for all velocities for a slab number
                         i, the slab number of the iteration over velocities
@@ -451,10 +451,10 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauH, tauHe, fracflux, alm, i, k, 
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
-    alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat[j], tauHedat[j], fracflux[j], 1e-12, j)
+    alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, 1e-12, j)
     print("Values for a_{2,0}:\n", alm)
     for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat[j], tauHedat[j], fracflux[j], alm[i], i, 1e-12, j)
+        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, 1e-12, j)
         Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
         Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
     Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
