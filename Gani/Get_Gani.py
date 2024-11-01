@@ -24,8 +24,9 @@ velocity = np.linspace(vmax/Nv, vmax, Nv)
 velocity_half = np.linspace(vmax/Nv, vmax, Nv*2)
 
 # Define necessary constants for all computations
+# IMPORTANT NOTE: the scipy.conststants module gives the constants in mks units.
 k_B = const.k # Boltzmann constant
-R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
+R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
 a_o = 5.29177210903e-11 # Bohr radius
 m_a = const.m_e # mass of an electron
 m_b1 = const.m_p # mass of HII
@@ -151,11 +152,17 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
+    # set up variables for computing D_theta over species
     D_final = 0
+    D_one = 0
+    D_two = 0
     for n in range(0,3): # Iterate through numbers and calculate D_theta for each of the species. Returns the sum over all species.
         D_one = (q_a**2*q_b**2*numbers[0+n]*lambda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity**3)
         D_two = (1-(numbers[3+n]**2/velocity**2))*math.erf(velocity/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/velocity)*math.exp(-(velocity**2)/(2*numbers[3+n]**2))
         D_final = D_one*D_two+D_final
+        # reset D_one and D_two for the next iteration.
+        D_one = 0
+        D_two = 0
     return D_final
 
 def get_A_a(Te, THII, THeII, yH, yHe, velocity):
@@ -183,20 +190,28 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
     n_b3 = n_e
-    
+
     # Calculate the columb logarithm.
     lambda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
-    
+
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
     sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
     sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
+    
     A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
+    # set up variables for computing over species
     A_final = 0
+    A_one = 0
+    A_two = 0
+    A_final_neg = 0
     for a in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
         A_one = (q_a**2*q_b**2*A_numbers[0+a]*((m_a/A_numbers[6+a])+1)*lambda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
         A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-(velocity**2)/(2*A_numbers[3+a]**2))
-        A_final = A_final + A_one*A_two
+        A_final = A_final + (A_one*A_two)
+        # reset for next iteration
+        A_one = 0
+        A_two = 0
     A_final_neg = -A_final # The result for A_a(v) is addative inverse of its sum over species.
     return A_final_neg
 
