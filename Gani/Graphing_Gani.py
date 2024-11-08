@@ -67,6 +67,7 @@ ax.plot(v_list, a20[(71*1049):(71*1050)], label = "Slab 1050")
 ax.plot(v_list, a20[(71*1069):(71*1070)], label = "Slab 1070")
 ax.plot(v_list, a20[(71*1089):(71*1090)], label = "Slab 1090")
 ax.plot(v_list, a20[(71*1099):(71*1100)], label = "Slab 1100")
+ax.plot(v_list, a20[(71*1199):(71*1200)], label = "Slab 1200")
 # set up the plot labels
 ax.set_xlabel("Velocity bin")
 ax.set_ylabel("Multipole Moment Value")
