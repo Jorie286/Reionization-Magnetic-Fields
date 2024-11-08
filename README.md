@@ -4,7 +4,7 @@ This repository contains code for solving parts of the magnetic fields at reioni
 The Graphing_Sigmas Python code solves for various values of sigma to be used in solving for the anisotropic and isotropic parts of the distribution.
 It then graphs the sigmas in terms various potential values of $\frac{i\ D_{\theta}}{k v}$ to see how chaning $\frac{i\ D_{\theta}}{k v}$ affects the value of sigma.
 
-The output.txt file contains the output from the reionization code by frankelzeng.
+The Reionization-Temp-Modified.c file contains a modified version of the reionization front temperature evolution model by frankelzeng. The output.txt file contains the main output from this modified temperature evolution model. __Note:__ the modified reionization code returns other files which are necessary to run Get_Gani.py but are not included in this repository because they are large and do not display well.
 
 The Get_Giso_u Python code uses the output.txt file to solve for $\frac{G^{iso}}{u}$ after finding the value of $D_{\theta}$ for a specific number of species. This is done by using a Reimann sum over values of velocity in place of using an integral.
 
