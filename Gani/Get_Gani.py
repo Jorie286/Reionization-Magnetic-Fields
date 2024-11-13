@@ -313,7 +313,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     
     # append the Slm_tot values to a file for later review and plotting
-    f_S = open("S20test.txt", "a")
+    f_S = open("S20.txt", "a")
     f_S.write(str(Slm_tot))
     f_S.write("\n")
     f_S.close()
@@ -428,7 +428,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
     # write a_{2,0} data to a file
-    f = open("a20test.txt", "a")
+    f = open("a20.txt", "a")
     for a in alm:
         f.write(str(a))
         f.write("\n")
