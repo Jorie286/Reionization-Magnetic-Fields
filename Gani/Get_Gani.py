@@ -21,7 +21,8 @@ Nv = 71
 # Create a distribution of velocities in linear space.
 velocity = np.linspace(vmax/Nv, vmax, Nv)
 # make a linear velocity distribution including "half-steps" for get_alm
-velocity_half = np.linspace(vmax/Nv, vmax, (Nv*2)+1)
+# Note: we need an extra half-step down and half step up
+velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
 
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
@@ -425,7 +426,6 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     Date of last revision: November 6, 2024
     """
     start_time=time.time() # get the time the function started computing
-    print("Starting slab", j, "computation.")
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
     # write a_{2,0} data to a file
     f = open("a20test.txt", "a")
