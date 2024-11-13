@@ -370,7 +370,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
         minus_1 = (i*2)
 
         # ensure that the i+/-1 indicies will not be out of range by checking their values
-        # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
+        # Note: velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if i>=len(velocity)-1:
             A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i-1]-velocity[i])))
             D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i-1]-velocity[i])**2)))
