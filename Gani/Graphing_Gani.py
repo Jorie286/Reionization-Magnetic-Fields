@@ -8,7 +8,7 @@ from Get_Gani import data
 
 # plot the source term values at various bin numbers, we want to find where it reaches its maximum
 # get the S_{2,0} data from the file created by Get_Gani
-S20 = np.loadtxt(r'S20test.txt')
+S20 = np.loadtxt(r'S20.txt')
 # create a plot and indexing list for convenient graphing
 fig, ax = plt.subplots(figsize=(14,10))
 v_list = []
@@ -30,7 +30,7 @@ fig.show()
 
 # plot the multipole moment values of a_{2,0} over varous slab numbers like we plotted S_{2,0} above
 # get the a_{2,0} data file from the output of Get_Gani
-a20 = np.loadtxt(r'a20test.txt')
+a20 = np.loadtxt(r'a20.txt')
 # create a plot and indexing list for convenient graphing
 fig, ax = plt.subplots(figsize=(14,10))
 v_list = []
@@ -133,7 +133,7 @@ fig.show()
 
 # make a plot of a_{2,0} at its largest (absolute) value
 # find the velocity bin number of the following value
-v_n = ((3*k_B*data[1078,5])/m_e)**0.5
+v_n = ((3*k_B*data[1077,5])/m_e)**0.5
 for v in range(len(velocity)):
     if v_n <= velocity[v]:
         v_bin = v
@@ -144,7 +144,7 @@ v_list = []
 for i in range(0,71):
     v_list.append(i)
 # plot multipole moment at its maximum
-ax.plot(v_list, a20[(71*1077):(71*1078)], label = "Slab 1078")
+ax.plot(v_list, a20[(71*1076):(71*1077)], label = "Slab 1077")
 ax.axvline(x=v_bin, color = 'r', linestyle = "--")
 # add the equation for this and arrow for this value on the plot
 equation = r'$\sqrt{\frac{3 k_B T_e}{m_e}}$'
