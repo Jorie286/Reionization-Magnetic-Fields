@@ -378,7 +378,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
         else:
             A_v_vals_plus = np.append(A_v_vals_plus, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i+1])*(velocity[i+1]**2))/(velocity[i+1]-velocity[i])))
             A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i+1]-velocity[i])))
-            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+1])*(velocity_half[plus_1+1]**2))/((velocity[i+1]-velocity[i])**2)))
+            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+2])*(velocity_half[plus_1+2]**2))/((velocity[i+1]-velocity[i])**2)))
             D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i+1]-velocity[i])**2)))
         
             D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])**2)))
