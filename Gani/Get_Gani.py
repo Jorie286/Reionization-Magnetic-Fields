@@ -366,8 +366,8 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
         
         # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
-        plus_1 = (i*2)+1
-        minus_1 = (i*2)-1
+        plus_1 = (i*2)+2
+        minus_1 = (i*2)
 
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # note, velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
