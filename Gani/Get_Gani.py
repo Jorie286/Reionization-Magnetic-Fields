@@ -40,12 +40,12 @@ H_o = 2.2618e-18 # Hubble constant
 G = const.G # gravitational constant
 z = 7 # redshift
 N_NU = 128 # number of frequency bins
-DNHI = 2.5e16
+DNHI = 2.5e20
 f_He = 0.079 # He abundance
 
 # Ionization energy of hydrogen and helium (in Joules)
-I_H = 13.59e-19
-I_He = 24.687e-19
+I_H = 13.59*const.eV
+I_He = 24.687*const.eV
 m_e = const.m_e # mass of an electron
 
 T=5e4 # reionization front temperature (Kelvin)
@@ -231,7 +231,6 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
     n_b3 = n_e
-    
     # Calculate the columb logarithm.
     lambda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
     
@@ -298,22 +297,22 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
         if E_lambda_He <= E_list[r]:
             r_He = r
             break
-
-    # Get S_{2,0} for H and He
+    
+    # Get find the slab number and S_{2,0} for H and He
     if r_H<N_NU:
         A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/DNHI)
         Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,j]/(tauHdat[r_H,j]+tauHedat[r_H,j]))*(m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_H = 0
+        
     if r_He<N_NU:
         A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/DNHI)
         Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_He,j]/(tauHdat[r_He,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
-    
     # append the Slm_tot values to a file for later review and plotting
-    f_S = open("S20.txt", "a")
+    f_S = open("S20test.txt", "a")
     f_S.write(str(Slm_tot))
     f_S.write("\n")
     f_S.close()
@@ -342,7 +341,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: November 4, 2024
+    Date of last revision: November 13, 2024
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -385,7 +384,6 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
             D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])**2)))
         plus_1 = 0
         minus_1 = 0
-        
     # diagonalize the matricies to make a tri-diagonal matrix    
     D_theta_matrix = np.diag(D_theta_vals)
     A_v_matrix = np.diag(A_v_vals)
@@ -397,7 +395,11 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
 
     # add the matricies together to get the complete matrix
     matrix = D_theta_matrix - A_v_matrix + D_para_matrix_1 + D_para_matrix_2 - D_para_matrix_minus + A_v_matrix_plus - D_para_matrix_plus
-    
+    f_1 = open("matrix.csv","a")
+    f_1.write(matrix)
+    f_1.write("\n")
+    f_1.write("\n")
+    f_1.close()
     # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix*a20
     a20 = np.linalg.solve(matrix, Slm_vals)
     return a20
@@ -428,7 +430,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
     # write a_{2,0} data to a file
-    f = open("a20.txt", "a")
+    f = open("a20test.txt", "a")
     for a in alm:
         f.write(str(a))
         f.write("\n")
