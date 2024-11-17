@@ -15,14 +15,14 @@ v_list = []
 for i in range(0,71):
     v_list.append(i)
 # plot source term over various slab numbers (the numbers plotted below correspond to where S_{2,0} reaches a max)
-ax.plot(v_list, S20[(71*999):(71*1000)], label = "Slab 1000")
-ax.plot(v_list, S20[(71*1029):(71*1030)], label = "Slab 1030")
-ax.plot(v_list, S20[(71*1049):(71*1050)], label = "Slab 1050")
-ax.plot(v_list, S20[(71*1069):(71*1070)], label = "Slab 1070")
-ax.plot(v_list, S20[(71*1089):(71*1090)], label = "Slab 1090")
-ax.plot(v_list, S20[(71*1099):(71*1100)], label = "Slab 1100")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*999):(71*1000)]), label = "Slab 1000")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1029):(71*1030)]), label = "Slab 1030")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1049):(71*1050)]), label = "Slab 1050")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1069):(71*1070)]), label = "Slab 1070")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1089):(71*1090)]), label = "Slab 1090")
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1099):(71*1100)]), label = "Slab 1100")
 # set up plot labels
-ax.set_xlabel("Velocity bin")
+ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Source Term Value")
 ax.set_title("Change in Source Term for a Selection of Slab Numbers")
 ax.legend()
@@ -37,15 +37,15 @@ v_list = []
 for i in range(0,71):
     v_list.append(i)
 # plot multipole moment over various slab numbers
-ax.plot(v_list, a20[(71*999):(71*1000)], label = "Slab 1000")
-ax.plot(v_list, a20[(71*1029):(71*1030)], label = "Slab 1030")
-ax.plot(v_list, a20[(71*1049):(71*1050)], label = "Slab 1050")
-ax.plot(v_list, a20[(71*1069):(71*1070)], label = "Slab 1070")
-ax.plot(v_list, a20[(71*1089):(71*1090)], label = "Slab 1090")
-ax.plot(v_list, a20[(71*1099):(71*1100)], label = "Slab 1100")
-ax.plot(v_list, a20[(71*1199):(71*1200)], label = "Slab 1200")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*999):(71*1000)]), label = "Slab 1000")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1029):(71*1030)]), label = "Slab 1030")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1049):(71*1050)]), label = "Slab 1050")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1069):(71*1070)]), label = "Slab 1070")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1089):(71*1090)]), label = "Slab 1090")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1099):(71*1100)]), label = "Slab 1100")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1199):(71*1200)]), label = "Slab 1200")
 # set up the plot labels
-ax.set_xlabel("Velocity bin")
+ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Multipole Moment Value")
 ax.set_title("Change in Multipole Moment for a Selection of Slab Numbers")
 ax.legend()
@@ -144,13 +144,13 @@ v_list = []
 for i in range(0,71):
     v_list.append(i)
 # plot multipole moment at its maximum
-ax.plot(v_list, a20[(71*1076):(71*1077)], label = "Slab 1077")
-ax.axvline(x=v_bin, color = 'r', linestyle = "--")
+ax.plot(velocity[v_list], (4*np.pi*velocity[v_list]**3*a20[(71*1076):(71*1077)]), label = "Slab 1077")
+ax.axvline(x=velocity[v_bin], color = 'r', linestyle = "--")
 # add the equation for this and arrow for this value on the plot
 equation = r'$\sqrt{\frac{3 k_B T_e}{m_e}}$'
-ax.text(v_bin+1, -0.5e-18, equation, fontsize = 20)
+ax.text(velocity[v_bin+1], -0.005, equation, fontsize=20)
 # set up the plot labels
-ax.set_xlabel("Velocity bin")
+ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Multipole Moment Value")
 ax.set_title("Change in Multipole Moment at Maximum")
 ax.legend()
@@ -161,10 +161,10 @@ fig, ax = plt.subplots(figsize=(14,10))
 v_list = []
 for i in range(0,71):
     v_list.append(i)
-# plot source term at its maximum
-ax.plot(v_list, S20[(71*1068):(71*1069)], label = "Slab 1069")
+# plot multipole moment at its maximum
+ax.plot(velocity[v_list], (4*np.pi*np.array(velocity[v_list])**3*S20[(71*1068):(71*1069)]), label = "Slab 1069")
 # set up the plot labels
-ax.set_xlabel("Velocity bin")
+ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Source Term Value")
 ax.set_title("Change in the Source Term at Maximum")
 ax.legend()
