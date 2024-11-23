@@ -472,7 +472,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     """
     n_e = get_n_e(yH, yHe) # electron density function
     # this needs to updated to reflect the solution for a_{l,m}
-    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
+    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(-math.sqrt(6)*alm)
     return Gani
 
 # Computes Gani as a sum over the velocities for a row in output.txt
