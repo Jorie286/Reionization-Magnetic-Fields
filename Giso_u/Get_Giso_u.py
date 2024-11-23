@@ -78,7 +78,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     n_e = get_n_e(yH, yHe) # electron density function
     sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
     
-    Giso_const = (1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
+    Giso_const = -(1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
     Giso = velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[0]*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return Giso_u
