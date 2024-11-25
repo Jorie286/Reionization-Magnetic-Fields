@@ -24,6 +24,9 @@ velocity = np.linspace(vmax/Nv, vmax, Nv)
 # Note: we need an extra half-step down and half step up
 velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
 
+# make a distribution of wavenumbers
+k = np.logspace(10**-18, 10**-10, 81)
+
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
 R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
@@ -478,14 +481,15 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
-    alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, 1e-12, j)
-    # write a20 results to a test file instead of printing them out
-    for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, 1e-12, j)
-        Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
-        Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
-    Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
-    Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
+    for slab in range(0, len(k)):
+        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, k[slab], j)
+        # write a20 results to a test file instead of printing them out
+        for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
+            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, k[slab], j)
+            Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
+            Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
+        Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+        Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
 
 computation_end_time=time.time() # get the time the code cell finished
 # return the total time it spent calculating the values
