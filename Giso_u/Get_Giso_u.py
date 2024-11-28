@@ -7,11 +7,14 @@ from scipy.linalg import solve_banded
 data = np.loadtxt(r'output.txt')
 
 # define the maximum velocity and number of velocities that we want to use for the compuation
-vmax = 1.0e8
+vmax = 5.0e6
 Nv = 71
 
 # Create a distribution of velocities in linear space.
 velocity = np.linspace(vmax/Nv, vmax, Nv)
+
+# make a distribution of wavenumbers
+k = np.logspace(-18, -10, 81)
 
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
@@ -29,8 +32,6 @@ H_o = 2.2618e-18 # Hubble constant
 G = const.G # gravitational constant
 z = 7 # redshift
 m_e = const.m_e # mass of an electron
-
-T = 5e4 # the temperature of the reionization front (Kelvin)
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
@@ -84,7 +85,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     return Giso_u
 
 # Computing D_theta
-def get_D_theta(Te, THII, THeII, yH, yHe, i):
+def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     """
     Function to get the value of D_theta (the angular diffusion coefficient) for certian conditions. This function can be used to iterate over a series of slabs in a
     distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. Please note that the inputs should be
@@ -92,8 +93,9 @@ def get_D_theta(Te, THII, THeII, yH, yHe, i):
 
     Important note: all physical constants are in units ov MKS for easy conversions.
     
-    Input arguments (6)
+    Input arguments (7)
         required    float or integer-like values
+                        T = 5e4 Kelvin, the temperature of the reionization front???
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -125,13 +127,13 @@ def get_D_theta(Te, THII, THeII, yH, yHe, i):
         D_final = D_one*D_two+D_final
     return D_final
 
-def get_sigmas(n, c):
+def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
     """
     Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
     This funciton is used as part of the function get_Giso_u. The input for n must be a positive whole number for the function to work correctly, please note that
     it does not check for good input.
     
-    Important note: all physical constants are in units ov MKS for easy conversions.
+    Important note: all physical constants are in units of MKS for easy conversions.
     
     Input arguments (2)
         required    float or integer-like values
@@ -140,7 +142,7 @@ def get_sigmas(n, c):
     Returns
         the values of the first n sigma_{n,1}
         
-    Date of last revision: July 9, 2024
+    Date of last revision: October 28, 2024
     """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
@@ -163,13 +165,13 @@ def get_sigmas(n, c):
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
-    print("Run", j)
-    for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, 1e-12, i)
-        Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
-        Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
-    Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
-    Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
+    for slab in range(0,8):
+        for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, k[slab*10], i)
+            Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
+            Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
+        Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
+        Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
 # Create lists of the correct length to fill with the computed values.
 real = [None]*len(Giso_list)
 imaginary = [None]*len(Giso_list)

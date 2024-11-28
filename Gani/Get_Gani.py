@@ -24,6 +24,9 @@ velocity = np.linspace(vmax/Nv, vmax, Nv)
 # Note: we need an extra half-step down and half step up
 velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
 
+# make a distribution of wavenumbers
+k = np.logspace(-18, -10, 81)
+
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
 R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
@@ -312,7 +315,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     # append the Slm_tot values to a file for later review and plotting
-    f_S = open("S20test.txt", "a")
+    f_S = open("S20.txt", "a")
     f_S.write(str(Slm_tot))
     f_S.write("\n")
     f_S.close()
@@ -395,11 +398,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
 
     # add the matricies together to get the complete matrix
     matrix = D_theta_matrix - A_v_matrix + D_para_matrix_1 + D_para_matrix_2 - D_para_matrix_minus + A_v_matrix_plus - D_para_matrix_plus
-    f_1 = open("matrix.csv","a")
-    f_1.write(matrix)
-    f_1.write("\n")
-    f_1.write("\n")
-    f_1.close()
+    #np.savetxt("matrix_test.csv", matrix, delimiter=",")
     # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix*a20
     a20 = np.linalg.solve(matrix, Slm_vals)
     return a20
@@ -430,7 +429,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
     # write a_{2,0} data to a file
-    f = open("a20test.txt", "a")
+    f = open("a20.txt", "a")
     for a in alm:
         f.write(str(a))
         f.write("\n")
@@ -438,7 +437,6 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     end_time=time.time() # get the time the funtion finished computing
     
     # print out the total time spent on this funciton
-    print("Time for slab", j, "alm computation was", end_time-start_time, "seconds.")
     return alm
 
 # Compute Gani for a specific value of sigma and D_theta.
@@ -471,23 +469,25 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     Date of last revision: October 29, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    # this needs to updated to reflect the solution for a_{l,m}
-    Gani = -(1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
+    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
     return Gani
 
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
-    alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, 1e-12, j)
-    # write a20 results to a test file instead of printing them out
-    for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-        Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, 1e-12, j)
-        Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
-        Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
-    Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
-    Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
-
+    slab_start_time= time.time()
+    for slab in range(0, 8):
+        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, k[slab*10], j)
+        # write a20 results to a test file instead of printing them out
+        for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
+            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, k[slab*10], j)
+            Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
+            Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
+        Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+        Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
+    slab_time = time.time()
+    print("Time for slab", j, "to finish was", slab_time-slab_start_time, "seconds.")
 computation_end_time=time.time() # get the time the code cell finished
 # return the total time it spent calculating the values
 print("Time for computation to complete:", computation_end_time-computation_start_time, "seconds")

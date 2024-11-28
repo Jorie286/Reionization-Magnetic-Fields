@@ -17,8 +17,8 @@ labels = ["Time", "yH", "yHe", "T e", "THII", "THeII"]
 # Graph real and imaginary portions of Giso_list seperatly for each graph.
 # Plot Giso_u over time.
 for g in range(0,6):
-    axs[positions[0+g]].plot(data_list[0+g], real, color = "c", label = "Giso real")  # Note: the timestep for data is 12000 (years???).
-    axs[positions[0+g]].plot(data_list[0+g], imaginary, color = "r", label = "Giso imaginary")
+    axs[positions[0+g]].plot(data_list[0+g], real[::8], color = "c", label = "Giso real")  # Note: the timestep for data is 12000 (years???).
+    axs[positions[0+g]].plot(data_list[0+g], imaginary[::8], color = "r", label = "Giso imaginary")
     axs[positions[0+g]].set_xlabel(labels[0+g])
     axs[positions[0+g]].set_ylabel("Giso/u")
     axs[positions[0+g]].legend()
