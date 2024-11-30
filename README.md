@@ -13,3 +13,5 @@ The Graphing_Giso_u Python code uses the data from Get_Giso_u to graph the $G^{i
 The Get_Gani Python code uses the data from the output.txt file to solve for $G^{ani}$. This uses a very similar method to Get_Giso_u in order to compute the values of $G^{ani}$. Again, a Reimann sum was used to substitute for the integral over v.
 
 The Graphing_Gani code uses the data from Get_Gani to graph the $G^{ani}$ data and the neutral fraction of hydrogen and helium in terms of the slab number ($j$). It also graphs other aspects of the $G^{ani}$ expression including the source term $S_{2,0}$ and the multipole moment $a_{2,0}$ over velocity slabs.
+
+The graph_against_k code graphs the Gani, Giso_u against the wave number (k). This code also calulates the values of the imaginary frequcny (Im w) and plots it against the wave number. Note: this code may contain some errors so it should be double checked at some time.
