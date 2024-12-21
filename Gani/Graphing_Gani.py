@@ -85,7 +85,6 @@ fig.show()
 # plot the multipole moment values of a_{2,0} over varous slab numbers like we plotted S_{2,0} above
 # get the a_{2,0} data file from the output of Get_Gani
 a20 = np.loadtxt(r'a20.txt')
-print(len(a20))
 # create a plot and indexing list for convenient graphing
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment over various slab numbers
@@ -139,6 +138,7 @@ for v in range(len(velocity)):
     if v_n <= velocity[v]:
         v_bin = v
         break
+        
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment at its maximum
 # Note: we are only plotting the last k bin
@@ -164,4 +164,49 @@ ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Source Term Value")
 ax.set_title("Change in the Source Term at Maximum")
 ax.legend()
+fig.show()
+
+# make a plot of Giso against k
+fig, ax = plt.subplots(figsize=(14,10))
+ax.plot(k[::10][:8], Giso_im_arr[1069], label = "k slab 1069 (Source max) (first k)")
+ax.plot(k[1::10][:8], Giso_im_arr[1069], label = "k slab 1069 (Source max) (second k)")
+ax.plot(k[2::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (third k)")
+ax.plot(k[3::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (fourth k)")
+ax.plot(k[4::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (fith k)")
+ax.plot(k[5::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (sixth k)")
+ax.plot(k[6::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (seventh k)")
+ax.plot(k[7::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (eighth k)")
+ax.set_title("Imaginary Giso against k")
+ax.set_xlabel("k")
+ax.set_ylabel("Giso Imaginary Value")
+ax.set_xscale('log')
+ax.legend()
+fig.show()
+
+# make a plot of Gani against k
+fig, ax = plt.subplots(figsize=(14,10))
+ax.plot(k[::10][:8], Gani_data[(8*1068):(8*1069)], label = "k slab 1069 (Source max)")
+ax.plot(k[::10][:8], Gani_data[(8*1076):(8*1077)], label = "k slab 1077 (Multipole max)")
+ax.set_title("Gani against k")
+ax.set_xlabel("k")
+ax.set_ylabel("Gani Value")
+ax.set_xscale('log')
+ax.legend()
+fig.show()
+
+im_w_list = []
+mu_0 = (4*np.pi)*(10**(-7)) # permiablity of free space (units of newtons ampere**-2)
+for m in range(2000):
+    n_e = get_n_e(data[m,2], data[m,3])
+    k_sd = np.sqrt((mu_0*n_e*q_a**2)/m_b3)
+    for n in range(8):
+        im_w_list.append((k[n*10]/imaginary[m*8+n])*(Gani_data[m*8+n]-(k[n*10]/k_sd)**2))
+print(im_w_list)
+
+# make a plot of imaginary w against k
+fig, ax = plt.subplots(figsize=(14,10))
+ax.plot(k[:8], im_w_arr[::2000])
+ax.set_title("Imaginary w against k")
+ax.set_xlabel("k")
+ax.set_ylabel("Imaginary w")
 fig.show()
