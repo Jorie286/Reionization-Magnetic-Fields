@@ -5,36 +5,8 @@ from scipy.linalg import solve_banded
 
 # Open and load the reionization temperatures output into Python
 data = np.loadtxt(r'output.txt')
-
-# define the maximum velocity and number of velocities that we want to use for the compuation
-vmax = 5.0e6
-Nv = 71
-
-# Create a distribution of velocities in linear space.
-velocity = np.linspace(vmax/Nv, vmax, Nv)
-
-# make a distribution of wavenumbers
-n_k_bins = 81
-k_min=-18
-k_max=-10
-k = np.logspace(k_min, k_max, n_k_bins)
-
-# Define necessary constants for all computations
-k_B = const.k # Boltzmann constant
-R_y = const.Rydberg*const.h # Rydberg constant (unit of energy)
-a_o = 5.29177210903e-11 # Bohr radius
-m_a = const.m_e # mass of an electron
-m_b1 = const.m_p # mass of HII
-m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-m_b3 = const.m_e # mass of an electron
-q_a = -const.eV # charge of an electron (also the charge of m_b3)
-q_b = const.eV # charge of HII and HeII
-epsilon_o = const.epsilon_0 # vacuum permittivity
-Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-H_o = 2.2618e-18 # Hubble constant
-G = const.G # gravitational constant
-z = 7 # redshift
-m_e = const.m_e # mass of an electron
+# get the variables and parameters for the calculation
+import calc_params
 
 # Compute Giso/u (the coefficient of proportionality) for a specific value of velocity using get_sigmas and get_D_theta.
 def get_n_e(yH, yHe):
@@ -53,7 +25,7 @@ def get_n_e(yH, yHe):
         
     Date of last revision: October 28, 2024
     """
-    n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
+    n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
 
 def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
@@ -71,8 +43,8 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        nHtot, total number of hydrogen atoms in the distribution???
-                        k = 1e-12, ???????
+                        nHtot, total number of hydrogen atoms in the distribution
+                        k, wavenumbers
                         i, the slab number of the iteration
     Returns
         the value of Giso_u for the specific conditions entered into the function
@@ -80,10 +52,10 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    sigma_e = math.sqrt((k_B*Te)/(m_e))
+    sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
-    Giso_const = -(1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (velocity[i]**2)*(get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[0])*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
+    Giso_const = -(1/calc_params.n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
+    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return np.array(Giso_u)
 
@@ -98,7 +70,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     
     Input arguments (7)
         required    float or integer-like values
-                        T = 5e4 Kelvin, the temperature of the reionization front???
+                        T = 5e4 Kelvin, the temperature of the reionization front
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
@@ -111,22 +83,22 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
-    n_b3 = n_e
+    n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
+    n_b3 = calc_params.n_e
     # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    lamda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*calc_params.n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
-    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
-    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
+    sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
+    sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
     for n in range(0,3): # Iterate through numbers and calculate D_theta for each of the species. Returns the sum over all species.
-        D_one = (q_a**2*q_b**2*numbers[0+n]*lamda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity[i]**3)
-        D_two = (1-(numbers[3+n]**2/velocity[i]**2))*math.erf(velocity[i]/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/velocity[i])*math.exp(-velocity[i]**2/(2*numbers[3+n]**2))
+        D_one = (calc_params.q_a**2*calc_params.q_b**2*numbers[0+n]*lamda_c)/(8*math.pi*calc_params.epsilon_o**2*calc_params.m_a**2*calc_params.velocity[i]**3)
+        D_two = (1-(numbers[3+n]**2/calc_params.velocity[i]**2))*math.erf(calc_params.velocity[i]/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/calc_params.velocity[i])*math.exp(-calc_params.velocity[i]**2/(2*numbers[3+n]**2))
         D_final = D_one*D_two+D_final
     return D_final
 
@@ -168,9 +140,9 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
-    for ik in range(0,8):
-        for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, k[ik*10], i)
+    for ik in range(0,k_step):
+        for i in range(0, Nv): # Compute the Reimann sum of velocities for a row of data.
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, k[ik*10], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
