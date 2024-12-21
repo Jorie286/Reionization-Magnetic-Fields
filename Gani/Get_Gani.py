@@ -437,10 +437,10 @@ Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     slab_start_time= time.time()
-    for slab in range(0, 8):
+    for slab in range(0, calc_params.k_step):
         alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, calc_params.k[slab*10], j)
         # write a20 results to a test file instead of printing them out
-        for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
+        for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
             Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[i], i, calc_params.k[slab*10], j)
             Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
