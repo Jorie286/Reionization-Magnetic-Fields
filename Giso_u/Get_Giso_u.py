@@ -14,7 +14,10 @@ Nv = 71
 velocity = np.linspace(vmax/Nv, vmax, Nv)
 
 # make a distribution of wavenumbers
-k = np.logspace(-18, -10, 81)
+n_k_bins = 81
+k_min=-18
+k_max=-10
+k = np.logspace(k_min, k_max, n_k_bins)
 
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
@@ -77,12 +80,12 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    sigma_e = math.sqrt((k_B**2*Te)/(m_e**2))
+    sigma_e = math.sqrt((k_B*Te)/(m_e))
     
     Giso_const = -(1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = velocity[i]**2*get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[0]*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
+    Giso = (velocity[i]**2)*(get_sigmas(20, (1j*get_D_theta(5e4, Te, THII, THeII, yH, yHe, i))/(k*velocity[i]))[0])*((n_e*velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
-    return Giso_u
+    return np.array(Giso_u)
 
 # Computing D_theta
 def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
@@ -165,9 +168,9 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
-    for slab in range(0,8):
+    for ik in range(0,8):
         for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, k[slab*10], i)
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, k[ik*10], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
