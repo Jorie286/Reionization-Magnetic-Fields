@@ -315,7 +315,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     # append the Slm_tot values to a file for later review and plotting
-    f_S = open("S20.txt", "a")
+    f_S = open("S20test.txt", "a")
     f_S.write(str(Slm_tot))
     f_S.write("\n")
     f_S.close()
@@ -429,7 +429,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
     # write a_{2,0} data to a file
-    f = open("a20.txt", "a")
+    f = open("a20test.txt", "a")
     for a in alm:
         f.write(str(a))
         f.write("\n")
@@ -470,8 +470,8 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     """
     n_e = get_n_e(yH, yHe) # electron density function
     Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
-    return Gani
-
+    return np.array(Gani)
+    
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
