@@ -14,47 +14,7 @@ tauHdat = np.loadtxt(r'tauH.txt')
 tauHedat = np.loadtxt(r'tauHe.txt')
 fracflux = np.loadtxt(r'fracflux.txt')
 
-# define the maximum velocity and number of velocities that we want to use for the compuation
-vmax = 5.0e6
-Nv = 71
-
-# Create a distribution of velocities in linear space.
-velocity = np.linspace(vmax/Nv, vmax, Nv)
-# make a linear velocity distribution including "half-steps" for get_alm
-# Note: we need an extra half-step down and half step up
-velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
-
-# make a distribution of wavenumbers
-k = np.logspace(-18, -10, 81)
-
-# Define necessary constants for all computations
-k_B = const.k # Boltzmann constant
-R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
-a_o = 5.29177210903e-11 # Bohr radius
-m_a = const.m_e # mass of an electron
-m_b1 = const.m_p # mass of HII
-m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-m_b3 = const.m_e # mass of an electron
-q_a = -const.eV # charge of an electron (also the charge of m_b3)
-q_b = const.eV # charge of HII and HeII
-epsilon_o = const.epsilon_0 # vacuum permittivity
-Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-H_o = 2.2618e-18 # Hubble constant
-G = const.G # gravitational constant
-z = 7 # redshift
-N_NU = 128 # number of frequency bins
-DNHI = 2.5e20
-f_He = 0.079 # He abundance
-
-# Ionization energy of hydrogen and helium (in Joules)
-I_H = 13.59*const.eV
-I_He = 24.687*const.eV
-m_e = const.m_e # mass of an electron
-
-T=5e4 # reionization front temperature (Kelvin)
-
-# make a list of energies that we are considering with the same length as the number of frequency bins
-E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
+import calc_params
 
 # Compute the electron number density during reionization.
 def get_n_e(yH, yHe):
@@ -73,7 +33,7 @@ def get_n_e(yH, yHe):
         
     Date of last revision: October 28, 2024
     """
-    n_e = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*(4.5767e26*(1-yH)+3.6132e25*(1-yHe))
+    n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
 
 def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
@@ -133,24 +93,24 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
+    n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
     
     # Calculate the columb logarithm.
-    lambda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    lambda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*calc_params.n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
-    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
-    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
+    sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
+    sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
     D_one = 0
     D_two=0
     for n in range(0,3): # Iterate through numbers and calculate D_theta for each of the species. Returns the sum over all species.
-        D_one = (q_a**2*q_b**2*numbers[0+n]*lambda_c)/(8*math.pi*epsilon_o**2*m_a**2*velocity**3)
+        D_one = (calc_params.q_a**2*calc_params.q_b**2*numbers[0+n]*lambda_c)/(8*math.pi*calc_params.epsilon_o**2*calc_params.m_a**2*velocity**3)
         D_two = (1-(numbers[3+n]**2/velocity**2))*math.erf(velocity/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/velocity)*math.exp(-(velocity**2)/(2*numbers[3+n]**2))
         D_final = (D_one*D_two)+D_final
         D_one = 0
@@ -179,17 +139,17 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
+    n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
 
     # Calculate the columb logarithm.
-    lambda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    lambda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*calc_params.n_e))
 
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
-    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
-    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
+    sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
+    sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
     
     A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
     # set up variables for computing over species
@@ -199,7 +159,7 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     A_final_neg = 0
     for a in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
         
-        A_one = (q_a**2*q_b**2*A_numbers[0+a]*((m_a/A_numbers[6+a])+1)*lambda_c)/(4*math.pi*epsilon_o**2*m_a**2*velocity**2)
+        A_one = (calc_params.q_a**2*calc_params.q_b**2*A_numbers[0+a]*((calc_params.m_a/A_numbers[6+a])+1)*lambda_c)/(4*math.pi*calc_params.epsilon_o**2*calc_params.m_a**2*velocity**2)
         A_two = math.erf(velocity/(math.sqrt(2)*A_numbers[3+a])) - math.sqrt(2/math.pi)*(velocity/A_numbers[3+a])*math.exp(-(velocity**2)/(2*A_numbers[3+a]**2))
         A_final = A_final + (A_one*A_two)
         # reset for next iteration
@@ -231,23 +191,23 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     Date of last revision: October 28, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
-    n_b1 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    n_b2 = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*3.6132e25*(1-yHe) # number density of ionized He
+    n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
+    n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
     # Calculate the columb logarithm.
-    lambda_c = ((3/2)*math.log((k_B*T)/R_y))-((1/2)*math.log(64*math.pi*a_o**3*n_e))
+    lambda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*calc_params.n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
-    sigma_b1 = math.sqrt((k_B*THII)/(m_b1))
-    sigma_b2 = math.sqrt((k_B*THeII)/(m_b2))
-    sigma_b3 = math.sqrt((k_B*Te)/(m_b3))
+    sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
+    sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
     Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
     Da_final = 0
     Da_one = 0
     Da_two = 0
     
     for d in range(0,3): # Iterate through numbers and calculate A_a for each of the species. Returns the sum over all species.
-        Da_one = (q_a**2*q_b**2*Da_numbers[0+d]*((m_a/Da_numbers[6+d])+1)*Da_numbers[3+d]**2*lambda_c)/(4*math.pi*epsilon_o**2*m_a*Da_numbers[6+d]*velocity**3)
+        Da_one = (calc_params.q_a**2*calc_params.q_b**2*Da_numbers[0+d]*((calc_params.m_a/Da_numbers[6+d])+1)*Da_numbers[3+d]**2*lambda_c)/(4*math.pi*calc_params.epsilon_o**2*calc_params.m_a*Da_numbers[6+d]*velocity**3)
         Da_two = math.erf(velocity/(math.sqrt(2)*Da_numbers[3+d])) - math.sqrt(2/math.pi)*(velocity/Da_numbers[3+d])*math.exp(-(velocity**2)/(2*Da_numbers[3+d]**2))
         Da_final = Da_final + (Da_one*Da_two)
         Da_one = 0
@@ -277,20 +237,20 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
 
     Date of last revision: November 4, 2024
     """
-    E_lambda_H = I_H + (1/2)*m_e*velocity**2 # Energy of H for a photon energy bin, lambda
-    E_lambda_He = I_He + (1/2)*m_e*velocity**2 # Energy of He for a photon energy bin, lambda
-    delta_E_H = E_lambda_H*math.log(4)/N_NU # Energy bin width for H
-    delta_E_He = E_lambda_He*math.log(4)/N_NU # Energy bin width for He
-    n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*math.pi*G))*4.5767e26*(1-yH) # number density of ionized H
-    F = (5e6*n_H*(1+f_He))/(1-5e6/const.c) # incident flux
+    E_lambda_H = calc_params.I_H + (1/2)*calc_params.m_e*velocity**2 # Energy of H for a photon energy bin, lambda
+    E_lambda_He = calc_params.I_He + (1/2)*calc_params.m_e*velocity**2 # Energy of He for a photon energy bin, lambda
+    delta_E_H = E_lambda_H*math.log(4)/calc_params.N_NU # Energy bin width for H
+    delta_E_He = E_lambda_He*math.log(4)/calc_params.N_NU # Energy bin width for He
+    n_H = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
+    F = (calc_params.vmax*n_H*(1+calc_params.f_He))/(1-calc_params.vmax/const.c) # incident flux
     
     # Get the sum for each element in the tauHdat and tauHedat data
     tautot = tauHdat + tauHedat
-    tautot=np.reshape(tautot, (128,2000)) # make sure that the array is the correct shape
+    tautot=np.reshape(tautot, (calc_params.N_NU,calc_params.NSLAB)) # make sure that the array is the correct shape
     
     # Determine which energy bin the energy of H or He is in for the given velocity
-    r_H = N_NU
-    r_He = N_NU
+    r_H = calc_params.N_NU
+    r_He = calc_params.N_NU
     for r in range(len(E_list)):
         if E_lambda_H <= E_list[r]:
             r_H = r
@@ -302,15 +262,15 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
             break
     
     # Get find the slab number and S_{2,0} for H and He
-    if r_H<N_NU:
-        A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/DNHI)
-        Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,j]/(tauHdat[r_H,j]+tauHedat[r_H,j]))*(m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
+    if r_H<calc_params.N_NU:
+        A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:j]))*((-np.expm1(-tautot[r_H,j]))/calc_params.DNHI)
+        Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,j]/(tauHdat[r_H,j]+tauHedat[r_H,j]))*(calc_params.m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_H = 0
         
-    if r_He<N_NU:
-        A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/DNHI)
-        Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_He,j]/(tauHdat[r_He,j]+tauHedat[r_He,j]))*(m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
+    if r_He<calc_params.N_NU:
+        A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:j]))*((-np.expm1(-tautot[r_He,j]))/calc_params.DNHI)
+        Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_He,j]/(tauHdat[r_He,j]+tauHedat[r_He,j]))*(calc_params.m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
@@ -362,9 +322,9 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
 
     # loop over velocities and calulate the values of each component of the matricies to be appended to their arrays    
     for i in range(len(velocity)):
-        D_theta_vals = np.append(D_theta_vals, (6*velocity[i]**2*get_D_theta(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])))
+        D_theta_vals = np.append(D_theta_vals, (6*calc_params.velocity[i]**2*get_D_theta(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity[i])))
         # make the vector for the source terms
-        Slm_vals = np.append(Slm_vals, (velocity[i]**2*get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, velocity[i])))
+        Slm_vals = np.append(Slm_vals, (calc_params.velocity[i]**2*get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, calc_params.velocity[i])))
         
         # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
@@ -374,17 +334,17 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # Note: velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if i>=len(velocity)-1:
-            A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i-1]-velocity[i])))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i-1]-velocity[i])**2)))
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i-1]-velocity[i])**2)))
+            A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity[i])*(calc_params.velocity[i]**2))/(calc_params.velocity[i-1]-calc_params.velocity[i])))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[plus_1])*(calc_params.velocity_half[plus_1]**2))/((calc_params.velocity[i-1]-calc_params.velocity[i])**2)))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[i-1]-calc_params.velocity[i])**2)))
         else:
-            A_v_vals_plus = np.append(A_v_vals_plus, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i+1])*(velocity[i+1]**2))/(velocity[i+1]-velocity[i])))
-            A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity[i])*(velocity[i]**2))/(velocity[i+1]-velocity[i])))
-            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1+2])*(velocity_half[plus_1+2]**2))/((velocity[i+1]-velocity[i])**2)))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[plus_1])*(velocity_half[plus_1]**2))/((velocity[i+1]-velocity[i])**2)))
+            A_v_vals_plus = np.append(A_v_vals_plus, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity[i+1])*(calc_params.velocity[i+1]**2))/(calc_params.velocity[i+1]-calc_params.velocity[i])))
+            A_v_vals = np.append(A_v_vals, ((get_A_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity[i])*(calc_params.velocity[i]**2))/(calc_params.velocity[i+1]-calc_params.velocity[i])))
+            D_para_vals_plus = np.append(D_para_vals_plus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[plus_1+2])*(calc_params.velocity_half[plus_1+2]**2))/((calc_params.velocity[i+1]-calc_params.velocity[i])**2)))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[plus_1])*(calc_params.velocity_half[plus_1]**2))/((calc_params.velocity[i+1]-calc_params.velocity[i])**2)))
         
-            D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])**2)))
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], velocity_half[minus_1])*(velocity_half[minus_1]**2))/((velocity[i+1]-velocity[i])**2)))
+            D_para_vals_minus = np.append(D_para_vals_minus, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[i+1]-calc_params.velocity[i])**2)))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[i+1]-calc_params.velocity[i])**2)))
         plus_1 = 0
         minus_1 = 0
     # diagonalize the matricies to make a tri-diagonal matrix    
@@ -469,7 +429,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     Date of last revision: October 29, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    Gani = (1/n_e)*velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, velocity[i]))/(k*velocity[i]))[1]*(math.sqrt(6)*alm)
+    Gani = (1/n_e)*calc_params.velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, calc_params.velocity[i]))/(calc_params.k*calc_params.velocity[i]))[1]*(math.sqrt(6)*alm)
     return np.array(Gani)
     
 # Computes Gani as a sum over the velocities for a row in output.txt
@@ -478,11 +438,11 @@ Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     slab_start_time= time.time()
     for slab in range(0, 8):
-        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, k[slab*10], j)
+        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, calc_params.k[slab*10], j)
         # write a20 results to a test file instead of printing them out
         for i in range(0, 71): # Compute the Reimann sum of velocities for a row of data.
-            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], 200, tauHdat, tauHedat, fracflux, alm[i], i, k[slab*10], j)
-            Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.
+            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[i], i, calc_params.k[slab*10], j)
+            Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
         Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
         Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
