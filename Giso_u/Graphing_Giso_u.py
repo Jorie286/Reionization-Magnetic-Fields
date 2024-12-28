@@ -6,13 +6,15 @@ import numpy as np
 from Get_Giso_u import real
 from Get_Giso_u import imaginary
 from Get_Giso_u import data
+import calc_params
 
 # Set up a 2x3 grid of subplots so all plots can be viewed together.
 fig, axs = plt.subplots(nrows = 2, ncols = 3, figsize=(14,10))
 
 # Create lists to iterate through while creating the plots. This eliminates many lines of uncessary code.
 positions = [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)]
-data_list = [data[:,0]*12000, data[:,2], data[:,3], data[:,5], data[:,7], data[:,13]]
+# in this plot, we will use the slab numbers to calcuate the amount of time that has passed (timestep comes from output.txt)
+data_list = [data[:,0]*calc_params.Timestep, data[:,2], data[:,3], data[:,5], data[:,7], data[:,13]] 
 labels = ["Time", "yH", "yHe", "T e", "THII", "THeII"] 
 # Graph real and imaginary portions of Giso_list seperatly for each graph.
 # Plot Giso_u over time.
