@@ -151,7 +151,7 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
     sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
     
-    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
+    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_b3] # List of coefficients to be used in calculating D_theta.
     # set up variables for computing over species
     A_final = 0
     A_one = 0
@@ -201,7 +201,7 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
     sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
-    Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, m_b1, m_b2, m_b3] # List of coefficients to be used in calculating D_theta.
+    Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_b3] # List of coefficients to be used in calculating D_theta.
     Da_final = 0
     Da_one = 0
     Da_two = 0
@@ -251,13 +251,13 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
     # Determine which energy bin the energy of H or He is in for the given velocity
     r_H = calc_params.N_NU
     r_He = calc_params.N_NU
-    for r in range(len(E_list)):
-        if E_lambda_H <= E_list[r]:
+    for r in range(len(calc_params.E_list)):
+        if E_lambda_H <= calc_params.E_list[r]:
             r_H = r
             break
             
-    for r in range(len(E_list)):
-        if E_lambda_He <= E_list[r]:
+    for r in range(len(calc_params.E_list)):
+        if E_lambda_He <= calc_params.E_list[r]:
             r_He = r
             break
     
@@ -429,7 +429,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     Date of last revision: October 29, 2024
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    Gani = (1/n_e)*calc_params.velocity[i]**2*get_sigmas(20, (1j*get_D_theta(Te, THII, THeII, yH, yHe, calc_params.velocity[i]))/(calc_params.k*calc_params.velocity[i]))[1]*(math.sqrt(6)*alm)
+    Gani = (1/n_e)*calc_params.velocity[i]**2*get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(Te, THII, THeII, yH, yHe, calc_params.velocity[i]))/(calc_params.k*calc_params.velocity[i]))[1]*(math.sqrt(6)*alm)
     return np.array(Gani)
     
 # Computes Gani as a sum over the velocities for a row in output.txt
