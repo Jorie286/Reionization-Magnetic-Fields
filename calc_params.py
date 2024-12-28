@@ -48,6 +48,8 @@ T = 5e4 # reionization front temperature (Kelvin)
 # make a list of energies that we are considering with the same length as the number of frequency bins
 E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
 
+# timestep from the inital simulation where we gathered the data
+Timestep = 12000
 # number of frequency bins
 N_NU = 128
 # define the number of slabs we want to use in the calculaiton
