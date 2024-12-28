@@ -35,13 +35,13 @@ def get_sigmas(n,c):
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
 
-get_sigmas(20, 1j)
+get_sigmas(calc_params.n_sigmas, 1j)
 
 # Graph the values of sigma_{1,1} and sigma{2,1} in terms of various possible values for i D_theta / k v.
 # We only want to look at these two sigmas because these are the only two that affect G_iso and G_ani.
 
-#Create a list of 20 real numbers with steps of 0.1 for x. We cannot directly plot i D_theta / k v because Matlab will not plot imaginary numbers correctly. 
-count = np.arange(0, 10, 0.1).tolist()
+# Create a list of 20 real numbers with steps of 0.1 for x. We cannot directly plot i D_theta / k v because Matlab will not plot imaginary numbers correctly. 
+count = np.arange(0, calc_params.n_sigmas, 0.1).tolist()
 
 #Create a list of i D_theta / k v that are imaginary and have the same constants as count. This is to be used in get_sigmas.
 g=[None]*len(count)
@@ -53,7 +53,7 @@ a = [None]*len(count)
 r = [None]*len(count)
 im = [None]*len(count)
 for i in range (0, len(count)):
-    a[i] = get_sigmas(20, g[i])
+    a[i] = get_sigmas(calc_params.n_sigmas, g[i])
     r[i] = a[i].real
     im[i] = a[i].imag
     
