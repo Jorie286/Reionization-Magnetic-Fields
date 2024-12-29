@@ -92,7 +92,7 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
         
     Date of last revision: October 28, 2024
     """
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
@@ -103,7 +103,7 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
-    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
@@ -138,7 +138,7 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
         
     Date of last revision: October 28, 2024
     """
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
@@ -149,9 +149,9 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
-    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
-    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_b3] # List of coefficients to be used in calculating D_theta.
+    A_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_e] # List of coefficients to be used in calculating D_theta.
     # set up variables for computing over species
     A_final = 0
     A_one = 0
@@ -190,7 +190,7 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
 
     Date of last revision: October 28, 2024
     """
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = n_e
@@ -200,8 +200,8 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
-    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
-    Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_b3] # List of coefficients to be used in calculating D_theta.
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
+    Da_numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3, calc_params.m_b1, calc_params.m_b2, calc_params.m_e] # List of coefficients to be used in calculating D_theta.
     Da_final = 0
     Da_one = 0
     Da_two = 0
