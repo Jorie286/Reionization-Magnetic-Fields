@@ -82,7 +82,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
         
     Date of last revision: October 28, 2024
     """
-    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_b3)
+    n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
     n_b3 = calc_params.n_e
@@ -92,7 +92,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
     sigma_b2 = math.sqrt((calc_params.k_B*THeII)/(calc_params.m_b2))
-    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_b3))
+    sigma_b3 = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
@@ -140,9 +140,9 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
-    for ik in range(0,k_step):
-        for i in range(0, Nv): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, k[ik*10], i)
+    for ik in range(0,calc_params.k_step):
+        for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, calc_params.k[ik*10], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
