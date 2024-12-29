@@ -23,7 +23,6 @@ a_o = 5.29177210903e-11 # Bohr radius
 m_a = const.m_e # mass of an electron
 m_b1 = const.m_p # mass of HII
 m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-m_b3 = const.m_e # mass of an electron
 q_a = -const.eV # charge of an electron (also the charge of m_b3)
 q_b = const.eV # charge of HII and HeII
 epsilon_o = const.epsilon_0 # vacuum permittivity
@@ -41,7 +40,6 @@ he = 3.6132e25 # multiplicative factor of ionozed fraction of helium in determin
 # Ionization energy of hydrogen and helium (in Joules)
 I_H = 13.59*const.eV
 I_He = 24.687*const.eV
-m_e = const.m_e # mass of an electron
 
 T = 5e4 # reionization front temperature (Kelvin)
 
