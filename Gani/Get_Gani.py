@@ -31,7 +31,7 @@ def get_n_e(yH, yHe):
     Returns
         the number density of electrons under the given conditions
         
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
@@ -90,7 +90,7 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of D_theta for the specific conditions entered into the function
         
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
@@ -136,7 +136,7 @@ def get_A_a(Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of A_a for the specific conditions entered into the function
         
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
@@ -188,7 +188,7 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     Returns
         the value of the along the path diffusion coefficient for the values entered into the function
 
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
@@ -223,19 +223,19 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, j, velocity):
 
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Input argument (6)
+    Input argument (7)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, wave number
+                        k, distribution of wave numbers
                         j, the bin number (time step)
                         velocity, given speed of electrons from linearly distributed list
     Returns
         the value of the source term for the specific conditions entered into the function
 
-    Date of last revision: November 4, 2024
+    Date of last revision: January 4, 2025
     """
     E_lambda_H = calc_params.I_H + (1/2)*calc_params.m_e*velocity**2 # Energy of H for a photon energy bin, lambda
     E_lambda_He = calc_params.I_He + (1/2)*calc_params.m_e*velocity**2 # Energy of He for a photon energy bin, lambda
@@ -289,7 +289,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
 
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Input argument (11)
+    Input argument (10)
         required    integer values
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
@@ -299,12 +299,12 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, wave number
+                        k, distribution of wave numbers
                         j, the bin number (time step)
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: November 13, 2024
+    Date of last revision: January 4, 2025
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -324,7 +324,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j):
     for i in range(len(velocity)):
         D_theta_vals = np.append(D_theta_vals, (6*calc_params.velocity[i]**2*get_D_theta(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.velocity[i])))
         # make the vector for the source terms
-        Slm_vals = np.append(Slm_vals, (calc_params.velocity[i]**2*get_Slm(data[j,2], tauHdat, tauHedat, fracflux, 1e-12, j, calc_params.velocity[i])))
+        Slm_vals = np.append(Slm_vals, (calc_params.velocity[i]**2*get_Slm(data[j,2], tauHdat, tauHedat, fracflux, calc_params.k[::calc_params.k_step], j, calc_params.velocity[i])))
         
         # create indeicies to check if (i*2)+/-1 will be out of range for velocity[i]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
@@ -379,12 +379,12 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k = 1e-12, wave number
+                        k, distribution of wave numbers
                         j, the bin number (time step)
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: November 6, 2024
+    Date of last revision: January 4, 2025
     """
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, j)
@@ -408,7 +408,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
     
     Important note: all physical constants are in units of MKS for easy conversions.
     
-    Input arguments (12)
+    Input arguments (13)
         required    float or integer-like values 
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
@@ -421,15 +421,15 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
                         fracflux, flux fraction in a photon bin
                         alm, solution of a_{2,0} for all velocities for a slab number
                         i, the slab number of the iteration over velocities
-                        k = 1e-12, wave number
+                        k, distribution of wave numbers
                         j, the bin number (time step)
     Returns
         the value of Gani for the specific conditions entered into the function
         
-    Date of last revision: October 29, 2024
+    Date of last revision: January 4, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function
-    Gani = (1/n_e)*calc_params.velocity[i]**2*get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(Te, THII, THeII, yH, yHe, calc_params.velocity[i]))/(calc_params.k*calc_params.velocity[i]))[1]*(math.sqrt(6)*alm)
+    Gani = (1/n_e)*calc_params.velocity[i]**2*get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(Te, THII, THeII, yH, yHe, calc_params.velocity[i]))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[1]*(math.sqrt(6)*alm)
     return np.array(Gani)
     
 # Computes Gani as a sum over the velocities for a row in output.txt
@@ -437,11 +437,11 @@ Gani_final = 0
 Gani_data = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     slab_start_time= time.time()
-    for slab in range(0, calc_params.k_step):
-        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, calc_params.k[slab*10], j)
+    for k_index in range(0, calc_params.num_k):
+        alm = compute_for_slab_timestep(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], tauHdat, tauHedat, fracflux, calc_params.k[k_index*calc_params.k_step], j)
         # write a20 results to a test file instead of printing them out
         for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
-            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[i], i, calc_params.k[slab*10], j)
+            Gani_compute = get_Gani(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[i], i, calc_params.k[k_index*calc_params.k_step], j)
             Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
         Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
