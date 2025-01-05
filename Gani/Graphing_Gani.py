@@ -70,12 +70,12 @@ S20 = np.loadtxt(r'S20.txt')
 fig, ax = plt.subplots(figsize=(14,10))
 # plot source term over various slab numbers
 # Note: we are only plotting the last k slab
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*999):(calc_params.Nv*8*1000)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1000")
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1029):(calc_params.Nv*8*1030)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1030")
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1049):(calc_params.Nv*8*1050)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1050")
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1069):(calc_params.Nv*8*1070)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1070")
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1089):(calc_params.Nv*8*1090)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1090")
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1099):(calc_params.Nv*8*1100)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1100")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*999):(calc_params.Nv*calc_params.num_k*1000)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1000")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1029):(calc_params.Nv*calc_params.num_k*1030)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1030")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1049):(calc_params.Nv*calc_params.num_k*1050)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1050")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1069):(calc_params.Nv*calc_params.num_k*1070)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1070")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1089):(calc_params.Nv*calc_params.num_k*1090)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1090")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1099):(calc_params.Nv*calc_params.num_k*1100)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1100")
 # set up plot labels
 ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Source Term Value")
@@ -91,13 +91,13 @@ a20 = np.loadtxt(r'a20.txt')
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment over various slab numbers
 # Note: we are only plotting the last k slab
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*999):(calc_params.Nv*8*1000)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1000")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1029):(calc_params.Nv*8*1030)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1030")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1049):(calc_params.Nv*8*1050)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1050")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1069):(calc_params.Nv*8*1070)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1070")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1089):(calc_params.Nv*8*1090)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1090")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1099):(calc_params.Nv*8*1100)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1100")
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1199):(calc_params.Nv*8*1200)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1200")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*999):(calc_params.Nv*calc_params.num_k*1000)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1000")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1029):(calc_params.Nv*calc_params.num_k*1030)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1030")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1049):(calc_params.Nv*calc_params.num_k*1050)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1050")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1069):(calc_params.Nv*calc_params.num_k*1070)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1070")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1089):(calc_params.Nv*calc_params.num_k*1090)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1090")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1099):(calc_params.Nv*calc_params.num_k*1100)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1100")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1199):(calc_params.Nv*calc_params.num_k*1200)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1200")
 # set up the plot labels
 ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Multipole Moment Value")
@@ -114,7 +114,7 @@ j_list = []
 for i in range(0,calc_params.NSLAB):
     j_list.append(i)
 # plot Gani over bins (j)
-axs[0].plot(j_list, Gani_data[::8], label="Gani")
+axs[0].plot(j_list, Gani_data[::calc_params.k_step], label="Gani")
 # plot the hydrogen and helium neutral fraction over the bins (j) in a separate subplot from Gani
 axs[1].plot(j_list, data[:,2], label="yH")
 axs[1].plot(j_list, data[:,3], label="yHe")
@@ -144,7 +144,7 @@ for v in range(len(calc_params.velocity)):
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment at its maximum
 # Note: we are only plotting the last k bin
-ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*8*1076):(calc_params.Nv*8*1077)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1077")
+ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*1076):(calc_params.Nv*calc_params.num_k*1077)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1077")
 ax.axvline(x=calc_params.velocity[v_bin], color = 'r', linestyle = "--")
 # add the equation for this and arrow for this value on the plot
 equation = r'$\sqrt{\frac{3 k_B T_e}{m_e}}$'
@@ -160,7 +160,7 @@ fig.show()
 # make a plot of S_{2,0} at its largest (absolute) value
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment at its maximum
-ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*8*1068):(calc_params.Nv*8*1069)][calc_params.Nv*7:calc_params.Nv*8]), label = "Slab 1069")
+ax.plot(calc_params.velocity, (4*np.pi*np.array(calc_params.velocity)**3*S20[(calc_params.Nv*calc_params.num_k*1068):(calc_params.Nv*calc_params.num_k*1069)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), label = "Slab 1069")
 # set up the plot labels
 ax.set_xlabel("Velocity [m/s]")
 ax.set_ylabel("Source Term Value")
@@ -170,14 +170,8 @@ fig.show()
 
 # make a plot of Giso against k
 fig, ax = plt.subplots(figsize=(14,10))
-ax.plot(calc_params.k[::10][:8], Giso_im_arr[1069], label = "k slab 1069 (Source max) (first k)")
-ax.plot(calc_params.k[1::10][:8], Giso_im_arr[1069], label = "k slab 1069 (Source max) (second k)")
-ax.plot(calc_params.k[2::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (third k)")
-ax.plot(calc_params.k[3::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (fourth k)")
-ax.plot(calc_params.k[4::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (fith k)")
-ax.plot(calc_params.k[5::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (sixth k)")
-ax.plot(calc_params.k[6::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (seventh k)")
-ax.plot(calc_params.k[7::10][:8], Giso_im_arr[(8*1068):(8*1069)][:8], label = "k slab 1069 (Source max) (eighth k)")
+for ind in range(0, calc_params.num_k):
+    ax.plot(calc_params.k[ind::calc_params.k_step][:calc_params.num_k], Giso_im_arr[1069], label = "k slab 1069 (Source max) (k 2.1f%)" % ind)
 ax.set_title("Imaginary Giso against k")
 ax.set_xlabel("k")
 ax.set_ylabel("Giso Imaginary Value")
@@ -187,8 +181,8 @@ fig.show()
 
 # make a plot of Gani against k
 fig, ax = plt.subplots(figsize=(14,10))
-ax.plot(calc_params.k[::10][:8], Gani_data[(8*1068):(8*1069)], label = "k slab 1069 (Source max)")
-ax.plot(calc_params.k[::10][:8], Gani_data[(8*1076):(8*1077)], label = "k slab 1077 (Multipole max)")
+ax.plot(calc_params.k[::calc_params.k_step][:calc_params.num_k], Gani_data[(calc_params.num_k*1068):(calc_params.num_k*1069)], label = "k slab 1069 (Source max)")
+ax.plot(calc_params.k[::calc_params.k_step][:calc_params.num_k], Gani_data[(calc_params.num_k*1076):(calc_params.num_k*1077)], label = "k slab 1077 (Multipole max)")
 ax.set_title("Gani against k")
 ax.set_xlabel("k")
 ax.set_ylabel("Gani Value")
@@ -201,8 +195,8 @@ mu_0 = (4*np.pi)*(10**(-7)) # permiablity of free space (units of newtons ampere
 for m in range(0, calc_params.NSLAB):
     n_e = get_n_e(data[m,2], data[m,3])
     k_sd = np.sqrt((mu_0*n_e*calc_params.q_a**2)/calc_params.m_e)
-    for n in range(8):
-        im_w_list.append((calc_params.k[n*10]/imaginary[m*8+n])*(Gani_data[m*8+n]-(calc_params.k[n*10]/k_sd)**2))
+    for n in range(0, calc_params.num_k):
+        im_w_list.append((calc_params.k[n*calc_params.k_step]/imaginary[m*8+n])*(Gani_data[m*8+n]-(calc_params.k[n*10]/k_sd)**2))
 print(im_w_list)
 
 # make a plot of imaginary w against k
