@@ -23,7 +23,7 @@ def get_n_e(yH, yHe):
     Returns
         the number density of electrons under the given conditions
         
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
@@ -49,13 +49,13 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     Returns
         the value of Giso_u for the specific conditions entered into the function
         
-    Date of last revision: October 28, 2024
+    Date of last revision: January 6, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function
     sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
     Giso_const = -(1/calc_params.n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
+    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return np.array(Giso_u)
 
@@ -80,7 +80,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     Returns
         the value of D_theta for the specific conditions entered into the function
         
-    Date of last revision: October 28, 2024
+    Date of last revision: December 28, 2025
     """
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
@@ -140,9 +140,9 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 Giso_final = 0
 Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
-    for ik in range(0,calc_params.k_step):
+    for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, calc_params.k[ik*10], i)
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, calc_params.k[ik*calc_params.k_step], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
