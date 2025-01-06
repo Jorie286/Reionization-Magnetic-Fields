@@ -5,6 +5,8 @@ import numpy as np
 # Get the data from Get_Gani to be used for graphing.
 from Get_Gani import Gani_data
 from Get_Gani import data
+# get imaginary data from Get_Giso_u to be used for graphing
+from Giso_u.Get_Giso_u import imaginary
 
 import calc_params
 
