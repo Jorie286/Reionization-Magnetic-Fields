@@ -198,12 +198,13 @@ for m in range(0, calc_params.NSLAB):
     n_e = get_n_e(data[m,2], data[m,3])
     k_sd = np.sqrt((mu_0*n_e*calc_params.q_a**2)/calc_params.m_e)
     for n in range(0, calc_params.num_k):
-        im_w_list.append((calc_params.k[n*calc_params.k_step]/imaginary[m*8+n])*(Gani_data[m*8+n]-(calc_params.k[n*10]/k_sd)**2))
+        im_w_list.append((calc_params.k[n*calc_params.k_step]/imaginary[m*n])*(Gani_data[m*n]-(calc_params.k[n*calc_params.k_step]/k_sd)**2))
 print(im_w_list)
+Im_w_arr = np.array(im_w_list).reshape(calc_params.NSLAB,calc_params.num_k) # reshape the list for easier graphing and analysis
 
 # make a plot of imaginary w against k
 fig, ax = plt.subplots(figsize=(14,10))
-ax.plot(calc_params.k[:8], im_w_arr[::2000])
+ax.plot(calc_params.k[::calc_params.k_step], Im_w_arr[0,:]) # plot the first row if values for imaginary omega.
 ax.set_title("Imaginary w against k")
 ax.set_xlabel("k")
 ax.set_ylabel("Imaginary w")
