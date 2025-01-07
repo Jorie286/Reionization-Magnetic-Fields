@@ -49,19 +49,22 @@ fig.show()
 # plot the wavenumbers agains the values that we calculated in Get_Giso and Get_Gani
 # make a plot of Giso against k
 fig, ax = plt.subplots(figsize=(14,10))
-ax.plot(calc_params.k[::calc_params.k_step], imaginary[(calc_params.num_k*1069):(calc_params.num_k*1070)], label = "k slab 1070")
+for ind in range(0, calc_params.num_k):
+    ax.plot(calc_params.k[ind::calc_params.k_step][:calc_params.num_k], Giso_im_arr[1069], label = "k slab 1069 (Source max) (k 2.1f%)" % ind)
 ax.set_title("Imaginary Giso against k")
 ax.set_xlabel("k")
 ax.set_ylabel("Giso Imaginary Value")
 ax.set_xscale('log')
+ax.legend()
 fig.show()
-
 
 # make a plot of Gani against k
 fig, ax = plt.subplots(figsize=(14,10))
-ax.plot(calc_params.k[::calc_params.k_step], Gani_data[(calc_params.num_k*1069):(calc_params.num_k*1070)], label = "k slab 1070")
+ax.plot(calc_params.k[::calc_params.k_step][:calc_params.num_k], Gani_data[(calc_params.num_k*1068):(calc_params.num_k*1069)], label = "k slab 1069 (Source max)")
+ax.plot(calc_params.k[::calc_params.k_step][:calc_params.num_k], Gani_data[(calc_params.num_k*1076):(calc_params.num_k*1077)], label = "k slab 1077 (Multipole max)")
 ax.set_title("Gani against k")
 ax.set_xlabel("k")
 ax.set_ylabel("Gani Value")
 ax.set_xscale('log')
+ax.legend()
 fig.show()
