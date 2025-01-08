@@ -1,3 +1,6 @@
+import numpy as np
+import scipy.constants as const
+
 # define the maximum velocity and number of velocities that we want to use for the compuation
 vmax = 5.0e6
 Nv = 71
