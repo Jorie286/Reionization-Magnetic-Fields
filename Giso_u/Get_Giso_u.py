@@ -54,9 +54,9 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     n_e = get_n_e(yH, yHe) # electron density function (also the number density of m_e)
     n_b1 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
     n_b2 = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.he*(1-yHe) # number density of ionized He
-    n_b3 = calc_params.n_e
+    n_b3 = n_e
     # Calculate the columb logarithm.
-    lamda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*calc_params.n_e))
+    lamda_c = ((3/2)*math.log((calc_params.k_B*calc_params.T)/calc_params.R_y))-((1/2)*math.log(64*math.pi*calc_params.a_o**3*n_e))
     
     # Calculate the velocity dispersion (one for each of the species)
     sigma_b1 = math.sqrt((calc_params.k_B*THII)/(calc_params.m_b1))
@@ -66,7 +66,7 @@ def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     numbers = [n_b1, n_b2, n_b3, sigma_b1, sigma_b2, sigma_b3] # List of coefficients to be used in calculating D_theta.
     D_final = 0
     for n in range(0,3): # Iterate through numbers and calculate D_theta for each of the species. Returns the sum over all species.
-        D_one = (calc_params.q_a**2*calc_params.q_b**2*numbers[0+n]*lamda_c)/(8*math.pi*calc_params.epsilon_o**2*calc_params.m_a**2*calc_params.velocity[i]**3)
+        D_one = (calc_params.q_a**2*calc_params.q_b**2*numbers[0+n]*lamda_c)/(8*math.pi*calc_params.epsilon_o**2*calc_params.m_e**2*calc_params.velocity[i]**3)
         D_two = (1-(numbers[3+n]**2/calc_params.velocity[i]**2))*math.erf(calc_params.velocity[i]/(math.sqrt(2)*numbers[3+n]))+math.sqrt(2/math.pi)*(numbers[3+n]/calc_params.velocity[i])*math.exp(-calc_params.velocity[i]**2/(2*numbers[3+n]**2))
         D_final = D_one*D_two+D_final
     return D_final
@@ -131,8 +131,8 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     n_e = get_n_e(yH, yHe) # electron density function
     sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
-    Giso_const = -(1/calc_params.n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
+    Giso_const = -(1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
+    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return np.array(Giso_u)
     
@@ -163,4 +163,4 @@ f = open("Giso_u.txt", "a")
 for a in imaginary:
     f.write(str(a))
     f.write("\n")
-f.close() # close the a20 test file
+f.close() # close the Giso_u file
