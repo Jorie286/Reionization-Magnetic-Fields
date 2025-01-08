@@ -17,7 +17,7 @@ k_step = 8 # number of values we want to skip over in the distribution between e
 kmin = -18 # minimum wavenumber
 kmax = -10 # maximum wavenumber
 # make a distribution of wavenumbers
-k = np.logspace(k_min, k_max, Nk)
+k = np.logspace(kmin, kmax, Nk)
 
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
