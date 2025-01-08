@@ -28,37 +28,6 @@ def get_n_e(yH, yHe):
     n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
 
-def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
-    """
-    Function to get the value of Giso_u for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
-    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
-    sense, please note that the function does not check for good inputs.
-
-    Important note: all physical constants are in units ov MKS for easy conversions.
-    
-    Input arguments (7)
-        required    float or integer-like values 
-                        Te, temperature of electrons in the reionization front
-                        THII, temperature of ionized hydrogen in the reionization front
-                        THeII, temperature of ionized helium in the reionization front
-                        yH, neutral fraction of hydrogen
-                        yHe, neutral fraction of helium
-                        nHtot, total number of hydrogen atoms in the distribution
-                        k, wavenumbers
-                        i, the slab number of the iteration
-    Returns
-        the value of Giso_u for the specific conditions entered into the function
-        
-    Date of last revision: January 6, 2025
-    """
-    n_e = get_n_e(yH, yHe) # electron density function
-    sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
-    
-    Giso_const = -(1/calc_params.n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
-    Giso_u = Giso_const*Giso
-    return np.array(Giso_u)
-
 # Computing D_theta
 def get_D_theta(T, Te, THII, THeII, yH, yHe, i):
     """
@@ -136,6 +105,37 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
     return x
 
+def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
+    """
+    Function to get the value of Giso_u for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
+    the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
+    sense, please note that the function does not check for good inputs.
+
+    Important note: all physical constants are in units ov MKS for easy conversions.
+    
+    Input arguments (7)
+        required    float or integer-like values 
+                        Te, temperature of electrons in the reionization front
+                        THII, temperature of ionized hydrogen in the reionization front
+                        THeII, temperature of ionized helium in the reionization front
+                        yH, neutral fraction of hydrogen
+                        yHe, neutral fraction of helium
+                        nHtot, total number of hydrogen atoms in the distribution
+                        k, wavenumbers
+                        i, the slab number of the iteration
+    Returns
+        the value of Giso_u for the specific conditions entered into the function
+        
+    Date of last revision: January 6, 2025
+    """
+    n_e = get_n_e(yH, yHe) # electron density function
+    sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
+    
+    Giso_const = -(1/calc_params.n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
+    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((calc_params.n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
+    Giso_u = Giso_const*Giso
+    return np.array(Giso_u)
+    
 # Computes Giso_u as a sum over the velocities for a row in output.txt
 Giso_final = 0
 Giso_list = []
