@@ -132,7 +132,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
     sigma_e = math.sqrt((calc_params.k_B*Te)/(calc_params.m_e))
     
     Giso_const = -(1/n_e)*((4*math.sqrt(math.pi))/math.sqrt(6))
-    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(calc_params.k[::calc_params.k_step]*calc_params.velocity[i]))[0])*((n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
+    Giso = (calc_params.velocity[i]**2)*(get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, Te, THII, THeII, yH, yHe, i))/(k*calc_params.velocity[i]))[0])*((n_e*calc_params.velocity[i])/((2*math.pi)**(3/2)*sigma_e**5))*math.exp(-(calc_params.velocity[i]**2)/(2*sigma_e**2))
     Giso_u = Giso_const*Giso
     return np.array(Giso_u)
     
