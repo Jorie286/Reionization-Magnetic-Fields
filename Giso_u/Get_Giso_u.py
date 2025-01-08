@@ -142,7 +142,7 @@ Giso_list = []
 for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
     for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], NHtot, calc_params.k[ik*calc_params.k_step], i)
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, calc_params.k[ik*calc_params.k_step], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
@@ -158,3 +158,9 @@ for m in range(0, len(Giso_list)):
 print(Giso_list)
 print(imaginary)
 print(real)
+# write Giso_u data to a file (we know only the imaginary numbers are nonzero).
+f = open("Giso_u.txt", "a")
+for a in imaginary:
+    f.write(str(a))
+    f.write("\n")
+f.close() # close the a20 test file
