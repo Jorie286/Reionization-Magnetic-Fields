@@ -23,7 +23,7 @@ k = np.logspace(kmin, kmax, Nk)
 k_B = const.k # Boltzmann constant
 R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
 a_o = 5.29177210903e-11 # Bohr radius
-m_a = const.m_e # mass of an electron
+m_e = const.m_e # mass of an electron
 m_b1 = const.m_p # mass of HII
 m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
 q_a = -const.eV # charge of an electron (also the charge of m_b3)
@@ -33,7 +33,6 @@ Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reioni
 H_o = 2.2618e-18 # Hubble constant
 G = const.G # gravitational constant
 z = 7 # redshift
-m_e = const.m_e # mass of an electron
 DNHI = 2.5e20
 f_He = 0.079 # He abundance
 
