@@ -22,3 +22,4 @@ for g in range(0,6):
     axs[positions[0+g]].set_xlabel(labels[0+g])
     axs[positions[0+g]].set_ylabel("Giso/u")
     axs[positions[0+g]].legend()
+fig.show()
