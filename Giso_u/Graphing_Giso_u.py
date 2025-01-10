@@ -15,8 +15,7 @@ positions = [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)]
 # in this plot, we will use the slab numbers to calcuate the amount of time that has passed (timestep comes from output.txt)
 data_list = [data[:,0]*calc_params.Timestep, data[:,2], data[:,3], data[:,5], data[:,7], data[:,13]] 
 labels = ["Time", "yH", "yHe", "T e", "THII", "THeII"] 
-# Graph real and imaginary portions of Giso_list seperatly for each graph.
-# Plot Giso_u over time.
+# Graph imaginary portions of Giso_u seperatly for each graph.
 for g in range(0,6):
     axs[positions[0+g]].plot(data_list[0+g], imaginary[::calc_params.k_step], color = "r", label = "Giso imaginary") # Note: the timestep for data is 12000 (years???).
     axs[positions[0+g]].set_xlabel(labels[0+g])
