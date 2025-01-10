@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Get the data from Get_Giso_u to be used for graphing.
-imaginary = np.loadtext(r'Giso_u.txt')
+imaginary = np.loadtxt(r'Giso_u.txt')
 
 import calc_params
 
