@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Get the data from Get_Giso_u to be used for graphing.
-from Get_Giso_u import real
-from Get_Giso_u import imaginary
-from Get_Giso_u import data
+imaginary = np.loadtext(r'Giso_u.txt')
+
 import calc_params
 
 # Set up a 2x3 grid of subplots so all plots can be viewed together.
@@ -19,8 +18,7 @@ labels = ["Time", "yH", "yHe", "T e", "THII", "THeII"]
 # Graph real and imaginary portions of Giso_list seperatly for each graph.
 # Plot Giso_u over time.
 for g in range(0,6):
-    axs[positions[0+g]].plot(data_list[0+g], real[::calc_params.k_step], color = "c", label = "Giso real")  # Note: the timestep for data is 12000 (years???).
-    axs[positions[0+g]].plot(data_list[0+g], imaginary[::calc_params.k_step], color = "r", label = "Giso imaginary")
+    axs[positions[0+g]].plot(data_list[0+g], imaginary[::calc_params.k_step], color = "r", label = "Giso imaginary") # Note: the timestep for data is 12000 (years???).
     axs[positions[0+g]].set_xlabel(labels[0+g])
     axs[positions[0+g]].set_ylabel("Giso/u")
     axs[positions[0+g]].legend()
