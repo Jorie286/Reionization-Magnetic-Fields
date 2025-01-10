@@ -1,5 +1,5 @@
 # Reionization-Magnetic-Fields
-This repository contains code for solving parts of the magnetic fields at reionization problem.
+This repository contains code for solving parts of the magnetic fields at reionization problem. Note: when running code in this respository, the Giso and Gani files will need to be taken out of their directories (or the output.txt, fracflux.txt and other data files will need to be added into both Gani and Giso directories.)
 
 The Graphing_Sigmas Python code solves for various values of sigma to be used in solving for the anisotropic and isotropic parts of the distribution.
 It then graphs the sigmas in terms various potential values of $\frac{i\ D_{\theta}}{k v}$ to see how chaning $\frac{i\ D_{\theta}}{k v}$ affects the value of sigma.
