@@ -446,6 +446,6 @@ print("Time for computation to complete:", computation_end_time-computation_star
 print(Gani_data)
 
 f_G = open("Gani.txt", "a")
-f_G.write(str(Gani_data))
+f_G.write(Gani_data)
 f_G.write("\n")
 f_G.close()
