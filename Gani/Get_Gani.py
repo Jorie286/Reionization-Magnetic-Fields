@@ -381,7 +381,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     start_time=time.time() # get the time the function started computing
     alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i)
     # write a_{2,0} data to a file
-    f = open("a20test.txt", "a")
+    f = open("a20.txt", "a")
     for a in alm:
         f.write(str(a))
         f.write("\n")
