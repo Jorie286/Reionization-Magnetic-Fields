@@ -267,7 +267,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
     # append the Slm_tot values to a file for later review and plotting
-    f_S = open("S20test.txt", "a")
+    f_S = open("S20.txt", "a")
     f_S.write(str(Slm_tot))
     f_S.write("\n")
     f_S.close()
@@ -446,6 +446,7 @@ print("Time for computation to complete:", computation_end_time-computation_star
 print(Gani_data)
 
 f_G = open("Gani.txt", "a")
-f_G.write(Gani_data)
-f_G.write("\n")
+for a in Gani_data: # write each value in Gani_data to a new line in the text file
+    f_G.write(str(a))
+    f_G.write("\n")
 f_G.close()
