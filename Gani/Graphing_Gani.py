@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Get the data from Get_Gani to be used for graphing.
-from Get_Gani import Gani_data
-from Get_Gani import data
+data = np.loadtxt(r'output.txt')
+Gani_data = np.loadtxt(r'Gani.txt')
 # get imaginary data from Get_Giso_u to be used for graphing
-from Giso_u.Get_Giso_u import imaginary
+imaginary = np.loadtxt(r'Giso_u.txt')
+# get the S_{2,0} data from the file created by Get_Gani
+S20 = np.loadtxt(r'S20.txt')
+# get the a_{2,0} data file from the output of Get_Gani
+a20 = np.loadtxt(r'a20.txt')
 
 import calc_params
 
@@ -19,7 +23,7 @@ max_val = 0
 a_list = []
 a_max = []
 for j in a20:
-    if n==calc_params.Nv*8*v: # check to make sure we are not at the end of a slab
+    if n==calc_params.Nv*calc_params.num_k*v: # check to make sure we are not at the end of a slab
         max_a = np.max(np.abs(a_list))
         # get the slab and value of a_20 at its maximum
         if max_a>max_val:
@@ -32,7 +36,7 @@ for j in a20:
     # add the value of a20 for the velocity bin we are on
     a_list.append(j)
     n+=1
-    if n==calc_params.NSLAB*8*calc_params.Nv:
+    if n==calc_params.NSLAB*calc_params.num_k*calc_params.Nv:
         a_max.append(np.max(np.abs(a_list)))
 print("The maximum absolute value of the multipole moment is", max_val)
 print("The slab number (j) where the absolute value of the multipole moment is at a maximum is", max_slab)
@@ -46,7 +50,7 @@ max_val_S = 0
 S_list = []
 S_max = []
 for j in S20:
-    if n==calc_params.Nv*8*v: # check to make sure we are not at the end of a slab
+    if n==calc_params.Nv*calc_params.num_k*v: # check to make sure we are not at the end of a slab
         max_S = np.max(np.abs(S_list))
         # get the slab and value of S_20 at its maximum
         if max_S>max_val_S:
@@ -59,16 +63,13 @@ for j in S20:
     # add the value of a20 for the velocity bin we are on
     S_list.append(j)
     n+=1
-    if n==calc_params.NSLAB*8*calc_params.Nv:
+    if n==calc_params.NSLAB*calc_params.num_k*calc_params.Nv:
         S_max.append(np.max(np.abs(S_list)))
 print("The maximum absolute value of the source term is", max_val_S)
 print("The slab number (j) where the absolute value of the source term is at a maximum is", max_slab_S)
 
 
 # plot the source term values at various bin numbers, we want to find where it reaches its maximum
-# get the S_{2,0} data from the file created by Get_Gani
-S20 = np.loadtxt(r'S20.txt')
-# create a plot and indexing list for convenient graphing
 fig, ax = plt.subplots(figsize=(14,10))
 # plot source term over various slab numbers
 # Note: we are only plotting the last k slab
@@ -84,12 +85,10 @@ ax.set_ylabel("Source Term Value")
 ax.set_title("Change in Source Term for a Selection of Slab Numbers")
 ax.legend()
 fig.show()
+fig.savefig("S20_plt.pdf")
 
 
 # plot the multipole moment values of a_{2,0} over varous slab numbers like we plotted S_{2,0} above
-# get the a_{2,0} data file from the output of Get_Gani
-a20 = np.loadtxt(r'a20.txt')
-# create a plot and indexing list for convenient graphing
 fig, ax = plt.subplots(figsize=(14,10))
 # plot multipole moment over various slab numbers
 # Note: we are only plotting the last k slab
@@ -106,6 +105,7 @@ ax.set_ylabel("Multipole Moment Value")
 ax.set_title("Change in Multipole Moment for a Selection of Slab Numbers")
 ax.legend()
 fig.show()
+fig.savefig("a20_plt.pdf")
 
 
 # plot the values of Gani against the neutal fractions
@@ -116,7 +116,7 @@ j_list = []
 for i in range(0,calc_params.NSLAB):
     j_list.append(i)
 # plot Gani over bins (j)
-axs[0].plot(j_list, Gani_data[::calc_params.k_step], label="Gani")
+axs[0].plot(j_list, Gani_data[::calc_params.num_k], label="Gani")
 # plot the hydrogen and helium neutral fraction over the bins (j) in a separate subplot from Gani
 axs[1].plot(j_list, data[:,2], label="yH")
 axs[1].plot(j_list, data[:,3], label="yHe")
@@ -133,6 +133,7 @@ axs[0].set_ylabel("Gani Value")
 axs[1].set_ylabel("Neutral Fraction")
 axs[0].set_title("Gani Compared to the Neutral Fraction for all Slab Numbers")
 fig.show()
+fig.savefig("Gani_plt_1.pdf")
 
 
 # make a plot of a_{2,0} at its largest (absolute) value
@@ -157,6 +158,7 @@ ax.set_ylabel("Multipole Moment Value")
 ax.set_title("Change in Multipole Moment at Maximum")
 ax.legend()
 fig.show()
+fig.savefig("a20_plt_max.pdf")
 
 
 # make a plot of S_{2,0} at its largest (absolute) value
@@ -169,3 +171,4 @@ ax.set_ylabel("Source Term Value")
 ax.set_title("Change in the Source Term at Maximum")
 ax.legend()
 fig.show()
+fig.savefig("S20_plt_max.pdf")
