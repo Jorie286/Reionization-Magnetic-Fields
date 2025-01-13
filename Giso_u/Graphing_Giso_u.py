@@ -18,8 +18,8 @@ data_list = [data[:,0]*calc_params.Timestep, data[:,2], data[:,3], data[:,5], da
 labels = ["Time", "yH", "yHe", "T e", "THII", "THeII"] 
 # Graph imaginary portions of Giso_u seperatly for each graph.
 for g in range(0,6):
-    axs[positions[0+g]].plot(data_list[0+g], imaginary[::calc_params.k_step][:calc_params.NSLAB], color = "r", label = "Giso imaginary") # Note: the timestep for data is 12000 (years???).
+    axs[positions[0+g]].plot(data_list[0+g], imaginary[::calc_params.num_k][:calc_params.NSLAB], label = "Giso_u") # Note: the timestep for data is 12000 (years???).
     axs[positions[0+g]].set_xlabel(labels[0+g])
     axs[positions[0+g]].set_ylabel("Giso/u")
     axs[positions[0+g]].legend()
-fig.show()
+fig.savefig("Giso_plt_1.pdf")
