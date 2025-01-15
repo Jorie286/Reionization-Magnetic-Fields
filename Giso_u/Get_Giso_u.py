@@ -139,7 +139,7 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 # Computes Giso_u as a sum over the velocities for a row in output.txt
 Giso_final = 0
 Giso_list = []
-for j in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
+for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
     for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
             Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, calc_params.k[ik*calc_params.k_step], i)
@@ -148,12 +148,12 @@ for j in range(0, len(data[:,0])): #Iterate through all the rows of data and com
         Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
         Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
 # Create lists of the correct length to fill with the computed values.
-real = [None]*len(Giso_list)
-imaginary = [None]*len(Giso_list)
+real = []
+imaginary = []
 # Add the computed values to the lists.
 for m in range(0, len(Giso_list)):
-    real[m] = Giso_list[m].real
-    imaginary[m] = Giso_list[m].imag
+    real.append(Giso_list[m].real)
+    imaginary.append(Giso_list[m].imag)
 # Print out the results.
 print(Giso_list)
 print(imaginary)
