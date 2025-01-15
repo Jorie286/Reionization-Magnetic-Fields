@@ -2,6 +2,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy.linalg import solve_banded
+import calc_params
 
 # Calculate the value of sigma.
 def get_sigmas(n,c):
@@ -72,6 +73,7 @@ ax.plot(count, real[:, 1], label="real sigma_{2,1}")
 ax.set_xlabel("i D_theta / kv")
 ax.set_ylabel("Value of sigma")
 ax.legend()
+fig.savefig("real_sigma.pdf")
 
 fig, ax = plt.subplots(figsize=(14, 10))
 #Here, we are only plotting the imaginary part of sigma_{l,m}.
@@ -80,3 +82,4 @@ ax.plot(count, imaginary[:, 1], label="imaginary sigma_{2,1}")
 ax.set_xlabel("i D_theta / kv")
 ax.set_ylabel("Value of sigma")
 ax.legend()
+fig.savefig("imag_sigma.pdf")
