@@ -22,14 +22,14 @@ def get_n_e(yH, yHe):
     the ouptut will not make sense, please note that he function does not check for good inputs.
 
     Important note: all physical constants are in units ov MKS for easy conversions.
-    
+
     Input arguments (2)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
     Returns
         the number density of electrons under the given conditions
-        
+
     Date of last revision: December 28, 2025
     """
     n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
@@ -427,7 +427,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
-for i in range(0, len(data[:,0])): #Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
+for i in range(0, calc_params.NSLAB)): # Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     slab_start_time= time.time()
     for k_index in range(0, calc_params.num_k):
         alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, calc_params.k[k_index*calc_params.k_step], i)
