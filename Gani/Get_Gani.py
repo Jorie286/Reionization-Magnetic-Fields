@@ -426,7 +426,7 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
 Gani_data = []
-for i in range(0, calc_params.NSLAB)): # Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
+for i in range(0, calc_params.NSLAB): # Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
     slab_start_time= time.time()
     for k_index in range(0, calc_params.num_k):
         alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, calc_params.k[k_index*calc_params.k_step], i)
