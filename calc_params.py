@@ -19,6 +19,7 @@ kmax = -10 # maximum wavenumber
 # make a distribution of wavenumbers
 k = np.logspace(kmin, kmax, Nk)
 
+
 # Define necessary constants for all computations
 k_B = const.k # Boltzmann constant
 R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
@@ -33,28 +34,26 @@ Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reioni
 H_o = 2.2618e-18 # Hubble constant
 G = const.G # gravitational constant
 z = 7 # redshift
-DNHI = 2.5e20 # width of a grid cell within the reionization front model
 f_He = 0.079 # He abundance
-
-h = 4.5767e26 # number of electrons in 1 kg of hydrogen
+h = 4.5767e26 # number of electrons in 1 kg of hydrogen (same as number of protons)
 he = 3.6132e25 # number of outer-shell electrons in 1 kg of helium
+T = 5e4 # reionization front temperature (Kelvin)
 
 # Ionization energy of hydrogen and helium (in Joules)
 I_H = 13.59*const.eV
 I_He = 24.687*const.eV
 
-T = 5e4 # reionization front temperature (Kelvin)
+DNHI = 2.5e20 # width of a grid cell within the reionization front model
+N_NU = 128 # number of frequency bins
+Timestep = 12000 # timestep from the inital simulation where we gathered the data
+NSLAB = 2000 # define the number of slabs we want to use in the calculaiton
+NHtot = 200 # total number of hydrogen atoms in the distribution
+n_sigmas = 20 # number of sigma terms we want to calculate
 
-# number of frequency bins
-N_NU = 128
+
 # make a list of energies that we are considering with the same length as the number of frequency bins
 E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
 
-# timestep from the inital simulation where we gathered the data
-Timestep = 12000
-# define the number of slabs we want to use in the calculaiton
-NSLAB = 2000
-# total number of hydrogen atoms in the distribution
-NHtot = 200
-# number of sigma terms we want to calculate
-n_sigmas = 20
+
+Y_p_He = 4*f_He/(1+4*f_He) # primordial mass fraction of helium
+n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h*(1-Y_p_He) # total number density of all hydrogen
