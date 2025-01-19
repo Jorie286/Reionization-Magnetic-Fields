@@ -233,8 +233,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
     E_lambda_He = calc_params.I_He + (1/2)*calc_params.m_e*velocity**2 # Energy of He for a photon energy bin, lambda
     delta_E_H = E_lambda_H*math.log(4)/calc_params.N_NU # Energy bin width for H
     delta_E_He = E_lambda_He*math.log(4)/calc_params.N_NU # Energy bin width for He
-    n_H = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*calc_params.h*(1-yH) # number density of ionized H
-    F = (calc_params.vmax*n_H*(1+calc_params.f_He))/(1-calc_params.vmax/const.c) # incident flux
+    F = (calc_params.vmax*calc_params.n_H*(1+calc_params.f_He))/(1-calc_params.vmax/const.c) # incident flux
     
     # Get the sum for each element in the tauHdat and tauHedat data
     tautot = tauHdat + tauHedat
@@ -256,13 +255,13 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
     # Get find the slab number and S_{2,0} for H and He
     if r_H<calc_params.N_NU:
         A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:i]))*((-np.expm1(-tautot[r_H,i]))/calc_params.DNHI)
-        Slm_H = -((8*math.pi)/3)*n_H*F*A_j_H*(tauHdat[r_H,i]/(tauHdat[r_H,i]+tauHedat[r_H,i]))*(calc_params.m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
+        Slm_H = -((8*math.pi)/3)*calc_params.n_H*F*A_j_H*(tauHdat[r_H,i]/(tauHdat[r_H,i]+tauHedat[r_H,i]))*(calc_params.m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_H = 0
         
     if r_He<calc_params.N_NU:
         A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:i]))*((-np.expm1(-tautot[r_He,i]))/calc_params.DNHI)
-        Slm_He = -((8*math.pi)/3)*n_H*F*A_j_He*(tauHedat[r_He,i]/(tauHdat[r_He,i]+tauHedat[r_He,i]))*(calc_params.m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
+        Slm_He = -((8*math.pi)/3)*calc_params.n_H*F*A_j_He*(tauHedat[r_He,i]/(tauHdat[r_He,i]+tauHedat[r_He,i]))*(calc_params.m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
     else:
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
