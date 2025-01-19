@@ -33,11 +33,11 @@ Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reioni
 H_o = 2.2618e-18 # Hubble constant
 G = const.G # gravitational constant
 z = 7 # redshift
-DNHI = 2.5e20
+DNHI = 2.5e20 # width of a grid cell within the reionization front model
 f_He = 0.079 # He abundance
 
-h = 4.5767e26 # multiplicative factor of ionozed fraction of hydrogen in determining number density
-he = 3.6132e25 # multiplicative factor of ionozed fraction of helium in determining number density
+h = 4.5767e26 # number of electrons in 1 kg of hydrogen
+he = 3.6132e25 # number of outer-shell electrons in 1 kg of helium
 
 # Ionization energy of hydrogen and helium (in Joules)
 I_H = 13.59*const.eV
