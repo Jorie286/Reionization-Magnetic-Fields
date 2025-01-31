@@ -11,11 +11,11 @@ velocity = np.linspace(vmax/Nv, vmax, Nv)
 velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
 
 
-Nk = 81 # number of wavenumbers we want to have in the distribution
-num_k = 10 # number of k values we want to use in the calculation
-k_step = 8 # number of values we want to skip over in the distribution between each calculation
+Nk = 101 # number of wavenumbers we want to have in the distribution
+num_k = 101 # number of k values we want to use in the calculation
+k_step = 1 # number of values we want to skip over in the distribution between each calculation
 kmin = -18 # minimum wavenumber
-kmax = -10 # maximum wavenumber
+kmax = -8 # maximum wavenumber
 # make a distribution of wavenumbers
 k = np.logspace(kmin, kmax, Nk)
 
@@ -32,6 +32,7 @@ q_b = const.eV # charge of HII and HeII
 epsilon_o = const.epsilon_0 # vacuum permittivity
 Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
 H_o = 2.2618e-18 # Hubble constant
+H_o_km_Mpc=H_o*(3.086e+19) # Hubble constant in km/s/Mpc
 G = const.G # gravitational constant
 z = 7 # redshift
 f_He = 0.079 # He abundance
@@ -57,3 +58,5 @@ E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
 
 Y_p_He = 4*f_He/(1+4*f_He) # primordial mass fraction of helium
 n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h*(1-Y_p_He) # total number density of all hydrogen
+print(Y_p_He)
+print(n_H)
