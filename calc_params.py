@@ -57,6 +57,4 @@ E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
 
 
 Y_p_He = 4*f_He/(1+4*f_He) # primordial mass fraction of helium
-n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h*(1-Y_p_He) # total number density of all hydrogen
-print(Y_p_He)
-print(n_H)
+n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h # total number density of all hydrogen
