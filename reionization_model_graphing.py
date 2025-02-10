@@ -27,6 +27,7 @@ plt.rcParams['font.size'] = 25  # Change the matplotlib font size
 fig, ax = plt.subplots(figsize=(20,10))
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,2], linewidth = 4, marker = "<", markersize = 20, markevery = 100, label="yH")
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,3], linewidth = 4, marker = "*", markersize = 20, markevery = 100, label="yHe")
+ax.set_ylim(1e-4, 1-1e-4)
 ax.set_xlabel("Distance (m)")
 ax.set_ylabel("Neutral Fraction")
 ax.set_yscale("logit", one_half = "0.5")
@@ -41,9 +42,10 @@ k_slab_list_1=[0, 10, 20, 40, 90] # list of slabs to plot in Gani plot
 # Graph Gani.
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_1:
-    ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), Gani[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k slab %2.1f" % k_index, color=magma(k_index*calc_params.k_step))
+    ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), Gani[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e m^-1" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+ax.set_yscale("log")
 ax.set_xlabel("Distance (m)")
-ax.set_ylabel("Giso/u")
+ax.set_ylabel("Gani")
 ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Gani_plt_1.pdf")
@@ -53,9 +55,10 @@ k_slab_list_2=[0, 10, 20, 40, 60, 80, 90] # list of slabs to plot in Giso plot
 # Graph imaginary Giso.
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_2:
-    ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k slab %2.1f" % k_index, color=magma(k_index*calc_params.k_step))
+    ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e m^-1" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+ax.set_yscale("log")
 ax.set_xlabel("Distance (m)")
-ax.set_ylabel("Giso/u")
+ax.set_ylabel("Giso/u (s m^-1)")
 ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Giso_plt_1.pdf")
@@ -103,30 +106,33 @@ extent = [left, right, bottom, top]
 im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=extent)
 
 # pick out slabs that we want to plot individualy
-plot_list=[500, 1080, 1800] # list of slabs we want to plot in the Im w heatmap subplot
+plot_list=[1200, 1500, 1800] # list of slabs we want to plot in the Im w heatmap subplot
 for slab in plot_list:
     ax[0].axvline(x=data[slab,0]*(calc_params.DNHI/calc_params.n_H), linewidth = 4, color = magma(slab/2000), linestyle="--")
-cbar = plt.colorbar(im, pad = 0.13, location = "left")
-cbar.set_label("Im w", labelpad=-110, y=-0.1, rotation=0)
+cbar = plt.colorbar(im, pad = 0.15, location = "left")
+cbar.set_label("Im w (s^-1)", labelpad=-110, y=-0.1, rotation=0)
 # change the xticks to represent distance instead of slab number
 ax[0].set_xlabel("Distance (m)")
-ax[0].set_ylabel("Wavenumber")
+ax[0].set_ylabel("Wavenumber (m^-1)")
 
 # plot Im w for the above chosen slabs
 for slab in plot_list:
     ax[1].plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000))
-ax[1].set_xlabel("Im w")
+ax[1].set_xlabel("Im w (s^1)")
 fig.subplots_adjust(wspace=0.05)
 fig.savefig('Im_w_2D.pdf')
 
 
 
 # plot the source term over the slabs indicated in the Im w plot
+k_slabs=[1, 50, 100]
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
-ax.set_xlabel("Velocity")
-ax.set_ylabel("Source Term Value")
+    for k_index in k_slabs:
+        ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(k_index-1):calc_params.Nv*k_index]), color = magma(slab/2000), marker="o", mfc = magma(k_index), mec = magma(k_index), linewidth = 4, label = "Slab %5.0f, k = %2.1e (m^-1)" % (slab, calc_params.k[k_index]))
+ax.legend()
+ax.set_xlabel("Velocity (m s^-1)")
+ax.set_ylabel("Source Term Value (m^5 s^-3)") # ???? check this
 fig.savefig('S20_plt.pdf')
 
 
@@ -134,7 +140,9 @@ fig.savefig('S20_plt.pdf')
 # plot the multipole moment over the slabs indicated in the Im w plot
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
-ax.set_xlabel("Velocity")
-ax.set_ylabel("Multipole Moment")
+    for k_index in k_slabs:
+        ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(k_index-1):calc_params.Nv*k_index]), color = magma(slab/2000), marker="o", mfc = magma(k_index), mec = magma(k_index), linewidth = 4, label = "Slab %5.0f, k = %2.1e (m^-1)" % (slab, calc_params.k[k_index]))
+ax.legend()
+ax.set_xlabel("Velocity (m s^-1)")
+ax.set_ylabel("Multipole Moment (m^-3)")
 fig.savefig('a20_plt.pdf')
