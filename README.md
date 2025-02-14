@@ -5,6 +5,10 @@ The Reionization-Temp-Modified.c file contains a modified version of the reioniz
 
 The calc_params.py script contains all the necessary variables to run the computational and graphing code for both $G^{ani}$ and $G^{iso}_u$. To adjust the parameters that you want to use when calculating $G^{iso}_u$ or $G^{ani}$ the variables in calc_params.py can be changed and these changes should then be reflected throughout the computational and graphing code.
 
+The get_sigmas.py script calculates the values of $\frac{D_{theta}}{kv}$ and $\sigma_{l,m}$ for all wavenumber slabs and slabs of the reionization front model. These are stored in a text file for use in the reionization_model_graphing.py file.
+
+The reionization_model_graphing.py file uses the outputs from Get_Giso_u.py, Get_Gani.py, get_sigmas.py, and Reionization-Temp-Modified.c to create plots illustrating relationships between various parameters. These include imaginary growth rate against wavenumber, value of $G^{iso}_u$ and $G^{ani}$ against the reionization front model slabs, and the value of the source term and multipole moment against the reionization front model slabs.
+
 The Graphing_Sigmas.py python code solves for various values of sigma to be used in solving for the anisotropic and isotropic parts of the distribution.
 It then graphs the sigmas in terms various potential values of $\frac{i\ D_{\theta}}{k v}$ to see how chaning $\frac{i\ D_{\theta}}{k v}$ affects the value of sigma.
 
