@@ -114,18 +114,24 @@ for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data
             d_theta_vel.append(get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i]))
             sigmas_vel[i, :] = get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i])) # calculate all sigmas for a slab and add them to an array
         d_theta_mean[j, ik]= np.mean(d_theta_vel)
+        d_theta_vel=[] # clear list
         for col in range(len(sigmas_vel[0, :])):
             sigmas_mean[j, ik, col]=np.mean(sigmas_vel[:, col])
+        sigmas_vel = np.zeros((calc_params.Nv, calc_params.n_sigmas)) # clear matrix
+    print("Finished slab", j)
 
 # write data to a file
 f = open("D_theta.txt", "a")
-for a in d_theta:
-    f.write(str(a))
-    f.write("\n")
+for a in d_theta_mean:
+    for val in a:
+        f.write(str(val))
+        f.write("\n")
 f.close() # close the d_theta file
 
 f = open("sigmas.txt", "a")
-for a in sigmas:
-    f.write(str(a))
-    f.write("\n")
+for a in sigmas_mean:
+    for row in a:
+        for val in row:
+            f.write(str(val))
+            f.write("\n")
 f.close() # close the sigmas file
