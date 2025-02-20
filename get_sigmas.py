@@ -83,7 +83,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     Returns
         the values of the first n sigma_{n,1}
 
-    Date of last revision: October 28, 2024
+    Date of last revision: February 19, 2025
     """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
@@ -100,38 +100,44 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     b = np.zeros((n,), dtype=np.complex128)
     b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
+
+    if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
+        x[0]=1j*np.sqrt((3*(np.pi**3))/8)
+
     return x
 
 # make empty lists to temporarily store the data
 d_theta_vel = []
-d_theta_mean = np.zeros((calc_params.NSLAB, calc_params.num_k))
-sigmas_vel = np.zeros((calc_params.Nv, calc_params.n_sigmas))
-sigmas_mean = np.zeros((calc_params.NSLAB, calc_params.num_k, calc_params.n_sigmas))
+sigmas_vel_11 = []
+sigmas_vel_21 = []
 # calculate and store the sigma and d_theta/kv values in text files
 for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data
     for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the average of the velocities for a row of data
-            d_theta_vel.append(get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i]))
-            sigmas_vel[i, :] = get_sigmas(calc_params.n_sigmas, (1j*get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i))/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i])) # calculate all sigmas for a slab and add them to an array
-        d_theta_mean[j, ik]= np.mean(d_theta_vel)
-        d_theta_vel=[] # clear list
-        for col in range(len(sigmas_vel[0, :])):
-            sigmas_mean[j, ik, col]=np.mean(sigmas_vel[:, col])
-        sigmas_vel = np.zeros((calc_params.Nv, calc_params.n_sigmas)) # clear matrix
-    print("Finished slab", j)
+            d_theta_vel.append(1j*get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i]))
+            sigmas_vel_11.append(get_sigmas(calc_params.n_sigmas, (d_theta_vel[i]))[0]) # calculate all sigmas for a slab and add them to an array
+            sigmas_vel_21.append(get_sigmas(calc_params.n_sigmas, (d_theta_vel[i]))[1])
 
-# write data to a file
-f = open("D_theta.txt", "a")
-for a in d_theta_mean:
-    for val in a:
-        f.write(str(val))
-        f.write("\n")
-f.close() # close the d_theta file
-
-f = open("sigmas.txt", "a")
-for a in sigmas_mean:
-    for row in a:
-        for val in row:
-            f.write(str(val))
+            # write velocity data to a file
+            f = open("D_theta_vel.txt", "a")
+            f.write(str(d_theta_vel[i]))
             f.write("\n")
-f.close() # close the sigmas file
+            f.close()
+
+            f = open("sigmas_vel_11.txt", "a")
+            f.write(str(np.real(sigmas_vel_11[i])))
+            f.write("\n")
+            f.write(str(np.imag(sigmas_vel_11[i])))
+            f.write("\n")
+            f.close()
+
+            f = open("sigmas_vel_21.txt", "a")
+            f.write(str(np.real(sigmas_vel_21[i])))
+            f.write("\n")
+            f.write(str(np.imag(sigmas_vel_21[i])))
+            f.write("\n")
+            f.close()
+
+        d_theta_vel=[] # clear list
+        sigmas_vel_11 = [] # clear list
+        sigmas_vel_21 = [] # clear list
