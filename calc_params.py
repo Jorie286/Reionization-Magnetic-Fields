@@ -49,7 +49,7 @@ N_NU = 128 # number of frequency bins
 Timestep = 12000 # timestep from the inital simulation where we gathered the data
 NSLAB = 2000 # define the number of slabs we want to use in the calculaiton
 NHtot = 200 # total number of hydrogen atoms in the distribution
-n_sigmas = 20 # number of sigma terms we want to calculate
+n_sigmas = 40 # number of sigma terms we want to calculate
 
 
 # make a list of energies that we are considering with the same length as the number of frequency bins
