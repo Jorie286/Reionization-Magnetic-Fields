@@ -110,8 +110,9 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 d_theta_vel = []
 sigmas_vel_11 = []
 sigmas_vel_21 = []
+slab_plot_list = [100, 500, 800, 1000, 1500, 1999]
 # calculate and store the sigma and d_theta/kv values in text files
-for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data
+for j in slab_plot_list: # Iterate through all the rows of data
     for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the average of the velocities for a row of data
             d_theta_vel.append(1j*get_D_theta(calc_params.T, data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], i)/(calc_params.k[ik*calc_params.k_step]*calc_params.velocity[i]))
