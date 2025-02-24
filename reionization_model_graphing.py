@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib.colors as colors
+from scipy.linalg import solve_banded
 import numpy as np
 import math
 import calc_params
@@ -15,6 +16,10 @@ imaginary = np.loadtxt(r'Giso_u.txt')
 S20 = np.loadtxt(r'S20.txt')
 # get the a_{2,0} data file from the output of Get_Gani
 a20 = np.loadtxt(r'a20.txt')
+# get the sigma_11, sigma_21, and D_theta data
+d_theta = np.loadtxt(r'D_theta_vel.txt', dtype=np.complex128)
+sigmas_11 = np.loadtxt(r'sigmas_vel_11.txt', dtype=np.complex128)
+sigmas_21 = np.loadtxt(r'sigmas_vel_21.txt', dtype=np.complex128)
 
 # get color maps for plotting
 magma = cm.get_cmap('magma').resampled(101)
@@ -132,7 +137,7 @@ for slab in plot_list:
         ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(k_index-1):calc_params.Nv*k_index]), color = magma(slab/2000), marker="o", mfc = magma(k_index), mec = magma(k_index), linewidth = 4, label = "Slab %5.0f, k = %2.1e (m^-1)" % (slab, calc_params.k[k_index]))
 ax.legend()
 ax.set_xlabel("Velocity (m s^-1)")
-ax.set_ylabel("Source Term Value (m^5 s^-3)") # ???? check this
+ax.set_ylabel("Source Term Value (m^-3 s^-1)")
 fig.savefig('S20_plt.pdf')
 
 
@@ -146,3 +151,26 @@ ax.legend()
 ax.set_xlabel("Velocity (m s^-1)")
 ax.set_ylabel("Multipole Moment (m^-3)")
 fig.savefig('a20_plt.pdf')
+
+# plot D_theta/kv against sigma_11 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$sigma_{1,1}$ calculated")
+ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="cutoff")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "slope")
+ax.set_xlabel("$\\frac{D_{theta}}{kv}$ (s^-1)")
+ax.set_ylabel("$\\sigma_{1,1}$ (m s^-1)")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_11_plt.pdf")
+
+# plot D_theta/kv against sigma_11 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2])
+ax.set_xlabel("$\\frac{D_{theta}}{kv}$ (s^-1)")
+ax.set_ylabel("$\\sigma_{2,1}$ (m s^-1)")
+ax.set_xscale("log")
+ax.set_yscale("log")
+fig.savefig("sigma_21_plt.pdf")
