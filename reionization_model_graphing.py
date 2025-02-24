@@ -155,21 +155,21 @@ fig.savefig('a20_plt.pdf')
 # plot D_theta/kv against sigma_11 to see the relationship between the two parameters
 fig, ax = plt.subplots(figsize=(20, 10))
 # plot slab 1500, wavenumber 50 across all velocities
-ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$sigma_{1,1}$ calculated")
-ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="cutoff")
-ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "slope")
-ax.set_xlabel("$\\frac{D_{theta}}{kv}$ (s^-1)")
-ax.set_ylabel("$\\sigma_{1,1}$ (m s^-1)")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$\\mathcal{i} \\ \\sigma_{1,1}$ calculated")
+ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{3\\pi^3}{8}}$")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "$\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{\\pi}{6}} \\frac{k v}{\\mathcal{i} \\ D_{\\theta}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ (s^-1)")
+ax.set_ylabel("$\\mathcal{i} \\ \\sigma_{1,1}$ (m s^-1)")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.legend()
 fig.savefig("sigma_11_plt.pdf")
 
-# plot D_theta/kv against sigma_11 to see the relationship between the two parameters
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
 fig, ax = plt.subplots(figsize=(20, 10))
 # plot slab 1500, wavenumber 50 across all velocities
 ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2])
-ax.set_xlabel("$\\frac{D_{theta}}{kv}$ (s^-1)")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ (s^-1)")
 ax.set_ylabel("$\\sigma_{2,1}$ (m s^-1)")
 ax.set_xscale("log")
 ax.set_yscale("log")
