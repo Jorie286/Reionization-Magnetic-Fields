@@ -33,7 +33,8 @@ fig, ax = plt.subplots(figsize=(20,10))
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,2], linewidth = 4, marker = "<", markersize = 20, markevery = 100, label="yH")
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,3], linewidth = 4, marker = "*", markersize = 20, markevery = 100, label="yHe")
 ax.set_ylim(1e-4, 1-1e-4)
-ax.set_xlabel("Distance (m)")
+ax.set_xlim(1.5e21, max(data[:,0]*(calc_params.DNHI/calc_params.n_H)))
+ax.set_xlabel("Distance ($m$)")
 ax.set_ylabel("Neutral Fraction")
 ax.set_yscale("logit", one_half = "0.5")
 ax.set_rasterization_zorder(0)
@@ -47,7 +48,7 @@ k_slab_list_1=[0, 10, 20, 40, 90] # list of slabs to plot in Gani plot
 # Graph Gani.
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_1:
-    ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), Gani[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e m^-1" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+    ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), Gani[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
 ax.set_yscale("log")
 ax.set_xlabel("Distance (m)")
 ax.set_ylabel("Gani")
@@ -60,10 +61,10 @@ k_slab_list_2=[0, 10, 20, 40, 60, 80, 90] # list of slabs to plot in Giso plot
 # Graph imaginary Giso.
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_2:
-    ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e m^-1" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+    ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
 ax.set_yscale("log")
-ax.set_xlabel("Distance (m)")
-ax.set_ylabel("Giso/u (s m^-1)")
+ax.set_xlabel("Distance ($m$)")
+ax.set_ylabel("Giso/u ($s m^{-1}$)")
 ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Giso_plt_1.pdf")
@@ -92,6 +93,7 @@ def get_n_e(yH, yHe):
 
 # compute and plot the imaginary growth rate (Im w) throughout the model
 im_w_list = []
+x_e_list = []
 mu_0 = (4*np.pi)*(10**(-7)) # permiablity of free space (units of newtons ampere**-2)
 for m in range(0, calc_params.NSLAB):
     n_e = get_n_e(data[m,2], data[m,3])
@@ -117,8 +119,20 @@ for slab in plot_list:
 cbar = plt.colorbar(im, pad = 0.15, location = "left")
 cbar.set_label("Im w (s^-1)", labelpad=-110, y=-0.1, rotation=0)
 # change the xticks to represent distance instead of slab number
-ax[0].set_xlabel("Distance (m)")
-ax[0].set_ylabel("Wavenumber (m^-1)")
+ax[0].set_xlabel("Distance ($m$)")
+ax[0].set_ylabel("Wavenumber ($m^{-1})")
+
+# create a secondary axis that shows the fraction of free electrons in the system as the reionization front moves through
+x_e = [] # calculate the fraction of free electrons at each slab
+for slab in range(calc_params.NSLAB):
+    x_e.append(((1-data[slab, 2])*(1-data[slab,3]))/(data[slab,2]+data[slab,3]))
+    #x_e = (1-y_Hi) (1 - y_Hei) / (y_Hi + y_Hei) #???
+
+secax = ax[0].twiny() # plot the secondary axis
+secax.set_xlim(min(x_e), max(x_e))
+secax.set_xticks(x_e[::100])
+secax.set_xscale("log")
+secax.set_xlabel('Ionization Fraction')
 
 # plot Im w for the above chosen slabs
 for slab in plot_list:
@@ -133,11 +147,10 @@ fig.savefig('Im_w_2D.pdf')
 k_slabs=[1, 50, 100]
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    for k_index in k_slabs:
-        ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(k_index-1):calc_params.Nv*k_index]), color = magma(slab/2000), marker="o", mfc = magma(k_index), mec = magma(k_index), linewidth = 4, label = "Slab %5.0f, k = %2.1e (m^-1)" % (slab, calc_params.k[k_index]))
+    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), marker="o", linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
-ax.set_xlabel("Velocity (m s^-1)")
-ax.set_ylabel("Source Term Value (m^-3 s^-1)")
+ax.set_xlabel("Velocity ($m s^{-1}$)")
+ax.set_ylabel("Source Term Value ($m^{-3} s^{-1}$)")
 fig.savefig('S20_plt.pdf')
 
 
@@ -145,21 +158,20 @@ fig.savefig('S20_plt.pdf')
 # plot the multipole moment over the slabs indicated in the Im w plot
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    for k_index in k_slabs:
-        ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(k_index-1):calc_params.Nv*k_index]), color = magma(slab/2000), marker="o", mfc = magma(k_index), mec = magma(k_index), linewidth = 4, label = "Slab %5.0f, k = %2.1e (m^-1)" % (slab, calc_params.k[k_index]))
+    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
-ax.set_xlabel("Velocity (m s^-1)")
-ax.set_ylabel("Multipole Moment (m^-3)")
+ax.set_xlabel("Velocity ($m s^{-1}$)")
+ax.set_ylabel("Multipole Moment ($m^{-3}$)")
 fig.savefig('a20_plt.pdf')
 
 # plot D_theta/kv against sigma_11 to see the relationship between the two parameters
 fig, ax = plt.subplots(figsize=(20, 10))
 # plot slab 1500, wavenumber 50 across all velocities
-ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$\\mathcal{i} \\ \\sigma_{1,1}$ calculated")
-ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{3\\pi^3}{8}}$")
-ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "$\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{\\pi}{6}} \\frac{k v}{\\mathcal{i} \\ D_{\\theta}}$")
-ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ (s^-1)")
-ax.set_ylabel("$\\mathcal{i} \\ \\sigma_{1,1}$ (m s^-1)")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\mathcal{i} \\ \\sigma_{1,1}$ calculated")
+ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{3\\pi^3}{8}}$")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{\\pi}{6}} \\frac{k v}{\\mathcal{i} \\ D_{\\theta}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ ($s^{-1}$)")
+ax.set_ylabel("$-\\mathcal{i} \\ \\sigma_{1,1}$ ($m s^{-1}$)")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.legend()
@@ -168,9 +180,64 @@ fig.savefig("sigma_11_plt.pdf")
 # plot D_theta/kv against sigma_21 to see the relationship between the two parameters
 fig, ax = plt.subplots(figsize=(20, 10))
 # plot slab 1500, wavenumber 50 across all velocities
-ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2])
-ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ (s^-1)")
-ax.set_ylabel("$\\sigma_{2,1}$ (m s^-1)")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
 ax.set_xscale("log")
 ax.set_yscale("log")
+ax.legend()
 fig.savefig("sigma_21_plt.pdf")
+
+def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
+    """
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
+    a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
+
+    Important note: all physical constants are in units of MKS for easy conversions.
+
+    Input arguments (2)
+        required    float or integer-like values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which a value can be defined
+    Returns
+        the values of the first n sigma_{n,1}
+
+    Date of last revision: February 19, 2025
+    """
+    # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
+    ab = np.zeros((3,n), dtype = np.complex128)
+    for l in range (1, n+1):
+        ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
+
+    for l in range (1, n):
+        ab[0,l] = math.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
+
+    for l in range (2, n+1):
+        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
+
+    # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
+    b = np.zeros((n,), dtype=np.complex128)
+    b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
+    x = solve_banded((1, 1), ab, b) # Solve for the x vector
+
+    if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
+        x[0]=1j*np.sqrt((3*(np.pi**3))/8)
+
+    return x
+
+d_theta_log = np.logspace(-10, 5, num=71)
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
+sigmas_test=[]
+for theta in d_theta_log:
+    sigmas_test.append(get_sigmas(calc_params.n_sigmas, 1j*theta)[1])
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(d_theta_log, -np.array(sigmas_test), label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(d_theta_log), max(d_theta_log), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_21_test_plt.pdf")
