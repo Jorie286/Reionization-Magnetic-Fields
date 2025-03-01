@@ -37,7 +37,8 @@ def get_n_e(yH, yHe):
 
 def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l 
+    changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
     a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
 
     Important note: all physical constants are in units of MKS for easy conversions.
@@ -68,7 +69,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
 
     if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
-        x[0]=1j*np.sqrt((3*(np.pi**3))/8)
+        x[0]=-1j*np.sqrt((3*(np.pi**3))/8)
 
     return x
 
