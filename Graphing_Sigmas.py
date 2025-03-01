@@ -5,35 +5,42 @@ from scipy.linalg import solve_banded
 import calc_params
 
 # Calculate the value of sigma.
-def get_sigmas(n,c):
+def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes.
-    The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input.
-    
-    Input arguments (2)
-        required    integer values
-                        n, the number of sigma_{l,m} parameters we want values for
-                        c = (i*D_theta)/(k*v), a constant for which the value can be defined
-    Returns
-        the values of the first n sigma_{n,1} using a matrix to solve.
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l 
+    changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
+    a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
 
-    Date of last revision: July 9, 2024
+    Important note: all physical constants are in units of MKS for easy conversions.
+
+    Input arguments (2)
+        required    float or integer-like values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which a value can be defined
+    Returns
+        the values of the first n sigma_{n,1}
+
+    Date of last revision: February 19, 2025
     """
     # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
     ab = np.zeros((3,n), dtype = np.complex128)
     for l in range (1, n+1):
         ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
-        
+
     for l in range (1, n):
-        ab[0,l] = math.sqrt(((l+2)*(l))/(((2*l)+3)*((2*l)+1))) # sigma_{l+1,m} coefficient
-        
+        ab[0,l] = math.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
+
     for l in range (2, n+1):
-        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/(((2*l)-1)*((2*l)+1))) # sigma_{l-1,m} coefficient
-    
+        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
+
     # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
     b = np.zeros((n,), dtype=np.complex128)
     b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
+
+    if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
+        x[0]=-1j*np.sqrt((3*(np.pi**3))/8)
+
     return x
 
 get_sigmas(calc_params.n_sigmas, 1j)
