@@ -105,7 +105,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
 
     if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
-        x[0]=1j*np.sqrt((3*(np.pi**3))/8)
+        x[0]=-1j*np.sqrt((3*(np.pi**3))/8)
 
     return x
 
