@@ -6,6 +6,7 @@ vmax = 5.0e6
 Nv = 71
 # Create a distribution of velocities in linear space.
 velocity = np.linspace(vmax/Nv, vmax, Nv)
+delta_v = (vmax-(vmax/Nv))/Nv # get the change in v of each step in the velocity data
 # make a linear velocity distribution including "half-steps" for get_alm
 # Note: we need an extra half-step down and half step up
 velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
