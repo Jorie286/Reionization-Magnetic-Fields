@@ -32,6 +32,7 @@ plt.rcParams['font.size'] = 25  # Change the matplotlib font size
 fig, ax = plt.subplots(figsize=(20,10))
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,2], linewidth = 4, marker = "<", markersize = 20, markevery = 100, label="yH")
 ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), data[:,3], linewidth = 4, marker = "*", markersize = 20, markevery = 100, label="yHe")
+ax.grid(True, linestyle="--")
 ax.set_ylim(1e-4, 1-1e-4)
 ax.set_xlim(1.5e21, max(data[:,0]*(calc_params.DNHI/calc_params.n_H)))
 ax.set_xlabel("Distance ($m$)")
@@ -64,7 +65,7 @@ for k_index in k_slab_list_2:
     ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
 ax.set_yscale("log")
 ax.set_xlabel("Distance ($m$)")
-ax.set_ylabel("Giso/u ($s m^{-1}$)")
+ax.set_ylabel("Giso/u ($s \\ m^{-1}$)")
 ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Giso_plt_1.pdf")
@@ -113,31 +114,31 @@ extent = [left, right, bottom, top]
 im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=extent)
 
 # pick out slabs that we want to plot individualy
-plot_list=[1200, 1500, 1800] # list of slabs we want to plot in the Im w heatmap subplot
+plot_list=[1100, 1500, 1900] # list of slabs we want to plot in the Im w heatmap subplot
 for slab in plot_list:
     ax[0].axvline(x=data[slab,0]*(calc_params.DNHI/calc_params.n_H), linewidth = 4, color = magma(slab/2000), linestyle="--")
 cbar = plt.colorbar(im, pad = 0.15, location = "left")
-cbar.set_label("Im w (s^-1)", labelpad=-110, y=-0.1, rotation=0)
+cbar.set_label("Im w ($s^{-1}$)", labelpad=-110, y=-0.1, rotation=0)
 # change the xticks to represent distance instead of slab number
 ax[0].set_xlabel("Distance ($m$)")
-ax[0].set_ylabel("Wavenumber ($m^{-1})")
+ax[0].set_ylabel("Wavenumber ($m^{-1}$)")
 
 # create a secondary axis that shows the fraction of free electrons in the system as the reionization front moves through
 x_e = [] # calculate the fraction of free electrons at each slab
 for slab in range(calc_params.NSLAB):
-    x_e.append(((1-data[slab, 2])*(1-data[slab,3]))/(data[slab,2]+data[slab,3]))
-    #x_e = (1-y_Hi) (1 - y_Hei) / (y_Hi + y_Hei) #???
-
-secax = ax[0].twiny() # plot the secondary axis
-secax.set_xlim(min(x_e), max(x_e))
-secax.set_xticks(x_e[::100])
-secax.set_xscale("log")
-secax.set_xlabel('Ionization Fraction')
+    x_e.append(((1-data[slab, 2])*(1-calc_params.f_He))+((1-data[slab,3])*(calc_params.f_He))) # round all the numbers to 1 decimal
+    # x_e = (1-y_Hi)*fH + (1 - y_Hei)fHe ???
+print(x_e)
+# add labels for the fraction of ionized electrons
+ax[0].text(2.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1100], fontsize=25, color='k')
+ax[0].text(3.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1500], fontsize=25, color='k')
+ax[0].text(4.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1900], fontsize=25, color='k')
 
 # plot Im w for the above chosen slabs
 for slab in plot_list:
-    ax[1].plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000))
-ax[1].set_xlabel("Im w (s^1)")
+    ax[1].plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
+ax[1].set_xlabel("Im w ($s^{-1}$)")
+ax[1].legend()
 fig.subplots_adjust(wspace=0.05)
 fig.savefig('Im_w_2D.pdf')
 
@@ -147,7 +148,7 @@ fig.savefig('Im_w_2D.pdf')
 k_slabs=[1, 50, 100]
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), marker="o", linewidth = 4, label = "Slab %5.0f" % slab)
+    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
 ax.set_xlabel("Velocity ($m s^{-1}$)")
 ax.set_ylabel("Source Term Value ($m^{-3} s^{-1}$)")
