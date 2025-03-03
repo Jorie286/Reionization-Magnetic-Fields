@@ -439,7 +439,7 @@ for i in range(0, calc_params.NSLAB): # Iterate through all the rows of data and
             Gani_compute = get_Gani(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[j], i, calc_params.k[k_index*calc_params.k_step], j)
             Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
-        Gani_data.append(Gani_final) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+        Gani_data.append(Gani_final*calc_params.delta_v) #Add the computed value of Gani to the list of all Gani computed for each row of data.
         Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
     slab_time = time.time()
     print("Time for slab", i, "to finish was", slab_time-slab_start_time, "seconds.")
