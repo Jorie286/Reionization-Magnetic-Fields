@@ -149,7 +149,7 @@ for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data and
             Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, calc_params.k[ik*calc_params.k_step], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
-        Giso_list.append(Giso_final) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
+        Giso_list.append(Giso_final*calc_params.delta_v) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
         Giso_final = 0 # Clear Giso_final so it does not interfere with the next iteration.
 # Create lists of the correct length to fill with the computed values.
 real = []
