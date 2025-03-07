@@ -259,13 +259,13 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
     # Get find the slab number and S_{2,0} for H and He
     if r_H<calc_params.N_NU:
         A_j_H = fracflux[r_H]*math.exp(-np.sum(tautot[r_H,:i]))*((-np.expm1(-tautot[r_H,i]))/calc_params.DNHI)
-        Slm_H = -((8*math.pi)/3)*calc_params.n_H*F*A_j_H*(tauHdat[r_H,i]/(tauHdat[r_H,i]+tauHedat[r_H,i]))*(calc_params.m_e/(velocity*delta_E_H))*(1/3)*(math.sqrt((16*math.pi)/5))
+        Slm_H = -((8*math.pi)/9)*(math.sqrt((16*math.pi)/5))*calc_params.n_H*F*A_j_H*(tauHdat[r_H,i]/(tauHdat[r_H,i]+tauHedat[r_H,i]))*(calc_params.m_e/(velocity*delta_E_H))
     else:
         Slm_H = 0
 
     if r_He<calc_params.N_NU:
         A_j_He = fracflux[r_He]*math.exp(-np.sum(tautot[r_He,:i]))*((-np.expm1(-tautot[r_He,i]))/calc_params.DNHI)
-        Slm_He = -((8*math.pi)/3)*calc_params.n_H*F*A_j_He*(tauHedat[r_He,i]/(tauHdat[r_He,i]+tauHedat[r_He,i]))*(calc_params.m_e/(velocity*delta_E_He))*(1/3)*(math.sqrt((16*math.pi)/5))
+        Slm_He = -((8*math.pi)/9)*(math.sqrt((16*math.pi)/5))*calc_params.n_H*F*A_j_He*(tauHedat[r_He,i]/(tauHdat[r_He,i]+tauHedat[r_He,i]))*(calc_params.m_e/(velocity*delta_E_He))
     else:
         Slm_He = 0
     Slm_tot = Slm_H + Slm_He # Sum over the species in the source term (H and He)
