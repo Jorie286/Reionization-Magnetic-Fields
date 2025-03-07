@@ -37,8 +37,9 @@ H_o_km_Mpc=H_o*(3.086e+19) # Hubble constant in km/s/Mpc
 G = const.G # gravitational constant
 z = 7 # redshift
 f_He = 0.079 # He abundance
-h = 4.5767e26 # number of electrons in 1 kg of hydrogen (same as number of protons)
-he = 3.6132e25 # number of outer-shell electrons in 1 kg of helium
+N_A = const.N_A # avogadro's number
+h = 0.76*1e3*N_A # number of electrons in 1 kg of hydrogen (same as number of protons)
+he = 0.24*1e3*4*N_A # number of outer-shell electrons in 1 kg of helium
 T = 5e4 # reionization front temperature (Kelvin)
 
 # Ionization energy of hydrogen and helium (in Joules)
