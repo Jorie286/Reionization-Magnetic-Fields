@@ -39,7 +39,7 @@ z = 7 # redshift
 f_He = 0.079 # He abundance
 N_A = const.N_A # avogadro's number
 h = 0.76*1e3*N_A # number of electrons in 1 kg of hydrogen (same as number of protons)
-he = 0.24*1e3*4*N_A # number of outer-shell electrons in 1 kg of helium
+he = (0.24*1e3*N_A)/4 # number of outer-shell electrons in 1 kg of helium
 T = 5e4 # reionization front temperature (Kelvin)
 
 # Ionization energy of hydrogen and helium (in Joules)
