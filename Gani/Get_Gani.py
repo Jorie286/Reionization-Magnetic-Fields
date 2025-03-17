@@ -395,7 +395,7 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
     return alm
 
 # Compute Gani for a specific value of sigma and D_theta.
-def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, i, k, j):
+def get_Gani(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, alm, i, k, j):
     """
     Function to get the value of Gani for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
@@ -403,14 +403,13 @@ def get_Gani(Te, THII, THeII, yH, yHe, nHtot, tauHdat, tauHedat, fracflux, alm, 
 
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Input arguments (13)
+    Input arguments (12)
         required    float or integer-like values
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        nHtot = 200, total number of hydrogen atoms in the distribution??
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
@@ -436,7 +435,7 @@ for i in range(0, calc_params.NSLAB): # Iterate through all the rows of data and
         alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, calc_params.k[k_index*calc_params.k_step], i)
         # write a20 results to a test file instead of printing them out
         for j in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
-            Gani_compute = get_Gani(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.NHtot, tauHdat, tauHedat, fracflux, alm[j], i, calc_params.k[k_index*calc_params.k_step], j)
+            Gani_compute = get_Gani(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, alm[j], i, calc_params.k[k_index*calc_params.k_step], j)
             Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
         Gani_data.append(Gani_final*calc_params.delta_v) #Add the computed value of Gani to the list of all Gani computed for each row of data.
