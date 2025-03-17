@@ -108,7 +108,7 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 
     return x
 
-def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
+def get_Giso_u(Te, THII, THeII, yH, yHe, k, i):
     """
     Function to get the value of Giso_u for certian conditions. This function can be used to iterate over a series of slabs in a distribution for which we know
     the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should be postive otherwise the ouptut will not make
@@ -116,14 +116,13 @@ def get_Giso_u(Te, THII, THeII, yH, yHe, nHtot, k, i):
 
     Important note: all physical constants are in units ov MKS for easy conversions.
     
-    Input arguments (7)
+    Input arguments (6)
         required    float or integer-like values 
                         Te, temperature of electrons in the reionization front
                         THII, temperature of ionized hydrogen in the reionization front
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-                        nHtot, total number of hydrogen atoms in the distribution
                         k, wavenumbers
                         i, the slab number of the iteration
     Returns
@@ -145,7 +144,7 @@ Giso_list = []
 for j in range(0, calc_params.NSLAB): # Iterate through all the rows of data and compute Giso_final (sum over velocities) for each.
     for ik in range(0,calc_params.num_k):
         for i in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
-            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.NHtot, calc_params.k[ik*calc_params.k_step], i)
+            Giso_compute = get_Giso_u(data[j,5], data[j,7], data[j,13], data[j,2], data[j,3], calc_params.k[ik*calc_params.k_step], i)
             Giso_final = Giso_final + Giso_compute # Compute the Reimann sum in place of the integral.
             Giso_compute = 0 # Reset Giso_compute so it does not interfere with the following iteration
         Giso_list.append(Giso_final*calc_params.delta_v) #Add the computed value of Giso_u to the list of all Giso_u computed for each row of data.
