@@ -329,9 +329,9 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
         # ensure that the i+/-1 indicies will not be out of range by checking their values
         # Note: velocity_half has twice the number of values as velocity so each step in velocity_half is a "half step" in velocity
         if j>=len(calc_params.velocity)-1:
-            A_v_vals = np.append(A_v_vals, ((get_A_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity[j])*(calc_params.velocity[j]**2))/(calc_params.velocity[j-1]-calc_params.velocity[j])))
-            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity_half[plus_1])*(calc_params.velocity_half[plus_1]**2))/((calc_params.velocity[j-1]-calc_params.velocity[j])**2)))
-            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[j-1]-calc_params.velocity[j])**2)))
+            A_v_vals = np.append(A_v_vals, ((get_A_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity[j])*(calc_params.velocity[j]**2))/(calc_params.velocity[j]-calc_params.velocity[j-1])))
+            D_para_vals_1 = np.append(D_para_vals_1, ((get_D_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity_half[plus_1])*(calc_params.velocity_half[plus_1]**2))/((calc_params.velocity[j]-calc_params.velocity[j-1])**2)))
+            D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[j]-calc_params.velocity[j-1])**2)))
         else:
             A_v_vals_plus = np.append(A_v_vals_plus, ((get_A_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity[j+1])*(calc_params.velocity[j+1]**2))/(calc_params.velocity[j+1]-calc_params.velocity[j])))
             A_v_vals = np.append(A_v_vals, ((get_A_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity[j])*(calc_params.velocity[j]**2))/(calc_params.velocity[j+1]-calc_params.velocity[j])))
