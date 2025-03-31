@@ -16,7 +16,7 @@
 #define NTIMESTEP 12000
 
 /*Number of Frequency bins*/
-#define N_NU 128
+#define N_NU 512
 /*Rydberg temperature*/
 #define RYD_K 157800
 /*Helium ionization energy*/
