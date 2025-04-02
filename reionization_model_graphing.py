@@ -25,7 +25,6 @@ sigmas_21 = np.loadtxt(r'sigmas_vel_21.txt', dtype=np.complex128)
 magma = cm.get_cmap('magma').resampled(101)
 bwr = cm.get_cmap('bwr').resampled(101)
 # create a symlog scale to be used when graphing colorbars
-norm = colors.SymLogNorm(linthresh=1e-10, linscale=1.0, vmin=-1e-7, vmax=1e-7)
 plt.rcParams['font.size'] = 25  # Change the matplotlib font size
 
 # plot the neutral fractions of hydrogen and helium over the bins (in meters)
@@ -50,9 +49,12 @@ k_slab_list_1=[0, 10, 20, 40, 90] # list of slabs to plot in Gani plot
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_1:
     ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), Gani[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+ax.hlines(max(Gani), min(data[:,0]*(calc_params.DNHI/calc_params.n_H)), max(data[:,0]*(calc_params.DNHI/calc_params.n_H)), linestyles = "--", color="r", label="Max value of Gani %3.3f" % max(Gani)) # mark the largest value of Gani
+ax.set_ylim(1e-14, max(Gani)+10) # set limits on the plot to remove ambiguous portions
 ax.set_yscale("log")
 ax.set_xlabel("Distance (m)")
 ax.set_ylabel("Gani")
+ax.grid(True, linestyle="--") # add grid to make values easier to read
 ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Gani_plt_1.pdf")
@@ -102,8 +104,10 @@ for m in range(0, calc_params.NSLAB):
     for n in range(0, calc_params.num_k):
         im_w_list.append((calc_params.k[n*calc_params.k_step]/imaginary[m*calc_params.num_k+n])*(Gani[m*calc_params.num_k+n]-(calc_params.k[n*calc_params.k_step]/k_sd)**2))
 Im_w_arr = np.array(im_w_list).reshape((calc_params.NSLAB,calc_params.num_k)) # reshape the list for easier graphing and analysis
+np.savetxt('Im_w_arr.txt', Im_w_arr, delimiter=',') # save the array of Im_w results for future reference
 
 # make a 2D heatmap of Im w
+norm = colors.SymLogNorm(linthresh=1e-10, linscale=1.0, vmin=-np.min(Im_w_arr).real, vmax=np.min(Im_w_arr).real)
 fig, ax = plt.subplots(1, 2, width_ratios = np.array([3, 1]), figsize=(20,10), sharey=True)
 # set the graphing tick labels so that they show the maximum and minimum values of the k and model distance
 left=data[0,0]*(calc_params.DNHI/calc_params.n_H)
@@ -112,6 +116,8 @@ bottom=calc_params.k[0]
 top=calc_params.k[-1]
 extent = [left, right, bottom, top]
 im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=extent)
+ax[0].set_xscale("linear")
+ax[0].set_yscale("linear")
 
 # pick out slabs that we want to plot individualy
 plot_list=[1100, 1500, 1900] # list of slabs we want to plot in the Im w heatmap subplot
@@ -128,17 +134,19 @@ x_e = [] # calculate the fraction of free electrons at each slab
 for slab in range(calc_params.NSLAB):
     x_e.append(((1-data[slab, 2])*(1-calc_params.f_He))+((1-data[slab,3])*(calc_params.f_He))) # round all the numbers to 1 decimal
     # x_e = (1-y_Hi)*fH + (1 - y_Hei)fHe ???
-print(x_e)
+#print(x_e)
 # add labels for the fraction of ionized electrons
-ax[0].text(2.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1100], fontsize=25, color='k')
-ax[0].text(3.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1500], fontsize=25, color='k')
-ax[0].text(4.3e21, 1.01e-8, '$\\chi_{e}$=%1.2f' % x_e[1900], fontsize=25, color='k')
+ax[0].text(2.3e21, 1.01e-8, '$\\chi_{e}$=%1.3f' % x_e[1100], fontsize=25, color='k', rotation=90)
+ax[0].text(3.3e21, 1.01e-8, '$\\chi_{e}$=%1.3f' % x_e[1500], fontsize=25, color='k', rotation=90)
+ax[0].text(4.3e21, 1.01e-8, '$\\chi_{e}$=%1.3f' % x_e[1900], fontsize=25, color='k', rotation=90)
 
 # plot Im w for the above chosen slabs
 for slab in plot_list:
     ax[1].plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
+    print(Im_w_arr[slab, 100])
 ax[1].set_xlabel("Im w ($s^{-1}$)")
 ax[1].legend()
+ax[1].set_xscale("log")
 fig.subplots_adjust(wspace=0.05)
 fig.savefig('Im_w_2D.pdf')
 
