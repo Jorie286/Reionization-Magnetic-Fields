@@ -55,7 +55,6 @@ ax.set_yscale("log")
 ax.set_xlabel("Distance (m)")
 ax.set_ylabel("Gani")
 ax.grid(True, linestyle="--") # add grid to make values easier to read
-ax.set_rasterization_zorder(0)
 ax.legend()
 fig.savefig("Gani_plt_1.pdf")
 
@@ -68,7 +67,7 @@ for k_index in k_slab_list_2:
 ax.set_yscale("log")
 ax.set_xlabel("Distance ($m$)")
 ax.set_ylabel("Giso/u ($s \\ m^{-1}$)")
-ax.set_rasterization_zorder(0)
+ax.grid(True, linestyle="--") # add grid to make values easier to read
 ax.legend()
 fig.savefig("Giso_plt_1.pdf")
 
