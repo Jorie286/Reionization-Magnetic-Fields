@@ -4,7 +4,6 @@ from matplotlib import cm
 import matplotlib.colors as colors
 from scipy.linalg import solve_banded
 import numpy as np
-import math
 import calc_params
 
 # Get the data from the reionization front model
@@ -90,7 +89,7 @@ def get_n_e(yH, yHe):
 
     Date of last revision: December 28, 2025
     """
-    n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*math.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
+    n_e = ((3*(1+calc_params.z)**3*calc_params.Omega_b*calc_params.H_o**2)/(8*np.pi*calc_params.G))*(calc_params.h*(1-yH)+calc_params.he*(1-yHe))
     return n_e
 
 # compute and plot the imaginary growth rate (Im w) throughout the model
@@ -220,14 +219,14 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
         ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
 
     for l in range (1, n):
-        ab[0,l] = math.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
+        ab[0,l] = np.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
 
     for l in range (2, n+1):
-        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
+        ab[2,l-2] = np.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
 
     # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
     b = np.zeros((n,), dtype=np.complex128)
-    b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
+    b[0] = (-2*np.sqrt(np.pi))/np.sqrt(6)
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
 
     if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
