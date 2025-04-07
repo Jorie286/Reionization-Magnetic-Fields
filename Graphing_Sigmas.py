@@ -1,14 +1,42 @@
-import numpy as np
-import math
+# Using the Giso_list generated in the Get_Giso_u.py file, we can graph Giso_u against several variables.
 import matplotlib.pyplot as plt
 from scipy.linalg import solve_banded
+import numpy as np
 import calc_params
 
-# Calculate the value of sigma.
+# get the sigma_11, sigma_21, and D_theta data
+d_theta = np.loadtxt(r'D_theta_vel.txt', dtype=np.complex128)
+sigmas_11 = np.loadtxt(r'sigmas_vel_11.txt', dtype=np.complex128)
+sigmas_21 = np.loadtxt(r'sigmas_vel_21.txt', dtype=np.complex128)
+
+# plot D_theta/kv against sigma_11 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\mathcal{i} \\ \\sigma_{1,1}$ calculated")
+ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{3\\pi^3}{8}}$")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{\\pi}{6}} \\frac{k v}{\\mathcal{i} \\ D_{\\theta}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ ($s^{-1}$)")
+ax.set_ylabel("$-\\mathcal{i} \\ \\sigma_{1,1}$ ($m s^{-1}$)")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_11_plt.pdf")
+
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_21_plt.pdf")
+
 def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l 
-    changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
     a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
 
     Important note: all physical constants are in units of MKS for easy conversions.
@@ -28,14 +56,14 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
         ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
 
     for l in range (1, n):
-        ab[0,l] = math.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
+        ab[0,l] = np.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
 
     for l in range (2, n+1):
-        ab[2,l-2] = math.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
+        ab[2,l-2] = np.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
 
     # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
     b = np.zeros((n,), dtype=np.complex128)
-    b[0] = (-2*math.sqrt(math.pi))/math.sqrt(6)
+    b[0] = (-2*np.sqrt(np.pi))/np.sqrt(6)
     x = solve_banded((1, 1), ab, b) # Solve for the x vector
 
     if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
@@ -43,50 +71,18 @@ def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_th
 
     return x
 
-get_sigmas(calc_params.n_sigmas, 1j)
-
-# Graph the values of sigma_{1,1} and sigma{2,1} in terms of various possible values for i D_theta / k v.
-# We only want to look at these two sigmas because these are the only two that affect G_iso and G_ani.
-
-# Create a list of 20 real numbers with steps of 0.1 for x. We cannot directly plot i D_theta / k v because Matlab will not plot imaginary numbers correctly. 
-count = np.arange(0, calc_params.n_sigmas, 0.1).tolist()
-
-#Create a list of i D_theta / k v that are imaginary and have the same constants as count. This is to be used in get_sigmas.
-g=[None]*len(count)
-for i in range (0, len(count)):
-    g[i] = count[i]*1j
-
-#Calculate the values of sigma_{l,m} and separate each into two lists for graphing and analysis.
-a = [None]*len(count)
-r = [None]*len(count)
-im = [None]*len(count)
-for i in range (0, len(count)):
-    a[i] = get_sigmas(calc_params.n_sigmas, g[i])
-    r[i] = a[i].real
-    im[i] = a[i].imag
-    
-#We can make an array that contains each r and im list for each value of count.
-real = np.empty((len(count), len(a[0])))
-imaginary = np.empty((len(count), len(a[0])))
-for i in range (0, len(count)):
-    real[i, :] = r[i]
-    imaginary[i, :] = im[i]
-
-# Graph the imaginary and real parts of the two sigmas sepearatly. 
-fig, ax = plt.subplots(figsize=(14, 10))
-#For this plot, we are only using the real part of sigma_{l,m}.
-ax.plot(count, real[:, 0], label="real sigma_{1,1}")
-ax.plot(count, real[:, 1], label="real sigma_{2,1}")
-ax.set_xlabel("i D_theta / kv")
-ax.set_ylabel("Value of sigma")
+d_theta_log = np.logspace(-10, 5, num=71)
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
+sigmas_test=[]
+for theta in d_theta_log:
+    sigmas_test.append(get_sigmas(calc_params.n_sigmas, 1j*theta)[1])
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(d_theta_log, -np.array(sigmas_test), label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(d_theta_log), max(d_theta_log), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
 ax.legend()
-fig.savefig("real_sigma.pdf")
-
-fig, ax = plt.subplots(figsize=(14, 10))
-#Here, we are only plotting the imaginary part of sigma_{l,m}.
-ax.plot(count, imaginary[:, 0], label="imaginary sigma_{1,1}")
-ax.plot(count, imaginary[:, 1], label="imaginary sigma_{2,1}")
-ax.set_xlabel("i D_theta / kv")
-ax.set_ylabel("Value of sigma")
-ax.legend()
-fig.savefig("imag_sigma.pdf")
+fig.savefig("sigma_21_test_plt.pdf")
