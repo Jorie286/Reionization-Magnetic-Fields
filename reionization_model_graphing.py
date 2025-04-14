@@ -15,10 +15,6 @@ imaginary = np.loadtxt(r'Giso_u.txt')
 S20 = np.loadtxt(r'S20.txt')
 # get the a_{2,0} data file from the output of Get_Gani
 a20 = np.loadtxt(r'a20.txt')
-# get the sigma_11, sigma_21, and D_theta data
-d_theta = np.loadtxt(r'D_theta_vel.txt', dtype=np.complex128)
-sigmas_11 = np.loadtxt(r'sigmas_vel_11.txt', dtype=np.complex128)
-sigmas_21 = np.loadtxt(r'sigmas_vel_21.txt', dtype=np.complex128)
 
 # get color maps for plotting
 magma = cm.get_cmap('magma').resampled(101)
@@ -62,7 +58,7 @@ k_slab_list_2=[0, 10, 20, 40, 60, 80, 90] # list of slabs to plot in Giso plot
 # Graph imaginary Giso.
 fig, ax = plt.subplots(figsize=(20,10))
 for k_index in k_slab_list_2:
-    ax.plot(data[:,0]*(calc_params.DNHI*calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
+    ax.plot(data[:,0]*(calc_params.DNHI/calc_params.n_H), imaginary[k_index::calc_params.num_k][:calc_params.NSLAB], linewidth = 4, label = "k = %2.1e $m^{-1}$" % calc_params.k[k_index], color=magma(k_index*calc_params.k_step))
 ax.set_yscale("log")
 ax.set_xlabel("Distance ($m$)")
 ax.set_ylabel("Giso/u ($s \\ m^{-1}$)")
@@ -110,12 +106,11 @@ fig, ax = plt.subplots(1, 2, width_ratios = np.array([3, 1]), figsize=(20,10), s
 # set the graphing tick labels so that they show the maximum and minimum values of the k and model distance
 left=data[0,0]*(calc_params.DNHI/calc_params.n_H)
 right=data[-1,0]*(calc_params.DNHI/calc_params.n_H)
-bottom=calc_params.k[0]
-top=calc_params.k[-1]
+top=np.log(calc_params.k[-1])
+bottom=np.log(calc_params.k[0])
 extent = [left, right, bottom, top]
-im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=extent)
+im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=extent, origin="lower")
 ax[0].set_xscale("linear")
-ax[0].set_yscale("linear")
 
 # pick out slabs that we want to plot individualy
 plot_list=[700, 1100, 1500, 1900] # list of slabs we want to plot in the Im w heatmap subplot
@@ -126,29 +121,40 @@ cbar.set_label("Im w ($s^{-1}$)", labelpad=-110, y=-0.1, rotation=0)
 # change the xticks to represent distance instead of slab number
 ax[0].set_xlabel("Distance ($m$)")
 ax[0].set_ylabel("Wavenumber ($m^{-1}$)")
-
+def format_function(value, tick_number):
+    return f'{np.exp(value):.0e}'
+plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(format_function))
+print(calc_params.k)
 # create a secondary axis that shows the fraction of free electrons in the system as the reionization front moves through
 x_e = [] # calculate the fraction of free electrons at each slab
 for slab in range(calc_params.NSLAB):
     x_e.append(((1-data[slab, 2])*(1-calc_params.f_He))+((1-data[slab,3])*(calc_params.f_He))) # round all the numbers to 1 decimal
-    # x_e = (1-y_Hi)*fH + (1 - y_Hei)fHe ???
+    # x_e = (1-y_Hi)*fH + (1 - y_Hei)fHe
 #print(x_e)
 # add labels for the fraction of ionized electrons
-ax[0].text(1.5e21, 0.72e-8, '$\\chi_{e}$=%1.1e' % x_e[700], fontsize=25, color='k', rotation=90)
-ax[0].text(2.5e21, 0.75e-8, '$\\chi_{e}$=%1.1e' % x_e[1100], fontsize=25, color='k', rotation=90)
-ax[0].text(3.5e21, 0.75e-8, '$\\chi_{e}$=%1.1e' % x_e[1500], fontsize=25, color='k', rotation=90)
-ax[0].text(4.5e21, 0.75e-8, '$\\chi_{e}$=%1.1e' % x_e[1900], fontsize=25, color='k', rotation=90)
+ax[0].text(1.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[700], fontsize=25, color='k', rotation=90)
+ax[0].text(2.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1100], fontsize=25, color='k', rotation=90)
+ax[0].text(3.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1500], fontsize=25, color='k', rotation=90)
+ax[0].text(4.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1900], fontsize=25, color='k', rotation=90)
 
 # plot Im w for the above chosen slabs
 for slab in plot_list:
-    ax[1].plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
+    ax[1].plot(Im_w_arr[slab, :].real, np.log(calc_params.k[::calc_params.k_step][:calc_params.num_k]), linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
 ax[1].set_xlabel("Im w ($s^{-1}$)")
 ax[1].legend()
-#ax[1].set_xlim(np.min(Im_w_arr)-1e-5, np.max(Im_w_arr)+1e-2)
 ax[1].set_xscale("log")
 fig.subplots_adjust(wspace=0.05)
 fig.savefig('Im_w_2D.pdf')
 
+fig,ax=plt.subplots(figsize=(20,10))
+for slab in plot_list:
+    ax.plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
+ax.set_xlabel("Im w ($s^{-1}$)")
+ax.set_ylabel("Wavenumber ($m^{-1}$)")
+ax.legend()
+ax.set_xscale("log")
+ax.set_yscale("log")
+fig.savefig("Im_w_test.pdf")
 
 
 # plot the source term over the slabs indicated in the Im w plot
