@@ -1,64 +1,88 @@
+# Using the Giso_list generated in the Get_Giso_u.py file, we can graph Giso_u against several variables.
+import matplotlib.pyplot as plt
+from scipy.linalg import solve_banded
 import numpy as np
-import scipy.constants as const
+import calc_params
 
-# define the maximum velocity and number of velocities that we want to use for the compuation
-vmax = 5.0e6
-Nv = 142
-# Create a distribution of velocities in linear space.
-velocity = np.linspace(vmax/Nv, vmax, Nv)
-delta_v = (vmax-(vmax/Nv))/Nv # get the change in v of each step in the velocity data
-# make a linear velocity distribution including "half-steps" for get_alm
-# Note: we need an extra half-step down and half step up
-velocity_half = np.linspace((vmax/Nv)-((vmax-(vmax/Nv))/(Nv*2)), vmax+((vmax-(vmax/Nv))/(Nv*2)), (Nv*2)+3)
+# get the sigma_11, sigma_21, and D_theta data
+d_theta = np.loadtxt(r'D_theta_vel.txt', dtype=np.complex128)
+sigmas_11 = np.loadtxt(r'sigmas_vel_11.txt', dtype=np.complex128)
+sigmas_21 = np.loadtxt(r'sigmas_vel_21.txt', dtype=np.complex128)
 
+# plot D_theta/kv against sigma_11 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]),-sigmas_11[1+1500*calc_params.num_k*calc_params.Nv*2:((1+2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\mathcal{i} \\ \\sigma_{1,1}$ calculated")
+ax.hlines(np.sqrt((3*(np.pi**3))/8), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{3\\pi^3}{8}}$")
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), np.sqrt(np.pi/6)/np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), ls = "--", c="r", label = "$-\\mathcal{i} \\ \\sigma_{1,1}=\\sqrt{\\frac{\\pi}{6}} \\frac{k v}{\\mathcal{i} \\ D_{\\theta}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$ ($s^{-1}$)")
+ax.set_ylabel("$-\\mathcal{i} \\ \\sigma_{1,1}$ ($m s^{-1}$)")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_11_plt.pdf")
 
-Nk = 101 # number of wavenumbers we want to have in the distribution
-num_k = 101 # number of k values we want to use in the calculation
-k_step = 1 # number of values we want to skip over in the distribution between each calculation
-kmin = -18 # minimum wavenumber
-kmax = -6 # maximum wavenumber
-# make a distribution of wavenumbers
-k = np.logspace(kmin, kmax, Nk)
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)]), -sigmas_21[1500*calc_params.num_k*calc_params.Nv*2:((2*1500*calc_params.num_k*calc_params.Nv)+(2*calc_params.Nv)):2], label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), max(np.imag(d_theta[1500*calc_params.num_k*calc_params.Nv:(1500*calc_params.num_k*calc_params.Nv+calc_params.Nv)])), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_21_plt.pdf")
 
+def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
+    """
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
+    a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
 
-# Define necessary constants for all computations
-k_B = const.k # Boltzmann constant
-R_y = const.Rydberg*const.h*const.c # Rydberg constant (unit of energy)
-a_o = 5.29177210903e-11 # Bohr radius
-m_e = const.m_e # mass of an electron
-m_b1 = const.m_p # mass of HII
-m_b2 = 2*const.m_p+2*const.m_n+const.m_e # mass of HeII (ionized once so it still has one electron)
-q_a = -const.eV # charge of an electron (also the charge of m_b3)
-q_b = const.eV # charge of HII and HeII
-epsilon_o = const.epsilon_0 # vacuum permittivity
-Omega_b = 0.046 # Fraction of the universe made of baryonic matter during reionization
-H_o = 2.2618e-18 # Hubble constant
-H_o_km_Mpc=H_o*(3.086e+19) # Hubble constant in km/s/Mpc
-G = const.G # gravitational constant
-z = 7 # redshift
-f_He = 0.079 # He abundance
-N_A = const.N_A # avogadro's number
-h = 0.76*1e3*N_A # number of electrons in 1 kg of hydrogen (same as number of protons)
-he = (0.24*1e3*N_A)/4 # number of outer-shell electrons in 1 kg of helium
-T = 5e4 # reionization front temperature (Kelvin)
+    Important note: all physical constants are in units of MKS for easy conversions.
 
-# Ionization energy of hydrogen and helium (in Joules)
-I_H = 13.59*const.eV
-I_He = 24.687*const.eV
+    Input arguments (2)
+        required    float or integer-like values
+                        n, the number of sigma_{l,m} parameters we want values for
+                        c = (i*D_theta)/(k*v), a constant for which a value can be defined
+    Returns
+        the values of the first n sigma_{n,1}
 
-DNHI = 2.5e20 # width of a grid cell within the reionization front model
-N_NU = 512 # number of frequency bins
-Timestep = 12000 # timestep from the inital simulation where we gathered the data
-NSLAB = 2000 # define the number of slabs we want to use in the calculaiton
-NHtot = 200 # total number of hydrogen atoms in the distribution
-n_sigmas = 40 # number of sigma terms we want to calculate
+    Date of last revision: February 19, 2025
+    """
+    # Create a zero matrix and fill it with the diagonal part of the tridiagonal matrix
+    ab = np.zeros((3,n), dtype = np.complex128)
+    for l in range (1, n+1):
+        ab[1,l-1] = -l*(l+1)*c # sigma_{l,m} coefficient
 
+    for l in range (1, n):
+        ab[0,l] = np.sqrt(((l+2)*l)/((2*l+3)*(2*l+1))) # sigma_{l+1,m} coefficient
 
-# make a list of energies that we are considering with the same length as the number of frequency bins
-E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
+    for l in range (2, n+1):
+        ab[2,l-2] = np.sqrt(((l+1)*(l-1))/((2*l-1)*(2*l+1))) # sigma_{l-1,m} coefficient
 
+    # Create a zero matrix for the b vector of ab*x=b and fill it with the coefficients of each Y_l,m from the RHS of our equation.
+    b = np.zeros((n,), dtype=np.complex128)
+    b[0] = (-2*np.sqrt(np.pi))/np.sqrt(6)
+    x = solve_banded((1, 1), ab, b) # Solve for the x vector
 
-Y_p_He = 4*f_He/(1+4*f_He) # primordial mass fraction of helium
-n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h # total number density of all hydrogen
-U = vmax # Is this correct? I believe we entered U=500000000 in the reionization front model but it was in cm/s?
-delta_t = DNHI/(n_H*U)
+    if abs(c) <= 1e-3: # compare the absolute value of (i*D_theta)/kv to our cut-off value to prevent unwanted behavior at low values of D_theta/kv
+        x[0]=-1j*np.sqrt((3*(np.pi**3))/8)
+
+    return x
+
+d_theta_log = np.logspace(-10, 5, num=71)
+# plot D_theta/kv against sigma_21 to see the relationship between the two parameters
+sigmas_test=[]
+for theta in d_theta_log:
+    sigmas_test.append(get_sigmas(calc_params.n_sigmas, 1j*theta)[1])
+fig, ax = plt.subplots(figsize=(20, 10))
+# plot slab 1500, wavenumber 50 across all velocities
+ax.plot(d_theta_log, -np.array(sigmas_test), label="$-\\sigma_{2,1}$ calculated")
+ax.hlines(np.sqrt((10*np.pi)/3), min(d_theta_log), max(d_theta_log), linestyles = "--", color="r", label="$-\\sigma_{2,1}=- \\sqrt{\\frac{10\\pi}{3}}$")
+ax.set_xlabel("$\\frac{\\mathcal{i} \\ D_{\\theta}}{kv}$")
+ax.set_ylabel("$-\\sigma_{2,1}$")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.legend()
+fig.savefig("sigma_21_test_plt.pdf")
