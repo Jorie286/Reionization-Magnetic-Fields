@@ -60,3 +60,5 @@ E_list = I_H* (4**np.linspace(0, 1-(1/N_NU), N_NU))
 
 Y_p_He = 4*f_He/(1+4*f_He) # primordial mass fraction of helium
 n_H = ((3*(1+z)**3*Omega_b*H_o**2)/(8*np.pi*G))*h # total number density of all hydrogen
+U = vmax # Is this correct? I believe we entered U=500000000 in the reionization front model but it was in cm/s?
+delta_t = DNHI/(n_H*U)
