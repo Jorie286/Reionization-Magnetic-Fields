@@ -16,7 +16,7 @@ Nk = 101 # number of wavenumbers we want to have in the distribution
 num_k = 101 # number of k values we want to use in the calculation
 k_step = 1 # number of values we want to skip over in the distribution between each calculation
 kmin = -18 # minimum wavenumber
-kmax = -8 # maximum wavenumber
+kmax = -6 # maximum wavenumber
 # make a distribution of wavenumbers
 k = np.logspace(kmin, kmax, Nk)
 
