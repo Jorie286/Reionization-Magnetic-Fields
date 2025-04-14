@@ -1,5 +1,6 @@
 # Using the Giso_list generated in the Get_Giso_u.py file, we can graph Giso_u against several variables.
 import matplotlib.pyplot as plt
+import matplotlib as mplt
 from matplotlib import cm
 import matplotlib.colors as colors
 from scipy.linalg import solve_banded
@@ -101,7 +102,7 @@ Im_w_arr = np.array(im_w_list).reshape((calc_params.NSLAB,calc_params.num_k)) # 
 np.savetxt('Im_w_arr.txt', Im_w_arr, delimiter=',') # save the array of Im_w results for future reference
 
 # make a 2D heatmap of Im w
-norm = colors.SymLogNorm(linthresh=1e-10, linscale=1.0, vmin=-np.min(Im_w_arr).real, vmax=np.min(Im_w_arr).real)
+norm = colors.SymLogNorm(linthresh=1e-10, linscale=1.0, vmin=np.min(Im_w_arr).real, vmax=-np.min(Im_w_arr).real)
 fig, ax = plt.subplots(1, 2, width_ratios = np.array([3, 1]), figsize=(20,10), sharey=True)
 # set the graphing tick labels so that they show the maximum and minimum values of the k and model distance
 left=data[0,0]*(calc_params.DNHI/calc_params.n_H)
@@ -117,6 +118,7 @@ plot_list=[700, 1100, 1500, 1900] # list of slabs we want to plot in the Im w he
 for slab in plot_list:
     ax[0].axvline(x=data[slab,0]*(calc_params.DNHI/calc_params.n_H), linewidth = 4, color = magma(slab/2000), linestyle="--")
 cbar = plt.colorbar(im, pad = 0.15, location = "left")
+cbar.set_ticks([10**2, 10**0, 10**-2, 10**-4, 10**-6, 10**-8, 10**-10, 0, -10**-10, -10**-8, -10**-6, -10**-4, -10**-2, -10**0, -10**2])
 cbar.set_label("Im w ($s^{-1}$)", labelpad=-110, y=-0.1, rotation=0)
 # change the xticks to represent distance instead of slab number
 ax[0].set_xlabel("Distance ($m$)")
@@ -124,7 +126,6 @@ ax[0].set_ylabel("Wavenumber ($m^{-1}$)")
 def format_function(value, tick_number):
     return f'{np.exp(value):.0e}'
 plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(format_function))
-print(calc_params.k)
 # create a secondary axis that shows the fraction of free electrons in the system as the reionization front moves through
 x_e = [] # calculate the fraction of free electrons at each slab
 for slab in range(calc_params.NSLAB):
@@ -145,16 +146,6 @@ ax[1].legend()
 ax[1].set_xscale("log")
 fig.subplots_adjust(wspace=0.05)
 fig.savefig('Im_w_2D.pdf')
-
-fig,ax=plt.subplots(figsize=(20,10))
-for slab in plot_list:
-    ax.plot(Im_w_arr[slab, :].real, calc_params.k[::calc_params.k_step][:calc_params.num_k], linewidth = 4, color = magma(slab/2000), label="Slab %5.0f" % slab)
-ax.set_xlabel("Im w ($s^{-1}$)")
-ax.set_ylabel("Wavenumber ($m^{-1}$)")
-ax.legend()
-ax.set_xscale("log")
-ax.set_yscale("log")
-fig.savefig("Im_w_test.pdf")
 
 
 # plot the source term over the slabs indicated in the Im w plot
