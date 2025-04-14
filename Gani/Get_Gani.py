@@ -1,3 +1,4 @@
+
 import math
 import time
 import numpy as np
@@ -37,7 +38,7 @@ def get_n_e(yH, yHe):
 
 def get_sigmas(n, c): # m=1, n=number sigma parameters to be solved for, c=iD_theta/kv
     """
-    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l 
+    Funtion to find the value of sigma_{l,m} for a certian number of sigmas. For this function, it is assumed that m=1 for all sigmas, only the value of l
     changes. The input for n must be a positive whole number for the function to work correctly, please note that it does not check for good input. We add
     a check within the function to prevent it from using D_theta/kv values that will cause unrealistic values of sigmas.
 
@@ -211,7 +212,7 @@ def get_D_a(Te, THII, THeII, yH, yHe, velocity):
     return Da_final
 
 # Source term
-def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
+def get_Slm(yH, tauHdat, tauHedat, fracflux, i, velocity):
     """
     Function to get the value for the source term, S_{2,0}. This is the only nonzero term in the source equation. This function can be used to iterate over a
     series of slabs in a distribution for which we know the velocity in that specific slab, i is used to indicate the slab number being considered. The inputs should
@@ -219,19 +220,18 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
 
     Important note: all physical constants are in units of MKS for easy conversions.
 
-    Input argument (7)
+    Input argument (6)
         required    float or integer-like values
                         yH, neutral fraction of hydrogen
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k, distribution of wave numbers
                         i, the bin number (time step)
                         velocity, given speed of electrons from linearly distributed list
     Returns
         the value of the source term for the specific conditions entered into the function
 
-    Date of last revision: January 11, 2025
+    Date of last revision: April 14, 2025
     """
     E_lambda_H = calc_params.I_H + (1/2)*calc_params.m_e*velocity**2 # Energy of H for a photon energy bin, lambda
     E_lambda_He = calc_params.I_He + (1/2)*calc_params.m_e*velocity**2 # Energy of He for a photon energy bin, lambda
@@ -276,7 +276,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, k, i, velocity):
     f_S.close()
     return Slm_tot
 
-def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
+def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev=0, i):
     """
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0,
     this is the only one that is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function
@@ -294,12 +294,12 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k, distribution of wave numbers
+                        a20_prev, the solution to the multipole moments in the previous slab
                         i, the bin number (time step)
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: January 4, 2025
+    Date of last revision: April 14, 2025
     """
     # define all the variables for calculating the matricies
     D_theta_vals=np.array([])
@@ -319,7 +319,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
     for j in range(len(calc_params.velocity)):
         D_theta_vals = np.append(D_theta_vals, (6*calc_params.velocity[j]**2*get_D_theta(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity, j)))
         # make the vector for the source terms
-        Slm_vals = np.append(Slm_vals, (calc_params.velocity[j]**2*get_Slm(data[i,2], tauHdat, tauHedat, fracflux, calc_params.k[::calc_params.k_step], i, calc_params.velocity[j])))
+        Slm_vals = np.append(Slm_vals, (calc_params.velocity[j]**2*get_Slm(data[i,2], tauHdat, tauHedat, fracflux, i, calc_params.velocity[j])))
 
         # create indeicies to check if (j*2)+/-1 will be out of range for velocity[j]
         # since we are using velocity_half which runs a half step above or below velocity, we need to change the indexing of these values to account for it.
@@ -342,7 +342,12 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
             D_para_vals_2 = np.append(D_para_vals_2, ((get_D_a(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], calc_params.velocity_half[minus_1])*(calc_params.velocity_half[minus_1]**2))/((calc_params.velocity[j+1]-calc_params.velocity[j])**2)))
         plus_1 = 0
         minus_1 = 0
+
+    # make the vector for the added term to make a20 time depended
+    v_diag = (calc_params.velocity**2)/calc_params.delta_t
+
     # diagonalize the matricies to make a tri-diagonal matrix
+    v_diag_matrix = np.diag(v_diag)
     D_theta_matrix = np.diag(D_theta_vals)
     A_v_matrix = np.diag(A_v_vals)
     D_para_matrix_1 = np.diag(D_para_vals_1)
@@ -352,13 +357,13 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
     D_para_matrix_plus = np.diag(D_para_vals_plus, k=1)
 
     # add the matricies together to get the complete matrix
-    matrix = D_theta_matrix - A_v_matrix + D_para_matrix_1 + D_para_matrix_2 - D_para_matrix_minus + A_v_matrix_plus - D_para_matrix_plus
+    matrix = v_diag_matrix + D_theta_matrix - A_v_matrix + D_para_matrix_1 + D_para_matrix_2 - D_para_matrix_minus + A_v_matrix_plus - D_para_matrix_plus
     #np.savetxt("matrix_test.csv", matrix, delimiter=",")
     # now that we know what the matrix is and what the vector Slm is, we can solve the equation Slm = matrix*a20
-    a20 = np.linalg.solve(matrix, Slm_vals)
+    a20 = np.linalg.solve(matrix, Slm_vals+(a20_prev/calc_params.delta_t))
     return a20
 
-def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i):
+def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev, i):
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
@@ -374,15 +379,15 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        k, distribution of wave numbers
+                        a20_prev, the solution to the multipole moments in the previous slab
                         i, the bin number (time step)
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
-    Date of last revision: January 4, 2025
+    Date of last revision: April 14, 2025
     """
     start_time=time.time() # get the time the function started computing
-    alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, k, i)
+    alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev, i)
     # write a_{2,0} data to a file
     f = open("a20.txt", "a")
     for a in alm:
@@ -428,17 +433,20 @@ def get_Gani(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, alm, i, k, j
 
 # Computes Gani as a sum over the velocities for a row in output.txt
 Gani_final = 0
+a20_prev = 0
 Gani_data = []
-for i in range(0, calc_params.NSLAB): # Iterate through all the rows of data and compute Gani_final (sum over velocities) for each.
+for i in reversed(range(0, calc_params.NSLAB)): # Iterate through all the rows of data starting at the end and compute Gani_final (sum over velocities) for each.
+    if i>3:
+        break
     slab_start_time= time.time()
-    for k_index in range(0, calc_params.num_k):
-        alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, calc_params.k[k_index*calc_params.k_step], i)
-        # write a20 results to a test file instead of printing them out
+    alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, a20_prev = a20_prev, i)
+    a20_prev=np.copy(alm)
+    for k_index in reversed(range(0, calc_params.num_k)): # Iterate through all of the wavenumbers, starting at the end, to match the reionization front bin iterations.
         for j in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
             Gani_compute = get_Gani(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, alm[j], i, calc_params.k[k_index*calc_params.k_step], j)
             Gani_final = Gani_final + Gani_compute # Compute the Reimann sum in place of the integral.f
             Gani_compute = 0 # Reset Gani_compute so it does not interfere with the following iteration
-        Gani_data.append(Gani_final*calc_params.delta_v) #Add the computed value of Gani to the list of all Gani computed for each row of data.
+        Gani_data.insert(0, Gani_final*calc_params.delta_v) #Add the computed value of Gani to the beginning list of all Gani computed for each row of data.
         Gani_final = 0 # Clear Gani_final so it does not interfere with the next iteration.
     slab_time = time.time()
     print("Time for slab", i, "to finish was", slab_time-slab_start_time, "seconds.")
