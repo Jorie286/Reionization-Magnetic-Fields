@@ -276,7 +276,7 @@ def get_Slm(yH, tauHdat, tauHedat, fracflux, i, velocity):
     f_S.close()
     return Slm_tot
 
-def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev=0, i):
+def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, i, a20_prev=0):
     """
     Function to get the value of a_{l,m} for values of (l, m). Uses matrix algebra to solve. However, since the only nonzero value of a_{l,m} is for l=2, m=0,
     this is the only one that is computed. The inputs should be postive otherwise the ouptut will not make sense, please note that the function
@@ -294,8 +294,8 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev=0, i
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        a20_prev, the solution to the multipole moments in the previous slab
                         i, the bin number (time step)
+                        a20_prev, the solution to the multipole moments in the previous slab
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
@@ -363,7 +363,7 @@ def get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev=0, i
     a20 = np.linalg.solve(matrix, Slm_vals+(a20_prev/calc_params.delta_t))
     return a20
 
-def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev, i):
+def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, i, a20_prev=0):
     """
     Calls function to get the values of a_{l,m} for each velocity bin.
 
@@ -379,15 +379,15 @@ def compute_for_slab_timestep(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracf
                         tauHdat, hydrogen optical depths
                         tauHedat, helium optical depths
                         fracflux, flux fraction in a photon bin
-                        a20_prev, the solution to the multipole moments in the previous slab
                         i, the bin number (time step)
+                        a20_prev, the solution to the multipole moments in the previous slab
     Returns
         the value of a_{l,m} (the multipole moment) for the given l and m
 
     Date of last revision: April 14, 2025
     """
     start_time=time.time() # get the time the function started computing
-    alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, a20_prev, i)
+    alm = get_alm(Te, THII, THeII, yH, yHe, tauHdat, tauHedat, fracflux, i, a20_prev)
     # write a_{2,0} data to a file
     f = open("a20.txt", "a")
     for a in alm:
@@ -436,10 +436,8 @@ Gani_final = 0
 a20_prev = 0
 Gani_data = []
 for i in reversed(range(0, calc_params.NSLAB)): # Iterate through all the rows of data starting at the end and compute Gani_final (sum over velocities) for each.
-    if i>3:
-        break
     slab_start_time= time.time()
-    alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, a20_prev = a20_prev, i)
+    alm = compute_for_slab_timestep(data[i,5], data[i,7], data[i,13], data[i,2], data[i,3], tauHdat, tauHedat, fracflux, i, a20_prev)
     a20_prev=np.copy(alm)
     for k_index in reversed(range(0, calc_params.num_k)): # Iterate through all of the wavenumbers, starting at the end, to match the reionization front bin iterations.
         for j in range(0, calc_params.Nv): # Compute the Reimann sum of velocities for a row of data.
