@@ -152,7 +152,7 @@ fig.savefig('Im_w_2D.pdf')
 k_slabs=[1, 50, 100]
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
+    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*(slab-1)):(calc_params.Nv*slab)]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
 ax.set_xlabel("Velocity ($m s^{-1}$)")
 ax.set_ylabel("Source Term Value ($m^{-3} s^{-1}$)")
@@ -163,7 +163,7 @@ fig.savefig('S20_plt.pdf')
 # plot the multipole moment over the slabs indicated in the Im w plot
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*calc_params.num_k*(slab-1)):(calc_params.Nv*calc_params.num_k*slab)][calc_params.Nv*(calc_params.num_k-1):calc_params.Nv*calc_params.num_k]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
+    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*(slab-1)):(calc_params.Nv*slab)]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
 ax.set_xlabel("Velocity ($m s^{-1}$)")
 ax.set_ylabel("Multipole Moment ($m^{-3}$)")
