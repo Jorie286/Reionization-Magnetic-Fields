@@ -13,9 +13,9 @@ data = np.loadtxt(r'output.txt')
 Gani = np.loadtxt(r'Gani.txt', dtype=np.complex128)
 imaginary = np.loadtxt(r'Giso_u.txt')
 # get the S_{2,0} data from the file created by Get_Gani
-S20 = np.loadtxt(r'S20.txt')
+S20 = np.loadtxt(r'S20.txt').reshape((calc_params.NSLAB, calc_params.Nv))[::-1,:].T
 # get the a_{2,0} data file from the output of Get_Gani
-a20 = np.loadtxt(r'a20.txt')
+a20 = np.loadtxt(r'a20.txt').reshape((calc_params.NSLAB, calc_params.Nv))[::-1,:].T
 
 # get color maps for plotting
 magma = cm.get_cmap('magma').resampled(101)
@@ -114,7 +114,7 @@ im = ax[0].imshow(Im_w_arr.real.T, aspect='auto', cmap="bwr", norm=norm, extent=
 ax[0].set_xscale("linear")
 
 # pick out slabs that we want to plot individualy
-plot_list=[700, 1100, 1500, 1900] # list of slabs we want to plot in the Im w heatmap subplot
+plot_list=[900, 1100, 1500, 1900] # list of slabs we want to plot in the Im w heatmap subplot
 for slab in plot_list:
     ax[0].axvline(x=data[slab,0]*(calc_params.DNHI/calc_params.n_H), linewidth = 4, color = magma(slab/2000), linestyle="--")
 cbar = plt.colorbar(im, pad = 0.15, location = "left")
@@ -133,7 +133,7 @@ for slab in range(calc_params.NSLAB):
     # x_e = (1-y_Hi)*fH + (1 - y_Hei)fHe
 #print(x_e)
 # add labels for the fraction of ionized electrons
-ax[0].text(1.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[700], fontsize=25, color='k', rotation=90)
+ax[0].text(1.9e21, -40, '$\\chi_{e}$=%1.1e' % x_e[900], fontsize=25, color='k', rotation=90)
 ax[0].text(2.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1100], fontsize=25, color='k', rotation=90)
 ax[0].text(3.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1500], fontsize=25, color='k', rotation=90)
 ax[0].text(4.5e21, -40, '$\\chi_{e}$=%1.1e' % x_e[1900], fontsize=25, color='k', rotation=90)
@@ -149,13 +149,16 @@ fig.savefig('Im_w_2D.pdf')
 
 
 # plot the source term over the slabs indicated in the Im w plot
-k_slabs=[1, 50, 100]
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*S20[(calc_params.Nv*(slab-1)):(calc_params.Nv*slab)]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
-ax.legend()
+    ax.plot(calc_params.velocity, -(4*np.pi*calc_params.velocity**3*S20[:,slab]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
+ax.vlines(1.97e6, 1e-9, 1e-21, linestyles = "--", linewidth=4, color="b", label="H shielding") # H shielding
+ax.vlines(3.24e6, 1e-9, 1e-21, linestyles = "--", linewidth=4, color="k", label="He+ ionization") # He + ionization
+ax.set_ylim(1e-20, 1e-9) # scale the plot to emphasize some of the features.
+ax.set_yscale("log")
 ax.set_xlabel("Velocity ($m s^{-1}$)")
 ax.set_ylabel("Source Term Value ($m^{-3} s^{-1}$)")
+ax.legend()
 fig.savefig('S20_plt.pdf')
 
 
@@ -163,8 +166,10 @@ fig.savefig('S20_plt.pdf')
 # plot the multipole moment over the slabs indicated in the Im w plot
 fig, ax = plt.subplots(figsize=(20,10))
 for slab in plot_list:
-    ax.plot(calc_params.velocity, (4*np.pi*calc_params.velocity**3*a20[(calc_params.Nv*(slab-1)):(calc_params.Nv*slab)]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
+    ax.plot(calc_params.velocity, -(4*np.pi*calc_params.velocity**3*a20[:,slab]), color = magma(slab/2000), linewidth = 4, label = "Slab %5.0f" % slab)
 ax.legend()
+ax.set_ylim(1e-11, 1)
+ax.set_yscale("log")
 ax.set_xlabel("Velocity ($m s^{-1}$)")
 ax.set_ylabel("Multipole Moment ($m^{-3}$)")
 fig.savefig('a20_plt.pdf')
