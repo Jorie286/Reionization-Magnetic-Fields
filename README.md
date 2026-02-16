@@ -19,7 +19,9 @@ The Get_Gani Python code uses the data from the output.txt file to solve for $G^
 
 __Plotting Routines:__
 
-The get_sigmas.py script calculates the values of $\frac{D_{theta}}{kv}$ and $\sigma_{l,m}$ for all wavenumber slabs and slabs of the reionization front model. These are stored in a text file for use in the reionization_model_graphing.py file.
+The get_sigmas.py script calculates the values of $\frac{D_{theta}}{kv}$ and $\sigma_{l,m}$ for all wavenumber slabs and slabs of the reionization front model. These are stored in a text file for use in the reionization_model_graphing.py file and Graphing_Sigmas.py file.
+
+The Graphing_Sigmas.py file uses the output from get_sigmas.py to plot and examine the evolution of each of the sigma values which contribute to the calulations for $G^{ani}$ and $\frac{G^{iso}}{u}$. The limiting cases for our calulations are marked to illustrate how the behavior of each of the sigmas affect the values of $G^{ani}$ and $\frac{G^{iso}}{u}$.
 
 The reionization_model_graphing.py file uses the outputs from Get_Giso_u.py, Get_Gani.py, get_sigmas.py, and Reionization-Temp-Modified.c to create plots illustrating relationships between various parameters. These include imaginary growth rate against wavenumber, value of $G^{iso}_u$ and $G^{ani}$ against the reionization front model slabs, and the value of the source term and multipole moment against the reionization front model slabs.
 
