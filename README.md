@@ -28,8 +28,8 @@ The Graphing_Gani code uses the data from Get_Gani to graph the $G^{ani}$ data a
 
 # __To reproduce the magnetic field calculation:__
 
-- Use the Reionization-Temp-Modified.c file to create an output file with the reionization front parameters. An example of the model output is given in the repository for our version of the Reionization-Temp-Modified.c file. We use source temperature of $5 \times 10^4$ K and an ionization speed of $5 \times 10^8$ cm/s.
+1. Use the Reionization-Temp-Modified.c file to create an output file with the reionization front parameters. An example of the model output is given in the repository for our version of the Reionization-Temp-Modified.c file. We use source temperature of $5 \times 10^4$ K and an ionization speed of $5 \times 10^8$ cm/s.
 
-- With the reionization output and calc_params.py files in the same directory, run the Get_Gani.py and Get_Giso_u.py files. They will output the $G^{ani}$ and $\frac{G^{iso}}{u}$ data as text files.
+2. With the reionization output and calc_params.py files in the same directory, run the Get_Gani.py and Get_Giso_u.py files. They will output the $G^{ani}$ and $\frac{G^{iso}}{u}$ data as text files.
 
-- The ouptut files from the reionization front model and calculations for $G^{ani}$ and $\frac{G^{iso}}{u}$ can be used in the plotting routines to create plots which illustrate the evolution of the reionization front and growth of the instability.
+3. The ouptut files from the reionization front model and calculations for $G^{ani}$ and $\frac{G^{iso}}{u}$ can be used in the plotting routines to create plots which illustrate the evolution of the reionization front and growth of the instability.
