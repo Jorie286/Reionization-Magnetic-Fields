@@ -90,8 +90,8 @@ def get_D_theta(Te, THII, THeII, yH, yHe, velocity, j):
                         THeII, temperature of ionized helium in the reionization front
                         yH, neutral fraction of hydrogen
                         yHe, neutral fraction of helium
-			velocity, given speed of electrons from linearly distributed list
-			j, the slab number of the iteration over velocities
+                        velocity, given speed of electrons from linearly distributed list
+                        j, the slab number of the iteration over velocities
     Returns
         the value of D_theta for the specific conditions entered into the function
 
